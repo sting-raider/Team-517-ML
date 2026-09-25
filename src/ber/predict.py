@@ -98,6 +98,8 @@ def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,quer
               'blocker_fingerprint':blocker_fingerprint(),
               'retrieval_index_fingerprint':retrieval_index_fingerprint,
               'feature_code_sha256':source_file_sha256(batch_features),
+              'shortlist_code_sha256':source_file_sha256(shortlist_rows),
+              'prediction_code_sha256':source_file_sha256(score_batch),
               'partition_index':partition_index,'partition_count':partition_count}
     manifest=out/'run.json'
     if manifest.exists() and json.loads(manifest.read_text())!=identity:
