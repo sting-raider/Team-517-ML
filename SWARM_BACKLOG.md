@@ -1,5 +1,10 @@
 # SWARM_BACKLOG.md — initial high-value queue
 
+Coordinator integration INT001 (integration/submission-v2): matched-cap160 training on
+the original fit anchors plus fit-fold anchors at hash positions 50,001:200,000;
+inventory-frequency/rank features; paired baseline comparison; Modal L4 training.
+Public submission v1 scored 0.898. No research branch is a promoted model by itself.
+
 This is a seed queue, not a sacred roadmap. Agents should create more atomic tasks as evidence appears. Claim before working.
 
 Priority legend:
