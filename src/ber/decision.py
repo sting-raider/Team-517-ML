@@ -63,7 +63,13 @@ def expected_f05_prefix_utilities(
         1.25 * T / (k + 0.25 * (T + F)).
 
     Prefix and suffix Poisson-binomial distributions make the expectation exact under
-    independent Bernoulli candidate labels. Empty-set utility is exactly P(|truth|=0).
+    independent Bernoulli candidate labels. For a fixed prediction size, replacing a
+    selected lower-probability item with an unselected higher-probability item can only
+    increase expected utility: the F0.5 denominator depends on total truth cardinality,
+    so the two one-positive swap states share the same denominator and their expected
+    difference is proportional to p_high - p_low. Therefore searching probability
+    prefixes covers the exact optimum under these assumptions. Empty-set utility is
+    exactly P(|truth|=0).
 
     The complete-truth assumption matters: positives missing from retrieval are not
     represented by these probabilities and therefore are not included in this
