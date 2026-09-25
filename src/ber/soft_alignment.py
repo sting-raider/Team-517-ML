@@ -36,17 +36,39 @@ def address_soft_alignment_features(
     if not left_tokens or not right_tokens:
         return [0.0] * len(ADDRESS_SOFT_ALIGNMENT_FEATURE_NAMES)
 
+    # Exact pairs always outrank fuzzy pairs, so consume them first. Besides
+    # making that precedence explicit, this removes common shared tokens from
+    # the O(left * right) fuzzy cross-product.
+    right_exact = {}
+    for j, token in enumerate(right_tokens):
+        right_exact.setdefault(token, []).append(j)
+    right_offsets = {token: 0 for token in right_exact}
+    used_left = set()
+    used_right = set()
+    matches = []
+    for i, token in enumerate(left_tokens):
+        positions = right_exact.get(token)
+        offset = right_offsets.get(token, 0)
+        if positions is None or offset >= len(positions):
+            continue
+        j = positions[offset]
+        right_offsets[token] = offset + 1
+        used_left.add(i)
+        used_right.add(j)
+        matches.append(1.0)
+
     pairs = []
     for i, left_token in enumerate(left_tokens):
+        if i in used_left:
+            continue
         for j, right_token in enumerate(right_tokens):
+            if j in used_right:
+                continue
             score = _token_similarity(left_token, right_token)
             if score >= min_similarity:
                 pairs.append((-score, i, j))
     pairs.sort()
 
-    used_left = set()
-    used_right = set()
-    matches = []
     for negative_score, i, j in pairs:
         if i in used_left or j in used_right:
             continue
