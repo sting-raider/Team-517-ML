@@ -1,0 +1,38 @@
+{
+  "experiment": "X002",
+  "scope": {"train_source1_rows": 2206821, "test_source1_rows": 1732544, "sampling": "none"},
+  "normalization": {
+    "unicode_view": "lowercase + Unicode letters/numbers only; collapse separators",
+    "folded_view": "NFD accent/combining-mark removal then same normalization",
+    "production_parity": "France changed rates exactly reproduce X007 aggregate rates; DuckDB strip_accents unavailable in this runtime"
+  },
+  "groups": {
+    "train/US/name": {"rows":1323633,"changed_rate":0.0,"distinct_key_loss_from_folding":0,"unicode_collision_row_rate":0.3581241930353807,"folded_collision_row_rate":0.3581241930353807,"collision_row_rate_inflation_pp":0.0},
+    "train/US/address": {"rows":1323633,"changed_rate":0.0,"distinct_key_loss_from_folding":0,"unicode_collision_row_rate":0.05624746436512235,"folded_collision_row_rate":0.05624746436512235,"collision_row_rate_inflation_pp":0.0},
+    "train/India/name": {"rows":883188,"changed_rate":0.0,"distinct_key_loss_from_folding":0,"unicode_collision_row_rate":0.44397795259899364,"folded_collision_row_rate":0.44397795259899364,"collision_row_rate_inflation_pp":0.0},
+    "train/India/address": {"rows":883188,"changed_rate":0.0006272730154848118,"distinct_key_loss_from_folding":0,"unicode_collision_row_rate":0.04835776754213146,"folded_collision_row_rate":0.04835776754213146,"collision_row_rate_inflation_pp":0.0},
+    "test/US/name": {"rows":663106,"changed_rate":0.0,"distinct_key_loss_from_folding":0,"unicode_collision_row_rate":0.2912550934541386,"folded_collision_row_rate":0.2912550934541386,"collision_row_rate_inflation_pp":0.0},
+    "test/US/address": {"rows":663106,"changed_rate":0.0,"distinct_key_loss_from_folding":0,"unicode_collision_row_rate":0.04039776445998076,"folded_collision_row_rate":0.04039776445998076,"collision_row_rate_inflation_pp":0.0},
+    "test/India/name": {"rows":809986,"changed_rate":0.0,"distinct_key_loss_from_folding":0,"unicode_collision_row_rate":0.43756064919640586,"folded_collision_row_rate":0.43756064919640586,"collision_row_rate_inflation_pp":0.0},
+    "test/India/address": {"rows":809986,"changed_rate":0.00057408399651352,"distinct_key_loss_from_folding":0,"unicode_collision_row_rate":0.04727489117095851,"folded_collision_row_rate":0.04727489117095851,"collision_row_rate_inflation_pp":0.0},
+    "test/France/name": {
+      "rows":259452,"changed":40788,"changed_rate":0.15720826973775495,
+      "distinct_unicode_keys":192936,"distinct_folded_keys":192254,"distinct_key_loss_from_folding":682,
+      "unicode_collision_row_rate":0.3409339685182616,"folded_collision_row_rate":0.34405978755222544,"collision_row_rate_inflation_pp":0.31258190339638614,
+      "accent_split_folded_keys":678,"accent_split_rows":3678,"accent_split_row_rate":0.014176032560936127,
+      "newly_colliding_unique_unicode_rows":811,"newly_colliding_unique_unicode_row_rate":0.003125819033963893,
+      "additional_colliding_pairs_due_to_folding":7080,"max_unicode_variants_per_folded_key":3,
+      "fanout_row_weighted":{"unicode":{"p50":1,"p90":11,"p99":71,"p99.9":157},"folded":{"p50":1,"p90":11,"p99":71,"p99.9":157}}
+    },
+    "test/France/address": {
+      "rows":259452,"changed":72209,"changed_rate":0.27831352234710083,
+      "distinct_unicode_keys":241408,"distinct_folded_keys":240815,"distinct_key_loss_from_folding":593,
+      "unicode_collision_row_rate":0.10687526016372971,"folded_collision_row_rate":0.11105715122643109,"collision_row_rate_inflation_pp":0.4181891062701379,
+      "accent_split_folded_keys":593,"accent_split_rows":1380,"accent_split_row_rate":0.005318902918458906,
+      "newly_colliding_unique_unicode_rows":1085,"newly_colliding_unique_unicode_row_rate":0.004181891062701386,
+      "additional_colliding_pairs_due_to_folding":798,"max_unicode_variants_per_folded_key":2,
+      "fanout_row_weighted":{"unicode":{"p50":1,"p90":2,"p99":9,"p99.9":86},"folded":{"p50":1,"p90":2,"p99":9,"p99.9":86}}
+    }
+  },
+  "runtime": {"normalization_seconds_measured_chunks":122.83,"group_scan_seconds":15.54,"external_sort_seconds":"not separately instrumented"}
+}
