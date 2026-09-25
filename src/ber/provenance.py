@@ -127,9 +127,16 @@ def relation_fingerprint(connection, table: str, columns: Iterable[str]) -> dict
         not _IDENTIFIER.fullmatch(column) for column in columns
     ):
         raise ValueError("Unsafe or empty relation fingerprint identifier")
-    quoted = ",".join(f'"{column}"' for column in columns)
+    expressions = ["rowid" if column == "rowid" else f'"{column}"' for column in columns]
+    args = ",".join(expressions)
     row = connection.execute(
         f'SELECT count(*)::UBIGINT, '
-        f'coalesce(bit_xor(hash({quoted})), 0::UBIGINT)::UBIGINT FROM "{table}"'
+        f'coalesce(bit_xor(hash({args})), 0::UBIGINT)::UBIGINT, '
+        f'coalesce(sum(hash({args})), 0::HUGEINT)::HUGEINT FROM "{table}"'
     ).fetchone()
-    return {"rows": int(row[0]), "hash_xor": int(row[1]), "columns": columns}
+    return {
+        "rows": int(row[0]),
+        "hash_xor": int(row[1]),
+        "hash_sum": int(row[2]),
+        "columns": columns,
+    }
