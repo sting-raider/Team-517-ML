@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+D011	#25	D	ChatGPT	agent/d/D011-source1-singleton-prior	905904e3bf6de6d6cf77b2216da0e7b501a007e2	Source1-only observables predict true singleton status	full train_source1+truth; 30k hash-ordered dev intended; confirmation offset guarded	not measured	not measured	NA	Drive files accessible; local compute unavailable and CI runner not allocated	NA	BLOCKED	reports/swarm/D011-source1-singleton-prior.md
