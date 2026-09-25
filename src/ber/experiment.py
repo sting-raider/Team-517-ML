@@ -124,7 +124,7 @@ def run(db,out,reports,refresh=False,transfer=False,provenance=False):
         model.save_model(str(out/f'{name}.cbm'))
         np.save(out/f'{name}_probabilities.npy',prob)
         run={'threshold':threshold,'trees':model.tree_count_,'calibration_curve':curve,'holdout':{},
-             'feature_importance':dict(sorted(zip(FEATURE_NAMES,map(float,model.feature_importances_)),key=lambda kv:-kv[1]))}
+             'feature_importance':dict(sorted(zip(feature_names,map(float,model.feature_importances_)),key=lambda kv:-kv[1]))}
         for evaluation_country in [None]+countries:
             indices=[i for i,m in enumerate(meta) if m['fold']=='holdout' and (evaluation_country is None or m['country']==evaluation_country)]
             truth,pred,cand=mappings(meta,groups,target,prob,indices,threshold)
