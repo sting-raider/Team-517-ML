@@ -4,11 +4,11 @@ An executable business entity resolution baseline for the supplied name/address 
 The official target is **macro F0.5 per source-one entity**, including singletons.
 This is an initial measured baseline, not a claim about leaderboard position.
 
-**Current priority:** submit the completed first full test file and use feedback
-to refine the model and candidate budget. See [MODAL.md](MODAL.md) and
-`PROJECT_DECISIONS.md`.
-The earlier local export was stopped at the user's request; its partial shards
-are not a complete submission.
+**Submission 1 scored 0.898 on the public leaderboard.** The coordinator's
+second-submission integration uses a larger cap-160 training pool and 53 features.
+See [the integration decision](reports/COORDINATOR_PLAN.md),
+[measured results](reports/RESULTS.md), and [Modal commands](MODAL.md).
+Research branches are prototypes and evidence; they are not all production changes.
 
 ## Local setup
 

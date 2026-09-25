@@ -59,6 +59,7 @@ def confirm_model(depth:int):
     from catboost import CatBoostClassifier
     from ber.v2 import load_parts,score_slices
     from ber.features import FEATURE_NAMES
+    from ber.predict import sha256
     x,y,g,t,meta=load_parts(RUN_ROOT/'confirmation',1)
     folder=RUN_ROOT/f'depth{depth}'
     config=json.loads((folder/'model_config.json').read_text())
@@ -68,6 +69,7 @@ def confirm_model(depth:int):
     bp=old.predict_proba(x[:,:len(FEATURE_NAMES)],thread_count=8)[:,1]
     result={'protocol':'5000 anchors at hash positions 40001:45000, excluded from INT002 fitting and selection; other swarm S1 audits inspected full training labels',
         'depth':depth,'config':config,
+        'model_sha256':sha256(folder/'mixed.cbm'),
         'baseline':score_slices(meta,g,t,bp,'confirmation',.5750000000000002),
         'new':score_slices(meta,g,t,p,'confirmation',config['threshold'])}
     from ber.experiment import mappings

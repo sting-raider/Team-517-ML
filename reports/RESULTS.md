@@ -1,3 +1,12 @@
+# Current result — September 26, 2026
+
+**Submission 2 selected:** INT002 depth10 CatBoost, 53 features, cap160,
+threshold0.65. Matched 5,000-anchor confirmation macro F0.5 is **0.940478**,
+versus **0.927580** for the uploaded-v1 model on identical anchors.
+India0.913639; US0.958045; singleton FPR5.818%. Full export is underway.
+See [submission-2 evidence](SUBMISSION_2.md) and int002_depth10_confirmation.json.
+Submission1 has public score0.898. No public/private score is known for submission2.
+
 # Measured entity resolution results — 25 September 2026
 
 **Historical cap-640 selection (not the uploaded first file):** 640 raw blocking candidates per anchor, 47 numerical
