@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+R001	3	R	ChatGPT/Pod R	agent/r/R001-missed-positive-taxonomy	5d1f6a47b13617f092a928134dfcb9f6e39bbe94	Taxonomize cap-640 missed positives	4389 calibration anchors (intended)	pair_recall=0.9458627913; oracle=0.9811781092	NA	NA	Drive S2/S3 exceed 256MiB connector limit	NA	BLOCKED	reports/swarm/R001-missed-positive-taxonomy.md
