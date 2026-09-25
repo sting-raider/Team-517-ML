@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+I008	#28	I	ChatGPT	agent/i/I008-error-set-diff	dd09c48dabdb755d17b0c9b4ab0af01549d14487	Paired anchor-level diffs expose concentrated gains and invalid universe mismatches	synthetic fixtures + static source audit	n/a	n/a	n/a	strict paired-universe/slice diagnostics	not executed (runtime ClientError)	FOLLOW-UP	reports/swarm/I008-error-set-diff.md
