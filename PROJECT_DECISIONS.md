@@ -19,3 +19,8 @@
   to the user-authorized `sting-raider/Team-517-ML` repository.
 - Preserve a separate confirmation sample. Scores from repeatedly inspected
   development partitions are development evidence, not untouched estimates.
+
+- Record each generated/submitted leaderboard artifact in `submissions/LEDGER.tsv`.
+  A `SUBMITTED` row requires immutable code, config, matching-output, and candidate-output
+  hashes. Public/private leaderboard scores are provenance only and must never be used as
+  entity labels, model features, threshold-fitting data, or a substitute for held-out evaluation.
