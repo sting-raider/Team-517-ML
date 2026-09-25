@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+F012a	#20	X	ChatGPT	agent/x/F012a-source1-france-audit	82e864f21bb09d4103a76322ebeacdc3fdd7d9c9	France S1 has retrieval-relevant format shift vs US/India	full train_source1 + test_source1 intended	NA	NA	NA	Drive bytes accessible; execution runtime unavailable	NA	BLOCKED	reports/swarm/F012a-source1-france-audit.md
