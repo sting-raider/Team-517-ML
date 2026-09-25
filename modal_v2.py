@@ -112,6 +112,29 @@ def merge_prediction(depth:int,partitions:int=8):
     return merge_score.local(f'submission_v2_d{depth}',partitions,160)
 
 
+@app.function(image=image,volumes={str(VOLUME_ROOT):volume},cpu=2,memory=4096,timeout=900)
+def package_matching(depth:int):
+    """Compress the validated leaderboard file for a smaller network transfer."""
+    import gzip
+    from ber.predict import sha256
+    folder=VOLUME_ROOT/'project/output'/f'submission_v2_d{depth}'
+    receipt=json.loads((folder/'completion.json').read_text())
+    if receipt['status']!='PASS':
+        raise ValueError('Cannot package an unvalidated export')
+    source=folder/'matching_results.tsv'
+    if sha256(source)!=receipt['matching_sha256']:
+        raise ValueError('Matching file differs from the validation receipt')
+    target=folder/'matching_results.tsv.gz'
+    with source.open('rb') as src,target.open('wb') as dest:
+        with gzip.GzipFile(filename='',mode='wb',fileobj=dest,compresslevel=3,mtime=0) as zipped:
+            shutil.copyfileobj(src,zipped,1024*1024)
+    receipt['compressed_bytes']=target.stat().st_size
+    receipt['matching_bytes']=source.stat().st_size
+    receipt['compressed_sha256']=sha256(target)
+    volume.commit()
+    return receipt
+
+
 @app.local_entrypoint()
 def main(action:str='train',depth:int=10):
     if action=='train':
@@ -144,6 +167,10 @@ def main(action:str='train',depth:int=10):
             print(call.get(),flush=True)
         result=merge_prediction.remote(depth)
         Path(f'reports/int002_depth{depth}_export.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
+        print(json.dumps(result,indent=2))
+    elif action=='package':
+        result=package_matching.remote(depth)
+        Path(f'reports/int002_depth{depth}_download.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
         print(json.dumps(result,indent=2))
     else:
         raise ValueError('Unknown action')

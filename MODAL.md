@@ -101,3 +101,17 @@ folder after changing a model, feature definition, input database, or blocker.
 INT001's ordinal-rank checkpoints are archived research and must not be used.
 The `retrieval` action is an independent diagnostic study, not the selected
 submission blocker. The production second-file candidate cap stays at 160.
+
+
+For a slow internet connection, package the validated matching file before
+transferring it. This produces exactly the same TSV after decompression:
+
+```powershell
+modal run -d modal_v2.py --action package --depth 10
+modal volume get team517-business-er project/output/submission_v2_d10/matching_results.tsv.gz output/submission_v2_d10/matching_results.tsv.gz
+python -c "import gzip,shutil; src=gzip.open('output/submission_v2_d10/matching_results.tsv.gz','rb'); dst=open('output/submission_v2_d10/matching_results.tsv','wb'); shutil.copyfileobj(src,dst); dst.close(); src.close()"
+```
+
+Compare the decompressed SHA256 with the completion receipt before uploading.
+The confirmed checkpoint is also available locally under `artifacts/submission_v2`
+(excluded from Git), for explicit `ber.predict --model artifacts/submission_v2` use.
