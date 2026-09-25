@@ -6,15 +6,17 @@ import numpy as np
 from catboost import CatBoostClassifier
 from .experiment import choose_threshold,mappings
 from .metrics import evaluate
-from .provenance import files_signature,require_manifest,write_manifest
+from .provenance import StaleArtifactError,files_signature,read_manifest,require_manifest,write_manifest
 
 
 TUNE_CACHE_VERSION=1
 TRAIN_INPUTS=[
     Path('artifacts/address_baseline/features.npz'),
     Path('artifacts/address_baseline/anchors.json'),
+    Path('artifacts/address_baseline/features.manifest.json'),
     Path('artifacts/wide_calibration/features.npz'),
     Path('artifacts/wide_calibration/anchors.json'),
+    Path('artifacts/wide_calibration/features.manifest.json'),
 ]
 
 
@@ -37,6 +39,14 @@ def main():
                    help='Retrain even when compatible completed trial artifacts exist')
     a=p.parse_args()
     out=Path('artifacts/tuned');out.mkdir(parents=True,exist_ok=True)
+    for manifest in (
+        Path('artifacts/address_baseline/features.manifest.json'),
+        Path('artifacts/wide_calibration/features.manifest.json'),
+    ):
+        if read_manifest(manifest) is None:
+            raise StaleArtifactError(
+                f'Cannot tune from unsigned feature cache {manifest}; rebuild the feature cache first'
+            )
     base=np.load('artifacts/address_baseline/features.npz')
     x,y,groups=(base[k] for k in ('x','y','groups'))
     meta=json.loads(Path('artifacts/address_baseline/anchors.json').read_text())
