@@ -9,7 +9,7 @@ from catboost import CatBoostClassifier
 from .data import connect
 from .features import features, FEATURE_NAMES
 from .metrics import evaluate
-from .provenance import relation_fingerprint, require_manifest, write_manifest
+from .provenance import relation_fingerprint, require_manifest, source_file_sha256, write_manifest
 
 
 FEATURE_CACHE_VERSION=1
@@ -26,7 +26,10 @@ def feature_cache_identity(c,anchor_table='anchors',candidate_table='candidates'
         'kind':'pair_features',
         'version':FEATURE_CACHE_VERSION,
         'feature_names':FEATURE_NAMES,
-        'anchors':relation_fingerprint(c,anchor_table,['entity_id','country','source','n','a']),
+        'feature_code_sha256':source_file_sha256(features),
+        'train_records':relation_fingerprint(c,'train',['rowid','entity_id','country','source','n','a']),
+        'truth':relation_fingerprint(c,'truth',['anchor','matches']),
+        'anchors':relation_fingerprint(c,anchor_table,['rowid','entity_id','country','source','n','a']),
         'candidates':relation_fingerprint(c,candidate_table,['anchor','rid','retrieval','hits']),
     }
 
