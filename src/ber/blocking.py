@@ -1,8 +1,14 @@
 """Auditable bounded multi-pass lexical retrieval over the full record inventory."""
 import argparse
+import inspect
 import time
 from pathlib import Path
 from .data import connect
+from .provenance import fingerprint
+
+
+INDEX_VERSION=2
+MAX_KEY_FREQ=1000
 
 
 def init_macros(c):
@@ -26,11 +32,23 @@ def init_macros(c):
 
 def build_index(c, split):
     init_macros(c)
+    current=index_fingerprint()
     c.execute('CREATE TABLE IF NOT EXISTS index_versions (split VARCHAR PRIMARY KEY, version INTEGER)')
+    c.execute('CREATE TABLE IF NOT EXISTS index_signatures (split VARCHAR PRIMARY KEY, fingerprint VARCHAR)')
     version=c.execute('SELECT version FROM index_versions WHERE split=?',[split]).fetchone()
-    if version and version[0]==2:
-        print(f'Reusing {split} retrieval index', flush=True)
+    signature=c.execute('SELECT fingerprint FROM index_signatures WHERE split=?',[split]).fetchone()
+    if version and version[0]==INDEX_VERSION and signature and signature[0]==current:
+        print(f'Reusing {split} retrieval index ({current[:12]})', flush=True)
         return
+    if version and version[0]==INDEX_VERSION and not signature:
+        # One-time migration for the pre-I002 v2 index. Current main is the known v2
+        # implementation; future code/config changes alter current and are detectable.
+        c.execute('INSERT OR REPLACE INTO index_signatures VALUES (?,?)',[split,current])
+        c.execute('CHECKPOINT')
+        print(f'Adopted legacy {split} retrieval index signature ({current[:12]})',flush=True)
+        return
+    if signature and signature[0]!=current:
+        print(f'Rebuilding stale {split} retrieval index: {signature[0][:12]} -> {current[:12]}',flush=True)
     start=time.time()
     # Hashes are retrieval keys only, never ML features or matching evidence.
     c.execute(f"""CREATE OR REPLACE TABLE {split}_rawkeys AS
@@ -40,11 +58,12 @@ def build_index(c, split):
     c.execute(f"""CREATE OR REPLACE TABLE {split}_freq AS
         SELECT key,count(*)::INTEGER AS freq FROM {split}_rawkeys GROUP BY key""")
     c.execute(f"""CREATE OR REPLACE TABLE {split}_index AS SELECT r.rid,r.key,f.freq
-        FROM {split}_rawkeys r JOIN {split}_freq f USING(key) WHERE f.freq<=1000""")
+        FROM {split}_rawkeys r JOIN {split}_freq f USING(key) WHERE f.freq<={MAX_KEY_FREQ}""")
     c.execute(f'DROP TABLE {split}_rawkeys')
-    c.execute('INSERT OR REPLACE INTO index_versions VALUES (?,2)',[split])
+    c.execute('INSERT OR REPLACE INTO index_versions VALUES (?,?)',[split,INDEX_VERSION])
+    c.execute('INSERT OR REPLACE INTO index_signatures VALUES (?,?)',[split,current])
     c.execute('CHECKPOINT')
-    print(f'{split}: index ready in {time.time()-start:.1f}s',flush=True)
+    print(f'{split}: index ready in {time.time()-start:.1f}s ({current[:12]})',flush=True)
 
 
 def candidates(c, split, anchor_table='anchors', result='candidates', cap=80):
@@ -57,13 +76,31 @@ def candidates(c, split, anchor_table='anchors', result='candidates', cap=80):
         left(k,2) AS kind, f.freq
         FROM {anchor_table}, unnest(block_keys(n,a)) AS u(k)
         JOIN {split}_freq f ON f.key=hash(country,k)
-        WHERE k IS NOT NULL AND f.freq<=1000
+        WHERE k IS NOT NULL AND f.freq<={MAX_KEY_FREQ}
         QUALIFY kind IN ('n:','a:','h:','z:') OR row_number() OVER(PARTITION BY entity_id,kind ORDER BY f.freq,k)<=4""")
     c.execute(f"""CREATE OR REPLACE TABLE {result} AS
         WITH hits AS (SELECT q.anchor,r.rid,sum(q.bonus+ln(10000001.0/r.freq))::FLOAT AS retrieval,
             count(*)::SMALLINT AS hits FROM query_keys q JOIN {split}_index r USING(key) GROUP BY q.anchor,r.rid)
         SELECT h.* FROM hits h JOIN {split} t ON h.rid=t.rowid
         QUALIFY row_number() OVER(PARTITION BY anchor ORDER BY retrieval DESC,t.entity_id)<={int(cap)}""")
+
+
+def index_fingerprint():
+    """Fingerprint every code/config input that defines persisted retrieval indexes."""
+    return fingerprint({
+        'index_version':INDEX_VERSION,
+        'max_key_freq':MAX_KEY_FREQ,
+        'init_macros':inspect.getsource(init_macros),
+        'build_index':inspect.getsource(build_index),
+    })
+
+
+def blocker_fingerprint():
+    """Fingerprint index + candidate-generation behavior for resumable outputs."""
+    return fingerprint({
+        'index_fingerprint':index_fingerprint(),
+        'candidates':inspect.getsource(candidates),
+    })
 
 
 def main():
