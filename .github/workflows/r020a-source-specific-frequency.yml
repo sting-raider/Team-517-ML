@@ -4,7 +4,10 @@ on:
   push:
     branches:
       - agent/r/R020a-source-specific-frequency
-  pull_request:\n    branches:\n      - main\n  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: read
