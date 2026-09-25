@@ -106,6 +106,22 @@ class ExactThresholdTests(unittest.TestCase):
         self.assertEqual(threshold, 1.0)
         self.assertAlmostEqual(result["macro_f0_5"], 0.5)
 
+    def test_probability_one_is_included_at_max_threshold(self):
+        meta = [{"truth": set()}]
+        threshold, result = choose_threshold_exact(
+            meta, np.array([0]), np.array(["false"]), np.array([1.0]), [0]
+        )
+        self.assertEqual(threshold, 1.0)
+        self.assertEqual(result["macro_f0_5"], 0.0)
+        self.assertEqual(result["evaluated_states"], 1)
+
+    def test_rejects_duplicate_or_out_of_range_indices(self):
+        meta = [{"truth": set()}]
+        with self.assertRaises(ValueError):
+            choose_threshold_exact(meta, [], [], [], [0, 0])
+        with self.assertRaises(ValueError):
+            choose_threshold_exact(meta, [], [], [], [1])
+
     def test_rejects_nonfinite_or_out_of_range_probabilities(self):
         meta = [{"truth": {"a"}}]
         with self.assertRaises(ValueError):
