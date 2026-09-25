@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+F002	#140	R	chatgpt-agent	agent/r/F002-char-edit-patterns	51a735f00711783cf6d055af14f00894bf07dbcc	Positive-pair character corruption patterns can guide typo-tolerant retrieval	complete train positives intended; blocked by >256MiB S2/S3 transfer ceiling	NA	NA	NA	Drive verified; S1 210069713B accessible; S2 489301488B and S3 503705637B blocked	NA	BLOCKED	reports/swarm/F002-char-edit-patterns.md
