@@ -15,9 +15,13 @@ import modal
 from modal_experiment import (
     build_spec,
     command_for_spec,
+    make_invocation_id,
     parse_args_json,
     parse_required_paths_json,
+    required_inputs_fingerprint,
     run_directory,
+    run_identity_hash,
+    validate_invocation_id,
 )
 
 ROOT = Path(__file__).parent
@@ -58,8 +62,9 @@ def run_registered_experiment(
     code_sha: str,
     branch: str,
     run_name: str = "",
+    invocation_id: str = "",
 ):
-    """Execute one ber.* module against private Volume data with provenance."""
+    """Execute one ber.* module against one immutable private-Volume snapshot."""
     import os
     import time
     from datetime import datetime, timezone
@@ -73,15 +78,20 @@ def run_registered_experiment(
         branch=branch,
         run_name=run_name or None,
     )
+    invocation_id = validate_invocation_id(invocation_id)
+
+    # Modal workers can be warm/reused. Reload before any Volume reads so required
+    # inputs and collision checks observe the latest committed snapshot.
+    volume.reload()
     missing = [rel for rel in spec["required_paths"] if not (VOLUME_ROOT / rel).exists()]
     if missing:
         raise FileNotFoundError(f"Missing required Modal Volume inputs: {missing}")
 
-    out = run_directory(VOLUME_ROOT, spec)
+    input_identity, input_fingerprint = required_inputs_fingerprint(VOLUME_ROOT, spec["required_paths"])
+    identity_hash = run_identity_hash(spec, input_fingerprint)
+    out = run_directory(VOLUME_ROOT, spec, input_fingerprint, invocation_id)
     if out.exists():
-        raise FileExistsError(
-            f"Experiment output already exists: {out}. Use a new --run-name instead of overwriting provenance."
-        )
+        raise FileExistsError(f"Invocation directory already exists unexpectedly: {out}")
     out.mkdir(parents=True, exist_ok=False)
     SCRATCH.mkdir(parents=True, exist_ok=True)
 
@@ -89,6 +99,10 @@ def run_registered_experiment(
     started = datetime.now(timezone.utc)
     metadata = {
         **spec,
+        "input_identity": input_identity,
+        "input_fingerprint": input_fingerprint,
+        "run_identity_hash": identity_hash,
+        "invocation_id": invocation_id,
         "status": "RUNNING",
         "started_at": started.isoformat(),
         "command": command,
@@ -108,6 +122,9 @@ def run_registered_experiment(
         {
             "TEAM517_EXPERIMENT_ID": spec["experiment_id"],
             "TEAM517_CONFIG_HASH": spec["config_hash"],
+            "TEAM517_INPUT_FINGERPRINT": input_fingerprint,
+            "TEAM517_RUN_IDENTITY": identity_hash,
+            "TEAM517_INVOCATION_ID": invocation_id,
             "TEAM517_CODE_SHA": spec["code_sha"],
             "TEAM517_BRANCH": spec["branch"],
             "TEAM517_VOLUME_ROOT": str(VOLUME_ROOT),
@@ -117,7 +134,23 @@ def run_registered_experiment(
         }
     )
     start_clock = time.monotonic()
-    completed = subprocess.run(command, cwd=SCRATCH, env=env, check=False)
+    try:
+        completed = subprocess.run(command, cwd=SCRATCH, env=env, check=False)
+    except Exception as exc:
+        finished = datetime.now(timezone.utc)
+        metadata.update(
+            {
+                "status": "ERROR",
+                "finished_at": finished.isoformat(),
+                "duration_seconds": round(time.monotonic() - start_clock, 3),
+                "error_type": type(exc).__name__,
+                "error": str(exc),
+            }
+        )
+        _write_json(out / "run.json", metadata)
+        volume.commit()
+        raise
+
     finished = datetime.now(timezone.utc)
     metadata.update(
         {
@@ -144,7 +177,10 @@ def _require_clean_git() -> tuple[str, str]:
     dirty = subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True)
     if dirty.strip():
         raise RuntimeError("Commit or stash the working tree before a Modal experiment; provenance requires exact code.")
-    return _git_output("rev-parse", "HEAD"), _git_output("rev-parse", "--abbrev-ref", "HEAD")
+    branch = _git_output("rev-parse", "--abbrev-ref", "HEAD")
+    if branch == "HEAD":
+        raise RuntimeError("Run Modal experiments from a named branch, not detached HEAD, so provenance is reviewable.")
+    return _git_output("rev-parse", "HEAD"), branch
 
 
 @app.local_entrypoint()
@@ -167,14 +203,18 @@ def main(
         run_name=run_name or None,
     )
     if dry_run:
-        out = run_directory(VOLUME_ROOT, spec)
+        preview_dir = Path("/volume/project/experiments") / spec["experiment_id"] / spec["run_name"] / "<input-hash>" / "<invocation-id>"
         preview = {
             **spec,
-            "command": command_for_spec(spec, volume_root=VOLUME_ROOT, run_dir=out),
-            "run_dir": str(out),
+            "input_fingerprint": "<computed inside worker after volume.reload()>",
+            "invocation_id": "<generated for each execution>",
+            "command": command_for_spec(spec, volume_root=VOLUME_ROOT, run_dir=preview_dir),
+            "run_dir": str(preview_dir),
         }
         print(json.dumps(preview, indent=2, ensure_ascii=False))
         return
+
+    invocation_id = make_invocation_id()
     result = run_registered_experiment.remote(
         experiment_id=experiment_id,
         module=module,
@@ -183,5 +223,6 @@ def main(
         code_sha=code_sha,
         branch=branch,
         run_name=run_name,
+        invocation_id=invocation_id,
     )
     print(json.dumps(result, indent=2, ensure_ascii=False))
