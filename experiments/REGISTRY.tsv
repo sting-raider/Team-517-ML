@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+I004R	#54	I	ChatGPT	agent/i/I004R-modal-runner-redteam	3fe51ff47ba8abe7b894129fd18fd6f1d87eae81	Red-team I004 Modal runner provenance/concurrency claims	PR #22 static source/artifact audit	I004 PROMOTE recommendation	FOLLOW-UP	NA	3 material gaps: stale Volume view, path-only input provenance, non-atomic run collision	NA	FOLLOW-UP	reports/swarm/I004R-modal-runner-redteam.md
