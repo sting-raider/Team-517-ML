@@ -54,3 +54,41 @@ published Modal rates this is approximately $0.63 per worker-hour, or $5.04
 per hour while all eight workers are running, before storage/network and other
 charges. Check the actual Usage & Billing dashboard against the $30 plan; the
 dashboard also supports a spend limit.
+
+## Swarm experiment runner
+
+Atomic research branches can run full-data Python modules against the same private
+Volume with `modal_experiment_app.py`. The launcher records the exact branch,
+commit SHA, normalized arguments, required Volume inputs, config hash, resource
+request, duration, and return code in
+`/volume/project/experiments/<experiment-id>/<run-name>/run.json`.
+
+The launcher refuses a dirty Git worktree and refuses to overwrite an existing run
+directory. It executes a Python `ber.*` module directly, without a shell. This is
+deliberate: experiment provenance should not depend on whatever happened to be in a
+terminal history.
+
+Use a dry run first:
+
+```powershell
+modal run modal_experiment_app.py --experiment-id R003 --module ber.retrieval_char_address --args-json '["--db","{db}","--out","{run_dir}"]' --required-paths-json '["project/artifacts/data.duckdb"]' --dry-run
+```
+
+Then remove `--dry-run` to execute. Argument placeholders are expanded inside the
+worker:
+
+- `{volume}` -> `/volume`
+- `{db}` -> `/volume/project/artifacts/data.duckdb`
+- `{dataset}` -> `/volume/dataset`
+- `{run_dir}` -> the unique experiment output directory
+
+Experiment modules can also read `TEAM517_RUN_DIR`, `TEAM517_DB`,
+`TEAM517_DATASET_ROOT`, `TEAM517_CONFIG_HASH`, `TEAM517_CODE_SHA`, and
+`TEAM517_BRANCH`. Keep row-level artifacts, caches, checkpoints, and large outputs
+inside the Volume. Only aggregate reports and compact metrics belong in Git.
+
+By default the runner verifies that
+`project/artifacts/data.duckdb` exists. Pass a different JSON list to
+`--required-paths-json` when an experiment needs other staged inputs. A failed
+command still leaves a `run.json` with status `FAIL`; use a new `--run-name`
+for an intentional retry rather than overwriting the failed record.
