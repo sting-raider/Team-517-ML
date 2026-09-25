@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+F003a	#23	R/F	ChatGPT/Pod-R	agent/r/F003a-s1-rare-number-feasibility	5ef691548b0468a27d4b24d93dc08fbc55bfeb7a	Rare numeric tokens in S1 are selective enough for dedicated retrieval/matcher evidence	full train/test Source-1; execution blocked	n/a	n/a	n/a	Drive mounts succeeded; Python/container session ClientError	n/a	BLOCKED	reports/swarm/F003a-s1-rare-number-feasibility.md
