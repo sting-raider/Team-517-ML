@@ -40,7 +40,7 @@ New-Item -ItemType Directory -Force output/modal_parallel_v1 | Out-Null
 modal volume get team517-business-er project/output/modal_parallel_v1/matching_results.tsv output/modal_parallel_v1/matching_results.tsv
 modal volume get team517-business-er project/output/modal_parallel_v1/candidate_pairs.tsv output/modal_parallel_v1/candidate_pairs.tsv
 modal volume get team517-business-er project/output/modal_parallel_v1/completion.json output/modal_parallel_v1/completion.json
-python ../student_resource/utils/validate_submission.py --matching output/modal_parallel_v1/matching_results.tsv --test-dir ../student_resource/dataset/test
+python ../student_resource/utils/validate_submission.py --matching output/modal_parallel_v1/matching_results.tsv --candidate output/modal_parallel_v1/candidate_pairs.tsv --test-dir ../student_resource/dataset/test
 ```
 
 Upload `matching_results.tsv` for the leaderboard. Keep `candidate_pairs.tsv`

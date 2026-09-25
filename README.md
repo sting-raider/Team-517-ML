@@ -4,8 +4,9 @@ An executable business entity resolution baseline for the supplied name/address 
 The official target is **macro F0.5 per source-one entity**, including singletons.
 This is an initial measured baseline, not a claim about leaderboard position.
 
-**Current priority:** produce the first full test submission on Modal with a
-bounded candidate set. See [MODAL.md](MODAL.md) and `PROJECT_DECISIONS.md`.
+**Current priority:** submit the completed first full test file and use feedback
+to refine the model and candidate budget. See [MODAL.md](MODAL.md) and
+`PROJECT_DECISIONS.md`.
 The earlier local export was stopped at the user's request; its partial shards
 are not a complete submission.
 
@@ -74,7 +75,9 @@ confirmation macro F0.5 is 0.928835; the 160-cap calibration result is in
 checkpoint is a local artifact excluded from Git;
 `python -m ber.tune` recreates `artifacts/tuned/depth10.cbm` from the documented
 development features, and `python -m ber.freeze_first` assembles the selected
-checkpoint and configuration. Full test export now runs on Modal.
+checkpoint and configuration. The first full test export completed on Modal:
+1,732,544 S1 rows, 256,724,515 candidate pairs, and 5,881,092 predicted
+matches. The merged file passed the supplied submission-format validator.
 
 ```powershell
 $env:PYTHONPATH='src'
