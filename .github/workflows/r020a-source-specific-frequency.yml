@@ -1,12 +1,6 @@
 name: r020a-source-specific-frequency
 
 on:
-  push:
-    branches:
-      - agent/r/R020a-source-specific-frequency
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
