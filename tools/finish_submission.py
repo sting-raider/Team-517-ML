@@ -32,7 +32,10 @@ def main():
         if official.returncode:
             raise RuntimeError(f'Official validator returned {official.returncode}; see official_validation.txt')
         result={'status':'PASS','started_epoch':started,'finished_epoch':time.time(),
-                'streaming_validation':local,'official_validation_exit_code':official.returncode,
+                'streaming_validation':local,
+                'streaming_validation_scope':'matching_results.tsv + candidate_pairs.tsv; target-ID existence skipped',
+                'official_validation_exit_code':official.returncode,
+                'official_validation_scope':'matching_results.tsv only; candidate_pairs.tsv is checked by ber.validate to avoid the official validator full-candidate memory cost',
                 'matching_sha256':sha256(out/'matching_results.tsv'),
                 'candidate_sha256':sha256(out/'candidate_pairs.tsv')}
         status.write_text(json.dumps(result,indent=2),encoding='utf-8')
