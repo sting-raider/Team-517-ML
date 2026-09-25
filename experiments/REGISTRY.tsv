@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+R014	#8	R	ChatGPT/Pod R	agent/r/R014-cap-ceiling-study	608bfe6084ed454dff02074e65c1414886f20fa9	Widen blocker-v2 cap above 640 to measure remaining rank-depth oracle headroom	30k dev calibration planned; full train inventory required	0.980951 confirmation oracle context	BLOCKED	n/a	S2/S3 Drive files exceed 256 MiB connector transfer limit	n/a	BLOCKED	reports/swarm/R014-cap-ceiling-study.md
