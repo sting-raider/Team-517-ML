@@ -23,7 +23,7 @@ def contribution(kind: str, freq: int) -> float:
     return BONUS.get(kind, 8.0) + math.log(IDF_NUMERATOR / freq)
 
 
-def address_stack_keys(eligible_words: int, freq: int = 1000, include_h: bool = True):
+def address_stack_keys(eligible_words: int, freq: int = 1000, include_h: bool = True, include_z: bool = True):
     if eligible_words < 1:
         raise ValueError("eligible_words must be >= 1")
     m = min(eligible_words, 4)
@@ -71,7 +71,7 @@ def audit() -> dict:
     rare_name_score = score_sum(rare_name_keys)
     rows = []
     for words in (1, 2, 3, 4):
-        keys = address_stack_keys(words, freq=1000, include_h=True)
+        keys = address_stack_keys(words, freq=1000, include_h=True, include_z=True)
         current = score_sum(keys)
         family_max = score_family_max(keys)
         exact_address = contribution("a:", 1000)
