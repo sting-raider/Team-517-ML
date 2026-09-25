@@ -84,12 +84,20 @@ def candidates(c, split, anchor_table='anchors', result='candidates', cap=80, pr
             FROM query_keys q JOIN {split}_index r USING(key)
             GROUP BY q.anchor,r.rid
         ), ranked AS (
-            SELECT h.*, row_number() OVER(
-                PARTITION BY h.anchor ORDER BY h.retrieval DESC,t.entity_id
-            ) AS candidate_rank
+            SELECT h.*,
+                row_number() OVER(
+                    PARTITION BY h.anchor ORDER BY h.retrieval DESC,t.entity_id
+                ) AS selection_rank,
+                dense_rank() OVER(
+                    PARTITION BY h.anchor ORDER BY h.retrieval DESC
+                ) AS candidate_rank
             FROM hits h JOIN {split} t ON h.rid=t.rowid
         )
-        SELECT * FROM ranked WHERE candidate_rank<={int(cap)}""")
+        SELECT anchor,rid,retrieval,hits,
+            name_exact_hits,address_exact_hits,name_token_hits,address_token_hits,
+            address_bigram_hits,name_number_hits,address_number_hits,min_key_freq,
+            candidate_rank
+        FROM ranked WHERE selection_rank<={int(cap)}""")
 
 def main():
     p=argparse.ArgumentParser()
