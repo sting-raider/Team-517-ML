@@ -40,9 +40,11 @@ def score_batch(c,model,threshold,split,anchor_table,candidate_table,shortlist_c
     anchor_ids=[r[0] for r in c.execute(f'SELECT entity_id FROM {anchor_table} ORDER BY entity_id').fetchall()]
     selected={k:[] for k in anchor_ids}
     considered={k:[] for k in anchor_ids}
-    extra = '' if not provenance else ''',p.candidate_rank,p.name_exact_hits,p.address_exact_hits,
-        p.name_token_hits,p.address_token_hits,p.address_bigram_hits,p.name_number_hits,
-        p.address_number_hits,p.min_key_freq'''
+    extra = '' if not provenance else (
+        ',p.candidate_rank,p.name_exact_hits,p.address_exact_hits'
+        ',p.name_token_hits,p.address_token_hits,p.address_bigram_hits,p.name_number_hits'
+        ',p.address_number_hits,p.min_key_freq'
+    )
     c.execute(f'''SELECT p.anchor,r.entity_id,l.n,l.a,r.n,r.a,p.retrieval,p.hits,r.source{extra}
         FROM {candidate_table} p JOIN {anchor_table} l ON p.anchor=l.entity_id
         JOIN {split} r ON p.rid=r.rowid ORDER BY p.anchor,r.entity_id''')
