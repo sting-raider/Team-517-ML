@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+R008	#100	R	ChatGPT/Pod R	agent/r/R008-reverse-retrieval	478e817560bac13f9d92385c0c8c8ef4011ad8b9	Reverse S2/S3→S1 retrieval can recover forward-blocker misses	4,389 calibration anchors planned; complete S2/S3 unavailable	0.9811781092 oracle @ cap640			Drive 413 for 489,301,488B S2 and 503,705,637B S3 (>268,435,456B)	<5 min data access probe	BLOCKED	reports/swarm/R008-reverse-retrieval.md
