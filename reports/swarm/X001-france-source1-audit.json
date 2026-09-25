@@ -1,0 +1,206 @@
+{
+  "protocol": {
+    "scope": "Full train_source1.tsv and test_source1.tsv census; no sampling.",
+    "train_source1_bytes": 210069713,
+    "test_source1_bytes": 175022086,
+    "diagnostic_normalization": "Unicode NFKD combining-mark fold proxy; production uses DuckDB strip_accents().",
+    "row_level_output": false
+  },
+  "train": {
+    "US": {
+      "records": 1323633,
+      "name": {
+        "nonascii_pct": 0,
+        "nfkd_fold_changed_pct": 0,
+        "hyphen_pct": 0.8556752514,
+        "apostrophe_pct": 3.5200089451,
+        "mean_chars": 22.4651077753
+      },
+      "address": {
+        "nonascii_pct": 0,
+        "nfkd_fold_changed_pct": 0,
+        "hyphen_pct": 1.1229698867,
+        "apostrophe_pct": 0.0855221954,
+        "mean_chars": 34.9624321848
+      }
+    },
+    "India": {
+      "records": 883188,
+      "name": {
+        "nonascii_pct": 0,
+        "nfkd_fold_changed_pct": 0,
+        "hyphen_pct": 0.2480785518,
+        "apostrophe_pct": 0.0015851665,
+        "mean_chars": 26.3863050676
+      },
+      "address": {
+        "nonascii_pct": 0.0627273015,
+        "nfkd_fold_changed_pct": 0.0627273015,
+        "hyphen_pct": 38.5872543558,
+        "apostrophe_pct": 0.4792864033,
+        "mean_chars": 77.6996324678
+      }
+    }
+  },
+  "test": {
+    "US": {
+      "records": 663106,
+      "name": {
+        "nonascii_pct": 0,
+        "nfkd_fold_changed_pct": 0,
+        "hyphen_pct": 0.8255090438,
+        "apostrophe_pct": 3.5584054435,
+        "mean_chars": 22.4633075255
+      },
+      "address": {
+        "nonascii_pct": 0,
+        "nfkd_fold_changed_pct": 0,
+        "hyphen_pct": 1.1320965276,
+        "apostrophe_pct": 0.0865623294,
+        "mean_chars": 34.9661170311
+      }
+    },
+    "India": {
+      "records": 809986,
+      "name": {
+        "nonascii_pct": 0,
+        "nfkd_fold_changed_pct": 0,
+        "hyphen_pct": 0.2444486695,
+        "apostrophe_pct": 0.0019753428,
+        "mean_chars": 26.374770675
+      },
+      "address": {
+        "nonascii_pct": 0.0574083997,
+        "nfkd_fold_changed_pct": 0.0574083997,
+        "hyphen_pct": 38.7396819204,
+        "apostrophe_pct": 0.4848231945,
+        "mean_chars": 77.7138432022
+      }
+    },
+    "France": {
+      "records": 259452,
+      "name": {
+        "nonascii_pct": 15.7212124015,
+        "nfkd_fold_changed_pct": 15.7208269738,
+        "hyphen_pct": 2.2131261274,
+        "apostrophe_pct": 0,
+        "mean_chars": 19.4213496138
+      },
+      "address": {
+        "nonascii_pct": 28.2653438786,
+        "nfkd_fold_changed_pct": 27.8313522347,
+        "hyphen_pct": 82.8191727179,
+        "apostrophe_pct": 5.6206928449,
+        "mean_chars": 50.0708570371
+      }
+    }
+  },
+  "france": {
+    "name_distinct_preserve_diacritics": 192936,
+    "name_distinct_nfkd_fold": 192254,
+    "name_distinct_collapsed_nfkd": 682,
+    "address_distinct_preserve_diacritics": 241408,
+    "address_distinct_nfkd_fold": 240815,
+    "address_distinct_collapsed_nfkd": 593,
+    "top_name_tokens": [
+      [
+        "sarl",
+        73486
+      ],
+      [
+        "sas",
+        52278
+      ],
+      [
+        "club",
+        22673
+      ],
+      [
+        "france",
+        20793
+      ],
+      [
+        "de",
+        17859
+      ],
+      [
+        "eurl",
+        16980
+      ],
+      [
+        "ecole",
+        15668
+      ],
+      [
+        "amicale",
+        14389
+      ],
+      [
+        "comite",
+        13832
+      ],
+      [
+        "sa",
+        12767
+      ]
+    ],
+    "top_address_tokens": [
+      [
+        "de",
+        257496
+      ],
+      [
+        "rue",
+        170819
+      ],
+      [
+        "la",
+        115932
+      ],
+      [
+        "france",
+        102319
+      ],
+      [
+        "hauts",
+        101717
+      ],
+      [
+        "nouvelle",
+        85311
+      ],
+      [
+        "aquitaine",
+        85268
+      ],
+      [
+        "loire",
+        72836
+      ],
+      [
+        "pays",
+        72812
+      ],
+      [
+        "bordeaux",
+        43634
+      ],
+      [
+        "avenue",
+        30987
+      ],
+      [
+        "allee",
+        12038
+      ],
+      [
+        "bis",
+        11010
+      ],
+      [
+        "boulevard",
+        9310
+      ]
+    ]
+  }
+}
