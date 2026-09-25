@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+R003	#40	R	agent/r	agent/r/R003-address-char-ngram	02c7e15138fe98cd0dc298e723431bf44dc75f2e	Address char 3-5 gram retrieval may recover blocker-v2 misses	Intended fixed dev/calibration anchors; full S2/S3 unavailable	pair_recall=0.947246; oracle_f0.5=0.980951	not_measured	NA	Drive S2/S3 >256MiB; Python/container ClientError	0 empirical	BLOCKED	reports/swarm/R003-address-char-ngram.md
