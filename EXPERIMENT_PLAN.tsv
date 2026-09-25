@@ -1,10 +1,10 @@
 id	priority	hypothesis	comparison	primary_evidence	status
-E00	0	Local evaluation matches official semantics	Hand-checked sets and the PDF worked example	Exact score and empty-set agreement	Formula confirmed from PDF; scorer implementation and official format validator source still needed
-E01	1	A conservative baseline establishes a reliable floor	All-empty diagnostic and exact composite matches	Official macro score and singleton false-positive rate	Not run
-E02	2	Name and address retrieval recover different true links	Each sparse channel versus their union	Unique recovered entities; oracle macro ceiling; candidates	Not run
+E00	0	Local evaluation matches official semantics	Hand-checked sets and the PDF worked example	Exact score and empty-set agreement	Implemented official set metric; hand-checked example and empty-set tests pass
+E01	1	A conservative baseline establishes a reliable floor	All-empty diagnostic and exact composite matches	Official macro score and singleton false-positive rate	Measured learned lexical baseline: 0.829099 development macro F0.5; all-empty diagnostic 0.065225 on same sample
+E02	2	Name and address retrieval recover different true links	Each sparse channel versus their union	Unique recovered entities; oracle macro ceiling; candidates	Expanded address retrieval raises development score to 0.921733 and candidate recall to 0.912795; reports/address_baseline.json
 E03	2	Reverse retrieval fixes forward top-k saturation	Forward only versus bidirectional union	High-cardinality recall and extra candidate cost	Not run
-E04	3	Real candidate negatives improve precision	Random negatives versus mixed retrieved hard negatives	Macro score; same-name and shared-address false positives	Not run
-E05	3	Frequency and component conflicts resolve lookalikes	Feature model with versus without these feature groups	Entity-held-out macro score and error slices	Not run
+E04	3	Real candidate negatives improve precision	Random negatives versus mixed retrieved hard negatives	Macro score; same-name and shared-address false positives	Training uses retrieved candidate negatives; random-negative ablation still pending
+E05	3	Frequency and component conflicts resolve lookalikes	Feature model with versus without these feature groups	Entity-held-out macro score and error slices	Frequency and number-conflict features implemented; feature-group ablation pending
 E06	5	Supervised retrieval adds nonliteral matches	Sparse union versus sparse plus contrastive retrieval	Unique recall gain; oracle macro ceiling; runtime	Not run; verify checkpoint MIT/Apache 2.0 license and size
 E07	6	Joint text encoding complements explicit features	Feature matcher versus cross-encoder on identical candidates	Macro score; error overlap; full-run latency estimate	Not run; verify checkpoint MIT/Apache 2.0 license and size
 E08	7	Complementary models improve the final score	Single models versus out-of-fold blend	Separate-holdout score; paired entity bootstrap	Not run
@@ -12,7 +12,7 @@ E09	7	Row context improves singleton decisions	Global threshold versus singleton
 E10	8	Observed source noise is useful augmentation	No augmentation versus conservative source-derived changes	Authentic noise slice performance on held-out entities	Not run
 E11	9	Candidate consistency reduces false links	Independent pairs versus guarded graph/conflict features	Complete postprocessing macro score and cross-anchor errors	Not run
 E12	9	Set utility improves over thresholding	Calibrated threshold versus approximate expected-score decoder	Separate-holdout macro score and calibration stability	Not run; macro F0.5 confirmed
-E13	10	Final pipeline is reproducible and auditable	Clean rerun and official validation	Identical outputs; prediction subset of logged candidates	Blocked on challenge package
-E14	2	Country transfer exposes brittle signals	Train US evaluate India and reverse versus normal entity holdout	Macro score; retrieval ceiling; singleton errors per destination country	Not run; France confirmed absent from training
+E13	10	Final pipeline is reproducible and auditable	Clean rerun and official validation	Identical outputs; prediction subset of logged candidates	Runnable pipeline and checkpointed resume tests pass; full test export in progress
+E14	2	Country transfer exposes brittle signals	Train US evaluate India and reverse versus normal entity holdout	Macro score; retrieval ceiling; singleton errors per destination country	Measured both directions; US-only to India 0.777201 versus mixed 0.886178 with expanded blocker
 E15	6	Multilingual encoding improves transfer	Eligible multilingual versus monolingual encoder on fixed splits	Country-transfer and primary holdout scores; throughput	Not run; no claim that these proxies estimate France accuracy
-E16	0	Output pool and model artifacts satisfy supplied rules	Final matcher input IDs versus grouped candidate output; checkpoint metadata audit	One row per anchor; subset relation; MIT/Apache 2.0 license; parameter limit	Rules confirmed; artifacts not yet built
+E16	0	Output pool and model artifacts satisfy supplied rules	Final matcher input IDs versus grouped candidate output; checkpoint metadata audit	One row per anchor; subset relation; MIT/Apache 2.0 license; parameter limit	Candidate boundary and subset invariants implemented and tested; full export validation pending

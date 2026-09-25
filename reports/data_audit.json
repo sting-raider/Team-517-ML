@@ -1,0 +1,215 @@
+{
+  "train": [
+    {
+      "source": 1,
+      "country": "India",
+      "records": 883188,
+      "duplicate_ids": 0,
+      "empty_names": 0,
+      "empty_addresses": 0,
+      "avg_name_length": 26.39,
+      "avg_address_length": 77.7
+    },
+    {
+      "source": 1,
+      "country": "US",
+      "records": 1323633,
+      "duplicate_ids": 0,
+      "empty_names": 0,
+      "empty_addresses": 0,
+      "avg_name_length": 22.47,
+      "avg_address_length": 34.96
+    },
+    {
+      "source": 2,
+      "country": "India",
+      "records": 2017799,
+      "duplicate_ids": 0,
+      "empty_names": 0,
+      "empty_addresses": 57846,
+      "avg_name_length": 27.42,
+      "avg_address_length": 68.2
+    },
+    {
+      "source": 2,
+      "country": "US",
+      "records": 3016817,
+      "duplicate_ids": 0,
+      "empty_names": 0,
+      "empty_addresses": 111121,
+      "avg_name_length": 23.55,
+      "avg_address_length": 31.53
+    },
+    {
+      "source": 3,
+      "country": "India",
+      "records": 2115547,
+      "duplicate_ids": 0,
+      "empty_names": 0,
+      "empty_addresses": 64948,
+      "avg_name_length": 27.04,
+      "avg_address_length": 59.11
+    },
+    {
+      "source": 3,
+      "country": "US",
+      "records": 3170056,
+      "duplicate_ids": 0,
+      "empty_names": 0,
+      "empty_addresses": 110968,
+      "avg_name_length": 23.98,
+      "avg_address_length": 38.45
+    }
+  ],
+  "test": [
+    {
+      "source": 1,
+      "country": "France",
+      "records": 259452,
+      "duplicate_ids": 0,
+      "empty_names": 0,
+      "empty_addresses": 0,
+      "avg_name_length": 19.42,
+      "avg_address_length": 50.07
+    },
+    {
+      "source": 1,
+      "country": "India",
+      "records": 809986,
+      "duplicate_ids": 0,
+      "empty_names": 0,
+      "empty_addresses": 0,
+      "avg_name_length": 26.37,
+      "avg_address_length": 77.71
+    },
+    {
+      "source": 1,
+      "country": "US",
+      "records": 663106,
+      "duplicate_ids": 0,
+      "empty_names": 0,
+      "empty_addresses": 0,
+      "avg_name_length": 22.46,
+      "avg_address_length": 34.97
+    },
+    {
+      "source": 2,
+      "country": "France",
+      "records": 703378,
+      "duplicate_ids": 0,
+      "empty_names": 0,
+      "empty_addresses": 21537,
+      "avg_name_length": 21.1,
+      "avg_address_length": 39.55
+    },
+    {
+      "source": 2,
+      "country": "India",
+      "records": 2312565,
+      "duplicate_ids": 0,
+      "empty_names": 0,
+      "empty_addresses": 52764,
+      "avg_name_length": 28.25,
+      "avg_address_length": 68.75
+    },
+    {
+      "source": 2,
+      "country": "US",
+      "records": 1871330,
+      "duplicate_ids": 0,
+      "empty_names": 0,
+      "empty_addresses": 55107,
+      "avg_name_length": 24.29,
+      "avg_address_length": 31.84
+    },
+    {
+      "source": 3,
+      "country": "France",
+      "records": 731615,
+      "duplicate_ids": 0,
+      "empty_names": 0,
+      "empty_addresses": 21541,
+      "avg_name_length": 21.14,
+      "avg_address_length": 39.97
+    },
+    {
+      "source": 3,
+      "country": "India",
+      "records": 2405000,
+      "duplicate_ids": 0,
+      "empty_names": 0,
+      "empty_addresses": 59240,
+      "avg_name_length": 27.87,
+      "avg_address_length": 59.42
+    },
+    {
+      "source": 3,
+      "country": "US",
+      "records": 1945701,
+      "duplicate_ids": 0,
+      "empty_names": 0,
+      "empty_addresses": 55317,
+      "avg_name_length": 24.62,
+      "avg_address_length": 38.84
+    }
+  ],
+  "cardinality": [
+    {
+      "matches": 0,
+      "anchors": 123247
+    },
+    {
+      "matches": 1,
+      "anchors": 119157
+    },
+    {
+      "matches": 2,
+      "anchors": 375212
+    },
+    {
+      "matches": 3,
+      "anchors": 530841
+    },
+    {
+      "matches": 4,
+      "anchors": 484115
+    },
+    {
+      "matches": 5,
+      "anchors": 321957
+    },
+    {
+      "matches": 6,
+      "anchors": 164868
+    },
+    {
+      "matches": 7,
+      "anchors": 63968
+    },
+    {
+      "matches": 8,
+      "anchors": 18680
+    },
+    {
+      "matches": 9,
+      "anchors": 4205
+    },
+    {
+      "matches": 10,
+      "anchors": 534
+    },
+    {
+      "matches": 11,
+      "anchors": 37
+    }
+  ],
+  "integrity": {
+    "duplicate_truth_anchors": 0,
+    "duplicate_positive_pairs": 0,
+    "targets_with_multiple_anchors": 0,
+    "missing_truth_anchors": 0,
+    "unknown_truth_anchors": 0,
+    "unknown_truth_targets": 0,
+    "cross_country_positive_pairs": 0
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "retrieval_80": {
+    "threshold": 0.6250000000000002,
+    "entities": 4389,
+    "macro_f0_5": 0.9214863293964353,
+    "singleton_count": 252,
+    "singleton_false_positive_rate": 0.0992063492063492,
+    "all_empty_baseline": 0.05741626794258373,
+    "candidate_pair_recall": 0.9121497774286462,
+    "candidate_entity_recall": 0.9125323733554335,
+    "all_matches_retrieved_rate": 0.7597292724196277,
+    "blocking_oracle_macro_f0_5": 0.968225905801454,
+    "candidate_count_quantiles": {
+      "p50": 80.0,
+      "p90": 80.0,
+      "p99": 80.0,
+      "max": 80.0
+    }
+  },
+  "retrieval_160": {
+    "threshold": 0.6250000000000002,
+    "entities": 4389,
+    "macro_f0_5": 0.9241812107990498,
+    "singleton_count": 252,
+    "singleton_false_positive_rate": 0.10317460317460317,
+    "all_empty_baseline": 0.05741626794258373,
+    "candidate_pair_recall": 0.9253076721654884,
+    "candidate_entity_recall": 0.9250823961846442,
+    "all_matches_retrieved_rate": 0.7899444041576021,
+    "blocking_oracle_macro_f0_5": 0.9730807315133624,
+    "candidate_count_quantiles": {
+      "p50": 160.0,
+      "p90": 160.0,
+      "p99": 160.0,
+      "max": 160.0
+    }
+  },
+  "retrieval_320": {
+    "threshold": 0.6250000000000002,
+    "entities": 4389,
+    "macro_f0_5": 0.926111944947539,
+    "singleton_count": 252,
+    "singleton_false_positive_rate": 0.10714285714285714,
+    "all_empty_baseline": 0.05741626794258373,
+    "candidate_pair_recall": 0.9371563236449332,
+    "candidate_entity_recall": 0.9364367630865092,
+    "all_matches_retrieved_rate": 0.8177423253565386,
+    "blocking_oracle_macro_f0_5": 0.9773030259385169,
+    "candidate_count_quantiles": {
+      "p50": 320.0,
+      "p90": 320.0,
+      "p99": 320.0,
+      "max": 320.0
+    }
+  },
+  "retrieval_640": {
+    "threshold": 0.6250000000000002,
+    "entities": 4389,
+    "macro_f0_5": 0.9273731484763049,
+    "singleton_count": 252,
+    "singleton_false_positive_rate": 0.1111111111111111,
+    "all_empty_baseline": 0.05741626794258373,
+    "candidate_pair_recall": 0.9458627913066248,
+    "candidate_entity_recall": 0.9454912308973222,
+    "all_matches_retrieved_rate": 0.8411892675852066,
+    "blocking_oracle_macro_f0_5": 0.9811781091658961,
+    "candidate_count_quantiles": {
+      "p50": 597.0,
+      "p90": 640.0,
+      "p99": 640.0,
+      "max": 640.0
+    }
+  },
+  "lexical_80": {
+    "threshold": 0.6250000000000002,
+    "entities": 4389,
+    "macro_f0_5": 0.9262527961181551,
+    "singleton_count": 252,
+    "singleton_false_positive_rate": 0.10714285714285714,
+    "all_empty_baseline": 0.05741626794258373,
+    "candidate_pair_recall": 0.9322466614296936,
+    "candidate_entity_recall": 0.9326262992506646,
+    "all_matches_retrieved_rate": 0.8104906937394247,
+    "blocking_oracle_macro_f0_5": 0.9756449502760838,
+    "candidate_count_quantiles": {
+      "p50": 65.0,
+      "p90": 70.0,
+      "p99": 76.0,
+      "max": 80.0
+    }
+  },
+  "lexical_160": {
+    "threshold": 0.6250000000000002,
+    "entities": 4389,
+    "macro_f0_5": 0.9264118375799582,
+    "singleton_count": 252,
+    "singleton_false_positive_rate": 0.10714285714285714,
+    "all_empty_baseline": 0.05741626794258373,
+    "candidate_pair_recall": 0.9346032992930087,
+    "candidate_entity_recall": 0.9348188626832572,
+    "all_matches_retrieved_rate": 0.8165337200870196,
+    "blocking_oracle_macro_f0_5": 0.9763114316232789,
+    "candidate_count_quantiles": {
+      "p50": 144.0,
+      "p90": 148.0,
+      "p99": 152.0,
+      "max": 160.0
+    }
+  },
+  "lexical_320": {
+    "threshold": 0.6250000000000002,
+    "entities": 4389,
+    "macro_f0_5": 0.9268092802175376,
+    "singleton_count": 252,
+    "singleton_false_positive_rate": 0.10714285714285714,
+    "all_empty_baseline": 0.05741626794258373,
+    "candidate_pair_recall": 0.9384655669023304,
+    "candidate_entity_recall": 0.9381348534901834,
+    "all_matches_retrieved_rate": 0.82547739908146,
+    "blocking_oracle_macro_f0_5": 0.977697657340688,
+    "candidate_count_quantiles": {
+      "p50": 304.0,
+      "p90": 306.0,
+      "p99": 310.0,
+      "max": 319.0
+    }
+  },
+  "lexical_640": {
+    "threshold": 0.6250000000000002,
+    "entities": 4389,
+    "macro_f0_5": 0.9273731484763049,
+    "singleton_count": 252,
+    "singleton_false_positive_rate": 0.1111111111111111,
+    "all_empty_baseline": 0.05741626794258373,
+    "candidate_pair_recall": 0.9458627913066248,
+    "candidate_entity_recall": 0.9454912308973222,
+    "all_matches_retrieved_rate": 0.8411892675852066,
+    "blocking_oracle_macro_f0_5": 0.9811781091658961,
+    "candidate_count_quantiles": {
+      "p50": 597.0,
+      "p90": 640.0,
+      "p99": 640.0,
+      "max": 640.0
+    }
+  }
+}

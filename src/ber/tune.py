@@ -1,0 +1,42 @@
+"""Stronger learned matchers; calibration selects quality without a speed tolerance."""
+import json
+from pathlib import Path
+import numpy as np
+from catboost import CatBoostClassifier
+from .experiment import choose_threshold,mappings
+from .metrics import evaluate
+
+
+def main():
+    out=Path('artifacts/tuned');out.mkdir(parents=True,exist_ok=True)
+    base=np.load('artifacts/address_baseline/features.npz')
+    x,y,groups=(base[k] for k in ('x','y','groups'))
+    meta=json.loads(Path('artifacts/address_baseline/anchors.json').read_text())
+    wide=np.load('artifacts/wide_calibration/features.npz')
+    wx,wg,wt=(wide[k] for k in ('x','groups','target'))
+    wm=json.loads(Path('artifacts/wide_calibration/anchors.json').read_text())
+    fit=np.isin(groups,[i for i,m in enumerate(meta) if m['fold']=='fit'])
+    early=np.isin(groups,[i for i,m in enumerate(meta) if m['fold']=='early'])
+    counts=np.bincount(groups,minlength=len(meta))
+    weights=1/np.maximum(1,counts[groups[fit]]);weights/=weights.mean()
+    report=json.loads(Path('reports/tuning.json').read_text()) if Path('reports/tuning.json').exists() else {}
+    for depth in (8,10):
+        name=f'depth{depth}'
+        if name in report and (out/f'{name}.cbm').exists() and (out/f'{name}_wide_probabilities.npy').exists():
+            print(f'Reusing completed {name} trial',flush=True)
+            continue
+        model=CatBoostClassifier(iterations=1500,depth=depth,learning_rate=.045,loss_function='Logloss',
+            l2_leaf_reg=10,random_seed=517,thread_count=6,verbose=200,allow_writing_files=False)
+        model.fit(x[fit],y[fit],sample_weight=weights,eval_set=(x[early],y[early]),early_stopping_rounds=100)
+        p=model.predict_proba(wx,thread_count=6)[:,1]
+        threshold,_=choose_threshold(wm,wg,wt,p,range(len(wm)))
+        truth,pred,cand=mappings(wm,wg,wt,p,range(len(wm)),threshold)
+        report[name]={'threshold':threshold,'trees':model.tree_count_,**evaluate(truth,pred,cand)}
+        model.save_model(str(out/f'{name}.cbm'))
+        np.save(out/f'{name}_wide_probabilities.npy',p)
+        Path('reports/tuning.json').write_text(json.dumps(report,indent=2))
+        print(name,json.dumps(report[name]),flush=True)
+
+
+if __name__=='__main__':
+    main()

@@ -106,4 +106,9 @@ Guidelines, Simultaneous Logins and Accessibility, page 2: no simultaneous login
 
 The guidelines provide an organizer Google Form for hackathon queries. No questions have been sent. These administrative ambiguities do not prevent model/data work.
 
-Still needed: train/test TSVs, the official validator source, `Documentation_template.md`, record counts, system RAM/storage, and the portal's final-submission selection behavior. No dataset scores or model performance have been measured.
+Implementation update: the TSVs, official validator, and methodology template are
+now available in `student_resource/`. Aggregate data audits and measured model
+results are in `reports/`; local RAM is 16 GB. The portal's final-submission selection
+behavior remains unverified. The supplied validator supports an optional `--check-ids`
+flag; the local streaming validator checks all candidate IDs without holding every
+candidate set in RAM. No leaderboard score has been measured.

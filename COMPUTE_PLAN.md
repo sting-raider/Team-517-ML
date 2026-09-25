@@ -2,6 +2,14 @@
 
 Updated 25 September 2026 using the hardware and credit budget reported by the user. This is a proposed allocation; no AWS resources have been started and no account balance or quota has been inspected.
 
+Implementation update: local RAM is 16 GB. The supplied files contain 24,229,173
+records. CPU baselines, country-transfer tests, and disk-backed indexes are running;
+CUDA PyTorch is installed in `.venv-gpu`. The user clarified that validation quality
+takes priority over saving computation. Candidate/model limits must be justified by
+measured score or genuine feasibility constraints, not an assumed preference for
+cheap inference. The earlier 30-candidate speed trade-off has been withdrawn from
+production selection. No AWS spending has occurred.
+
 The team has enough local GPU memory to attempt the proposed compact encoder-based pipeline. Whether all training and inference finish before the deadline depends on record counts, candidate counts, sequence lengths, system RAM, and sustained laptop throughput. Problem difficulty alone is not a reliable predictor of required compute.
 
 ## Local allocation

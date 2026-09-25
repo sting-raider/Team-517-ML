@@ -1,0 +1,128 @@
+{
+  "protocol": "Separate hash-ordered anchors, excluded from fitting, early stopping, calibration, and candidate-budget selection",
+  "size": 5000,
+  "offset": 30000,
+  "config": {
+    "threshold": 0.6250000000000002,
+    "feature_names": [
+      "name_ratio",
+      "name_sorted_ratio",
+      "name_set_ratio",
+      "name_compact_ratio",
+      "name_jaro_winkler",
+      "name_exact",
+      "name_left_len",
+      "name_right_len",
+      "name_len_ratio",
+      "name_token_jaccard",
+      "name_token_overlap",
+      "name_left_coverage",
+      "name_right_coverage",
+      "name_number_jaccard",
+      "name_number_overlap",
+      "name_left_number_coverage",
+      "name_right_number_coverage",
+      "name_first_number_equal",
+      "name_last_number_equal",
+      "name_number_conflict",
+      "name_left_missing",
+      "name_right_missing",
+      "address_ratio",
+      "address_sorted_ratio",
+      "address_set_ratio",
+      "address_compact_ratio",
+      "address_jaro_winkler",
+      "address_exact",
+      "address_left_len",
+      "address_right_len",
+      "address_len_ratio",
+      "address_token_jaccard",
+      "address_token_overlap",
+      "address_left_coverage",
+      "address_right_coverage",
+      "address_number_jaccard",
+      "address_number_overlap",
+      "address_left_number_coverage",
+      "address_right_number_coverage",
+      "address_first_number_equal",
+      "address_last_number_equal",
+      "address_number_conflict",
+      "address_left_missing",
+      "address_right_missing",
+      "retrieval",
+      "key_hits",
+      "source"
+    ],
+    "candidate_cap": 80,
+    "seed": 517,
+    "shortlist_cap": 30,
+    "blocker_version": 2,
+    "selection": "calibration only",
+    "selection_tolerance": 0.002
+  },
+  "scores": {
+    "all": {
+      "entities": 5000,
+      "macro_f0_5": 0.9147589908768532,
+      "singleton_count": 274,
+      "singleton_false_positive_rate": 0.07664233576642336,
+      "all_empty_baseline": 0.0548,
+      "candidate_pair_recall": 0.8962350780532599,
+      "candidate_entity_recall": 0.8962252047101814,
+      "all_matches_retrieved_rate": 0.7213288192975031,
+      "blocking_oracle_macro_f0_5": 0.9602204032758381,
+      "candidate_count_quantiles": {
+        "p50": 21.0,
+        "p90": 24.0,
+        "p99": 28.0,
+        "max": 30.0
+      },
+      "bootstrap_95_percent_interval": [
+        0.9095388712138427,
+        0.9201839696185211
+      ]
+    },
+    "India": {
+      "entities": 2006,
+      "macro_f0_5": 0.881481260009471,
+      "singleton_count": 109,
+      "singleton_false_positive_rate": 0.11926605504587157,
+      "all_empty_baseline": 0.054336989032901295,
+      "candidate_pair_recall": 0.8518730340291678,
+      "candidate_entity_recall": 0.8536938022441449,
+      "all_matches_retrieved_rate": 0.6299420137058513,
+      "blocking_oracle_macro_f0_5": 0.9413802115613263,
+      "candidate_count_quantiles": {
+        "p50": 21.0,
+        "p90": 24.0,
+        "p99": 25.0,
+        "max": 30.0
+      },
+      "bootstrap_95_percent_interval": [
+        0.8716377323237283,
+        0.8910633089625573
+      ]
+    },
+    "US": {
+      "entities": 2994,
+      "macro_f0_5": 0.9370552928541309,
+      "singleton_count": 165,
+      "singleton_false_positive_rate": 0.048484848484848485,
+      "all_empty_baseline": 0.05511022044088176,
+      "candidate_pair_recall": 0.9259827420901247,
+      "candidate_entity_recall": 0.9247448478625573,
+      "all_matches_retrieved_rate": 0.782608695652174,
+      "blocking_oracle_macro_f0_5": 0.9728434575775451,
+      "candidate_count_quantiles": {
+        "p50": 20.0,
+        "p90": 24.0,
+        "p99": 28.0,
+        "max": 30.0
+      },
+      "bootstrap_95_percent_interval": [
+        0.9314075029066924,
+        0.9426445890266086
+      ]
+    }
+  }
+}

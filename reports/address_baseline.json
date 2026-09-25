@@ -1,0 +1,886 @@
+{
+  "anchor_count": 30000,
+  "candidate_pairs": 2252063,
+  "positive_candidate_pairs": 94955,
+  "features": [
+    "name_ratio",
+    "name_sorted_ratio",
+    "name_set_ratio",
+    "name_compact_ratio",
+    "name_jaro_winkler",
+    "name_exact",
+    "name_left_len",
+    "name_right_len",
+    "name_len_ratio",
+    "name_token_jaccard",
+    "name_token_overlap",
+    "name_left_coverage",
+    "name_right_coverage",
+    "name_number_jaccard",
+    "name_number_overlap",
+    "name_left_number_coverage",
+    "name_right_number_coverage",
+    "name_first_number_equal",
+    "name_last_number_equal",
+    "name_number_conflict",
+    "name_left_missing",
+    "name_right_missing",
+    "address_ratio",
+    "address_sorted_ratio",
+    "address_set_ratio",
+    "address_compact_ratio",
+    "address_jaro_winkler",
+    "address_exact",
+    "address_left_len",
+    "address_right_len",
+    "address_len_ratio",
+    "address_token_jaccard",
+    "address_token_overlap",
+    "address_left_coverage",
+    "address_right_coverage",
+    "address_number_jaccard",
+    "address_number_overlap",
+    "address_left_number_coverage",
+    "address_right_number_coverage",
+    "address_first_number_equal",
+    "address_last_number_equal",
+    "address_number_conflict",
+    "address_left_missing",
+    "address_right_missing",
+    "retrieval",
+    "key_hits",
+    "source"
+  ],
+  "protocol": "60% fit, 15% early stopping, 15% threshold calibration, 10% holdout; SHA256 of anchor ID; full training S2/S3 inventory",
+  "runs": {
+    "mixed": {
+      "threshold": 0.6250000000000002,
+      "trees": 500,
+      "calibration_curve": [
+        {
+          "threshold": 0.05,
+          "macro_f0_5": 0.7886240280512609
+        },
+        {
+          "threshold": 0.07500000000000001,
+          "macro_f0_5": 0.8236955545412383
+        },
+        {
+          "threshold": 0.10000000000000002,
+          "macro_f0_5": 0.847859198760344
+        },
+        {
+          "threshold": 0.12500000000000003,
+          "macro_f0_5": 0.8636529570212146
+        },
+        {
+          "threshold": 0.15000000000000002,
+          "macro_f0_5": 0.8750167628054993
+        },
+        {
+          "threshold": 0.17500000000000004,
+          "macro_f0_5": 0.8832751930155261
+        },
+        {
+          "threshold": 0.20000000000000007,
+          "macro_f0_5": 0.8912612614295885
+        },
+        {
+          "threshold": 0.22500000000000003,
+          "macro_f0_5": 0.8950636322861873
+        },
+        {
+          "threshold": 0.25000000000000006,
+          "macro_f0_5": 0.8997487626971946
+        },
+        {
+          "threshold": 0.2750000000000001,
+          "macro_f0_5": 0.9032619349905303
+        },
+        {
+          "threshold": 0.3000000000000001,
+          "macro_f0_5": 0.9073040757880692
+        },
+        {
+          "threshold": 0.32500000000000007,
+          "macro_f0_5": 0.9092967827280891
+        },
+        {
+          "threshold": 0.3500000000000001,
+          "macro_f0_5": 0.9116903118565939
+        },
+        {
+          "threshold": 0.3750000000000001,
+          "macro_f0_5": 0.9135706455891777
+        },
+        {
+          "threshold": 0.4000000000000001,
+          "macro_f0_5": 0.9150369714221203
+        },
+        {
+          "threshold": 0.4250000000000001,
+          "macro_f0_5": 0.9156247403971481
+        },
+        {
+          "threshold": 0.4500000000000001,
+          "macro_f0_5": 0.9173860075528782
+        },
+        {
+          "threshold": 0.47500000000000014,
+          "macro_f0_5": 0.9185216322165105
+        },
+        {
+          "threshold": 0.5000000000000002,
+          "macro_f0_5": 0.9194681179293629
+        },
+        {
+          "threshold": 0.5250000000000001,
+          "macro_f0_5": 0.9196576451068829
+        },
+        {
+          "threshold": 0.5500000000000003,
+          "macro_f0_5": 0.9207694457026988
+        },
+        {
+          "threshold": 0.5750000000000002,
+          "macro_f0_5": 0.9207635333954782
+        },
+        {
+          "threshold": 0.6000000000000002,
+          "macro_f0_5": 0.9210280440603933
+        },
+        {
+          "threshold": 0.6250000000000002,
+          "macro_f0_5": 0.9214863293964353
+        },
+        {
+          "threshold": 0.6500000000000002,
+          "macro_f0_5": 0.9211334981974718
+        },
+        {
+          "threshold": 0.6750000000000003,
+          "macro_f0_5": 0.9206959523850109
+        },
+        {
+          "threshold": 0.7000000000000003,
+          "macro_f0_5": 0.9200475719463281
+        },
+        {
+          "threshold": 0.7250000000000003,
+          "macro_f0_5": 0.9187732964273465
+        },
+        {
+          "threshold": 0.7500000000000002,
+          "macro_f0_5": 0.9173435120625627
+        },
+        {
+          "threshold": 0.7750000000000002,
+          "macro_f0_5": 0.9155499756776344
+        },
+        {
+          "threshold": 0.8000000000000003,
+          "macro_f0_5": 0.9147535535120487
+        },
+        {
+          "threshold": 0.8250000000000003,
+          "macro_f0_5": 0.9138023914728615
+        },
+        {
+          "threshold": 0.8500000000000003,
+          "macro_f0_5": 0.9116537300603842
+        },
+        {
+          "threshold": 0.8750000000000003,
+          "macro_f0_5": 0.907195859745348
+        },
+        {
+          "threshold": 0.9000000000000004,
+          "macro_f0_5": 0.9010782129260761
+        },
+        {
+          "threshold": 0.9250000000000004,
+          "macro_f0_5": 0.8939767278443853
+        },
+        {
+          "threshold": 0.9500000000000004,
+          "macro_f0_5": 0.8793891258462462
+        },
+        {
+          "threshold": 0.97,
+          "macro_f0_5": 0.8589631786472794
+        },
+        {
+          "threshold": 0.98,
+          "macro_f0_5": 0.8400891201367354
+        },
+        {
+          "threshold": 0.99,
+          "macro_f0_5": 0.7970922844227757
+        },
+        {
+          "threshold": 0.995,
+          "macro_f0_5": 0.7441254806249666
+        },
+        {
+          "threshold": 0.999,
+          "macro_f0_5": 0.6132097464699073
+        }
+      ],
+      "holdout": {
+        "all": {
+          "entities": 3051,
+          "macro_f0_5": 0.921733474893402,
+          "singleton_count": 199,
+          "singleton_false_positive_rate": 0.11055276381909548,
+          "all_empty_baseline": 0.06522451655195018,
+          "candidate_pair_recall": 0.9127951256664127,
+          "candidate_entity_recall": 0.9108435461608673,
+          "all_matches_retrieved_rate": 0.7566619915848527,
+          "blocking_oracle_macro_f0_5": 0.9664239742760278,
+          "candidate_count_quantiles": {
+            "p50": 80.0,
+            "p90": 80.0,
+            "p99": 80.0,
+            "max": 80.0
+          }
+        },
+        "India": {
+          "entities": 1212,
+          "macro_f0_5": 0.8861778498511594,
+          "singleton_count": 97,
+          "singleton_false_positive_rate": 0.13402061855670103,
+          "all_empty_baseline": 0.08003300330033003,
+          "candidate_pair_recall": 0.87720156555773,
+          "candidate_entity_recall": 0.8729354402448573,
+          "all_matches_retrieved_rate": 0.6798206278026906,
+          "blocking_oracle_macro_f0_5": 0.9493342698982584,
+          "candidate_count_quantiles": {
+            "p50": 80.0,
+            "p90": 80.0,
+            "p99": 80.0,
+            "max": 80.0
+          }
+        },
+        "US": {
+          "entities": 1839,
+          "macro_f0_5": 0.9451665458837216,
+          "singleton_count": 102,
+          "singleton_false_positive_rate": 0.08823529411764706,
+          "all_empty_baseline": 0.05546492659053834,
+          "candidate_pair_recall": 0.9354738154613467,
+          "candidate_entity_recall": 0.9351771892790891,
+          "all_matches_retrieved_rate": 0.8059873344847438,
+          "blocking_oracle_macro_f0_5": 0.9776870094613763,
+          "candidate_count_quantiles": {
+            "p50": 80.0,
+            "p90": 80.0,
+            "p99": 80.0,
+            "max": 80.0
+          }
+        }
+      },
+      "feature_importance": {
+        "address_set_ratio": 17.6782089027741,
+        "name_compact_ratio": 10.363488472712094,
+        "name_right_len": 8.553459354788343,
+        "address_right_len": 7.567714897376673,
+        "name_ratio": 5.866009696041725,
+        "address_token_jaccard": 3.7072698400314508,
+        "name_set_ratio": 3.5002402348228503,
+        "name_len_ratio": 3.3977371405365027,
+        "address_token_overlap": 3.086641914097787,
+        "retrieval": 3.0721876507814185,
+        "address_number_overlap": 2.958203487372977,
+        "name_jaro_winkler": 2.8703124823702555,
+        "name_sorted_ratio": 2.658416863707711,
+        "name_token_overlap": 2.530606114442439,
+        "address_number_conflict": 2.3983743828900916,
+        "address_right_coverage": 2.1705414694270604,
+        "address_sorted_ratio": 2.126955367752716,
+        "name_right_coverage": 2.0849920983992454,
+        "address_len_ratio": 1.8181961186094944,
+        "name_left_coverage": 1.7617458008727953,
+        "source": 1.2565817647420519,
+        "address_left_len": 1.0736725279265296,
+        "address_number_jaccard": 1.0236498347550924,
+        "name_left_len": 0.8565255468102388,
+        "address_left_coverage": 0.8289067483817351,
+        "address_right_number_coverage": 0.8273968035125611,
+        "address_first_number_equal": 0.8073031682131618,
+        "name_token_jaccard": 0.7831037943403854,
+        "address_jaro_winkler": 0.6156929598302859,
+        "address_left_number_coverage": 0.5810762681870334,
+        "key_hits": 0.42003836373160486,
+        "address_compact_ratio": 0.28923869831715865,
+        "address_ratio": 0.2205467957176758,
+        "address_last_number_equal": 0.17856603062940435,
+        "address_right_missing": 0.042131781096221746,
+        "name_number_jaccard": 0.015774280219481285,
+        "name_right_number_coverage": 0.004100494257979262,
+        "name_first_number_equal": 0.0035876555250487973,
+        "name_last_number_equal": 0.0008041939986451359,
+        "name_exact": 0.0,
+        "name_number_overlap": 0.0,
+        "name_left_number_coverage": 0.0,
+        "name_number_conflict": 0.0,
+        "name_left_missing": 0.0,
+        "name_right_missing": 0.0,
+        "address_exact": 0.0,
+        "address_left_missing": 0.0
+      }
+    },
+    "train_India": {
+      "threshold": 0.6250000000000002,
+      "trees": 499,
+      "calibration_curve": [
+        {
+          "threshold": 0.05,
+          "macro_f0_5": 0.7623392602804008
+        },
+        {
+          "threshold": 0.07500000000000001,
+          "macro_f0_5": 0.7967189235807489
+        },
+        {
+          "threshold": 0.10000000000000002,
+          "macro_f0_5": 0.8192026885915404
+        },
+        {
+          "threshold": 0.12500000000000003,
+          "macro_f0_5": 0.8367124583876121
+        },
+        {
+          "threshold": 0.15000000000000002,
+          "macro_f0_5": 0.8485290699759986
+        },
+        {
+          "threshold": 0.17500000000000004,
+          "macro_f0_5": 0.8559651000586465
+        },
+        {
+          "threshold": 0.20000000000000007,
+          "macro_f0_5": 0.8645761067607601
+        },
+        {
+          "threshold": 0.22500000000000003,
+          "macro_f0_5": 0.8700143218350794
+        },
+        {
+          "threshold": 0.25000000000000006,
+          "macro_f0_5": 0.8762578488202949
+        },
+        {
+          "threshold": 0.2750000000000001,
+          "macro_f0_5": 0.8797827108274621
+        },
+        {
+          "threshold": 0.3000000000000001,
+          "macro_f0_5": 0.8815580830121315
+        },
+        {
+          "threshold": 0.32500000000000007,
+          "macro_f0_5": 0.8832351159851719
+        },
+        {
+          "threshold": 0.3500000000000001,
+          "macro_f0_5": 0.8859064843557517
+        },
+        {
+          "threshold": 0.3750000000000001,
+          "macro_f0_5": 0.8876057237785446
+        },
+        {
+          "threshold": 0.4000000000000001,
+          "macro_f0_5": 0.8893727770941403
+        },
+        {
+          "threshold": 0.4250000000000001,
+          "macro_f0_5": 0.8916603683061155
+        },
+        {
+          "threshold": 0.4500000000000001,
+          "macro_f0_5": 0.8939454579494557
+        },
+        {
+          "threshold": 0.47500000000000014,
+          "macro_f0_5": 0.895815937973848
+        },
+        {
+          "threshold": 0.5000000000000002,
+          "macro_f0_5": 0.894158954094662
+        },
+        {
+          "threshold": 0.5250000000000001,
+          "macro_f0_5": 0.8939805748772967
+        },
+        {
+          "threshold": 0.5500000000000003,
+          "macro_f0_5": 0.8950071442118862
+        },
+        {
+          "threshold": 0.5750000000000002,
+          "macro_f0_5": 0.8950391206141772
+        },
+        {
+          "threshold": 0.6000000000000002,
+          "macro_f0_5": 0.8956087770928721
+        },
+        {
+          "threshold": 0.6250000000000002,
+          "macro_f0_5": 0.8964047658442388
+        },
+        {
+          "threshold": 0.6500000000000002,
+          "macro_f0_5": 0.8958003283932564
+        },
+        {
+          "threshold": 0.6750000000000003,
+          "macro_f0_5": 0.8940768892137277
+        },
+        {
+          "threshold": 0.7000000000000003,
+          "macro_f0_5": 0.8928017451405553
+        },
+        {
+          "threshold": 0.7250000000000003,
+          "macro_f0_5": 0.8922852945639402
+        },
+        {
+          "threshold": 0.7500000000000002,
+          "macro_f0_5": 0.8876754077268812
+        },
+        {
+          "threshold": 0.7750000000000002,
+          "macro_f0_5": 0.885762376918779
+        },
+        {
+          "threshold": 0.8000000000000003,
+          "macro_f0_5": 0.8845310842791927
+        },
+        {
+          "threshold": 0.8250000000000003,
+          "macro_f0_5": 0.8785710766384343
+        },
+        {
+          "threshold": 0.8500000000000003,
+          "macro_f0_5": 0.8740888092570608
+        },
+        {
+          "threshold": 0.8750000000000003,
+          "macro_f0_5": 0.8684728396314007
+        },
+        {
+          "threshold": 0.9000000000000004,
+          "macro_f0_5": 0.8595666285091719
+        },
+        {
+          "threshold": 0.9250000000000004,
+          "macro_f0_5": 0.8429824239175482
+        },
+        {
+          "threshold": 0.9500000000000004,
+          "macro_f0_5": 0.8215902616257224
+        },
+        {
+          "threshold": 0.97,
+          "macro_f0_5": 0.7961327118193497
+        },
+        {
+          "threshold": 0.98,
+          "macro_f0_5": 0.7708450950188453
+        },
+        {
+          "threshold": 0.99,
+          "macro_f0_5": 0.7159518562534481
+        },
+        {
+          "threshold": 0.995,
+          "macro_f0_5": 0.649940679329401
+        },
+        {
+          "threshold": 0.999,
+          "macro_f0_5": 0.4722398886940253
+        }
+      ],
+      "holdout": {
+        "all": {
+          "entities": 3051,
+          "macro_f0_5": 0.9001987224816964,
+          "singleton_count": 199,
+          "singleton_false_positive_rate": 0.1457286432160804,
+          "all_empty_baseline": 0.06522451655195018,
+          "candidate_pair_recall": 0.9127951256664127,
+          "candidate_entity_recall": 0.9108435461608673,
+          "all_matches_retrieved_rate": 0.7566619915848527,
+          "blocking_oracle_macro_f0_5": 0.9664239742760278,
+          "candidate_count_quantiles": {
+            "p50": 80.0,
+            "p90": 80.0,
+            "p99": 80.0,
+            "max": 80.0
+          }
+        },
+        "India": {
+          "entities": 1212,
+          "macro_f0_5": 0.8886691029021261,
+          "singleton_count": 97,
+          "singleton_false_positive_rate": 0.13402061855670103,
+          "all_empty_baseline": 0.08003300330033003,
+          "candidate_pair_recall": 0.87720156555773,
+          "candidate_entity_recall": 0.8729354402448573,
+          "all_matches_retrieved_rate": 0.6798206278026906,
+          "blocking_oracle_macro_f0_5": 0.9493342698982584,
+          "candidate_count_quantiles": {
+            "p50": 80.0,
+            "p90": 80.0,
+            "p99": 80.0,
+            "max": 80.0
+          }
+        },
+        "US": {
+          "entities": 1839,
+          "macro_f0_5": 0.9077973624656221,
+          "singleton_count": 102,
+          "singleton_false_positive_rate": 0.1568627450980392,
+          "all_empty_baseline": 0.05546492659053834,
+          "candidate_pair_recall": 0.9354738154613467,
+          "candidate_entity_recall": 0.9351771892790891,
+          "all_matches_retrieved_rate": 0.8059873344847438,
+          "blocking_oracle_macro_f0_5": 0.9776870094613763,
+          "candidate_count_quantiles": {
+            "p50": 80.0,
+            "p90": 80.0,
+            "p99": 80.0,
+            "max": 80.0
+          }
+        }
+      },
+      "feature_importance": {
+        "address_right_coverage": 25.45792886724904,
+        "name_compact_ratio": 9.02032944388456,
+        "name_right_len": 6.90305449441868,
+        "address_right_len": 6.010579662190815,
+        "name_len_ratio": 5.169842997728209,
+        "name_jaro_winkler": 4.619787078653113,
+        "name_ratio": 4.577834954316461,
+        "name_set_ratio": 3.589523944982275,
+        "address_first_number_equal": 3.5656870008290404,
+        "name_sorted_ratio": 3.4895242125127957,
+        "retrieval": 3.046320713482639,
+        "key_hits": 2.2672140813311823,
+        "name_right_coverage": 2.221895516761776,
+        "source": 2.105725905114421,
+        "name_left_len": 1.6904938005847785,
+        "name_left_coverage": 1.6776465474113913,
+        "name_token_jaccard": 1.4739863609891581,
+        "address_token_overlap": 1.4706522638726671,
+        "address_number_conflict": 1.3418719455197405,
+        "address_number_overlap": 1.2541875172572718,
+        "address_number_jaccard": 1.1172407081870814,
+        "address_right_number_coverage": 1.0527762153059697,
+        "name_token_overlap": 0.9561490182989542,
+        "address_token_jaccard": 0.8674447408628858,
+        "address_left_number_coverage": 0.828919684048949,
+        "address_len_ratio": 0.8236619229902454,
+        "address_set_ratio": 0.7262185683954091,
+        "address_left_len": 0.6002767033778323,
+        "address_jaro_winkler": 0.5874760858149,
+        "address_sorted_ratio": 0.4317008820678215,
+        "address_compact_ratio": 0.3628304923750722,
+        "address_left_coverage": 0.3011162749486155,
+        "address_last_number_equal": 0.1895713844115013,
+        "address_ratio": 0.17984062556068298,
+        "address_right_missing": 0.019075626748387618,
+        "address_exact": 0.0015272630929164728,
+        "name_number_overlap": 5.894757342461346e-05,
+        "name_left_number_coverage": 2.7546849338557313e-05,
+        "name_exact": 0.0,
+        "name_number_jaccard": 0.0,
+        "name_right_number_coverage": 0.0,
+        "name_first_number_equal": 0.0,
+        "name_last_number_equal": 0.0,
+        "name_number_conflict": 0.0,
+        "name_left_missing": 0.0,
+        "name_right_missing": 0.0,
+        "address_left_missing": 0.0
+      }
+    },
+    "train_US": {
+      "threshold": 0.8000000000000003,
+      "trees": 500,
+      "calibration_curve": [
+        {
+          "threshold": 0.05,
+          "macro_f0_5": 0.8263320603279966
+        },
+        {
+          "threshold": 0.07500000000000001,
+          "macro_f0_5": 0.8625302202029999
+        },
+        {
+          "threshold": 0.10000000000000002,
+          "macro_f0_5": 0.8802825318385494
+        },
+        {
+          "threshold": 0.12500000000000003,
+          "macro_f0_5": 0.8949021555621657
+        },
+        {
+          "threshold": 0.15000000000000002,
+          "macro_f0_5": 0.90551151413197
+        },
+        {
+          "threshold": 0.17500000000000004,
+          "macro_f0_5": 0.9126398065316549
+        },
+        {
+          "threshold": 0.20000000000000007,
+          "macro_f0_5": 0.9180401149668815
+        },
+        {
+          "threshold": 0.22500000000000003,
+          "macro_f0_5": 0.9233453180179145
+        },
+        {
+          "threshold": 0.25000000000000006,
+          "macro_f0_5": 0.9272362779441744
+        },
+        {
+          "threshold": 0.2750000000000001,
+          "macro_f0_5": 0.9293326978781281
+        },
+        {
+          "threshold": 0.3000000000000001,
+          "macro_f0_5": 0.9314498983741959
+        },
+        {
+          "threshold": 0.32500000000000007,
+          "macro_f0_5": 0.9334037879822956
+        },
+        {
+          "threshold": 0.3500000000000001,
+          "macro_f0_5": 0.9345526881791921
+        },
+        {
+          "threshold": 0.3750000000000001,
+          "macro_f0_5": 0.9348032801220141
+        },
+        {
+          "threshold": 0.4000000000000001,
+          "macro_f0_5": 0.9364743492709273
+        },
+        {
+          "threshold": 0.4250000000000001,
+          "macro_f0_5": 0.9379690727643742
+        },
+        {
+          "threshold": 0.4500000000000001,
+          "macro_f0_5": 0.9383492146820765
+        },
+        {
+          "threshold": 0.47500000000000014,
+          "macro_f0_5": 0.9394745490507812
+        },
+        {
+          "threshold": 0.5000000000000002,
+          "macro_f0_5": 0.9409716175932878
+        },
+        {
+          "threshold": 0.5250000000000001,
+          "macro_f0_5": 0.941198302043575
+        },
+        {
+          "threshold": 0.5500000000000003,
+          "macro_f0_5": 0.9420917896104783
+        },
+        {
+          "threshold": 0.5750000000000002,
+          "macro_f0_5": 0.9431801423848551
+        },
+        {
+          "threshold": 0.6000000000000002,
+          "macro_f0_5": 0.9433425077757938
+        },
+        {
+          "threshold": 0.6250000000000002,
+          "macro_f0_5": 0.9433348363814235
+        },
+        {
+          "threshold": 0.6500000000000002,
+          "macro_f0_5": 0.9439963915292491
+        },
+        {
+          "threshold": 0.6750000000000003,
+          "macro_f0_5": 0.9436380180130076
+        },
+        {
+          "threshold": 0.7000000000000003,
+          "macro_f0_5": 0.9440650586161038
+        },
+        {
+          "threshold": 0.7250000000000003,
+          "macro_f0_5": 0.9440925736281218
+        },
+        {
+          "threshold": 0.7500000000000002,
+          "macro_f0_5": 0.9446761825858623
+        },
+        {
+          "threshold": 0.7750000000000002,
+          "macro_f0_5": 0.9446146495487069
+        },
+        {
+          "threshold": 0.8000000000000003,
+          "macro_f0_5": 0.9449977861848
+        },
+        {
+          "threshold": 0.8250000000000003,
+          "macro_f0_5": 0.9432742801951566
+        },
+        {
+          "threshold": 0.8500000000000003,
+          "macro_f0_5": 0.9416774162186338
+        },
+        {
+          "threshold": 0.8750000000000003,
+          "macro_f0_5": 0.9398556496564912
+        },
+        {
+          "threshold": 0.9000000000000004,
+          "macro_f0_5": 0.9369735507667543
+        },
+        {
+          "threshold": 0.9250000000000004,
+          "macro_f0_5": 0.9333763596547681
+        },
+        {
+          "threshold": 0.9500000000000004,
+          "macro_f0_5": 0.9280477164067423
+        },
+        {
+          "threshold": 0.97,
+          "macro_f0_5": 0.9156250009694126
+        },
+        {
+          "threshold": 0.98,
+          "macro_f0_5": 0.9014667677632756
+        },
+        {
+          "threshold": 0.99,
+          "macro_f0_5": 0.8685956310317956
+        },
+        {
+          "threshold": 0.995,
+          "macro_f0_5": 0.8288553519875154
+        },
+        {
+          "threshold": 0.999,
+          "macro_f0_5": 0.7028763881446142
+        }
+      ],
+      "holdout": {
+        "all": {
+          "entities": 3051,
+          "macro_f0_5": 0.8785038014518589,
+          "singleton_count": 199,
+          "singleton_false_positive_rate": 0.1708542713567839,
+          "all_empty_baseline": 0.06522451655195018,
+          "candidate_pair_recall": 0.9127951256664127,
+          "candidate_entity_recall": 0.9108435461608673,
+          "all_matches_retrieved_rate": 0.7566619915848527,
+          "blocking_oracle_macro_f0_5": 0.9664239742760278,
+          "candidate_count_quantiles": {
+            "p50": 80.0,
+            "p90": 80.0,
+            "p99": 80.0,
+            "max": 80.0
+          }
+        },
+        "India": {
+          "entities": 1212,
+          "macro_f0_5": 0.7772012387578463,
+          "singleton_count": 97,
+          "singleton_false_positive_rate": 0.26804123711340205,
+          "all_empty_baseline": 0.08003300330033003,
+          "candidate_pair_recall": 0.87720156555773,
+          "candidate_entity_recall": 0.8729354402448573,
+          "all_matches_retrieved_rate": 0.6798206278026906,
+          "blocking_oracle_macro_f0_5": 0.9493342698982584,
+          "candidate_count_quantiles": {
+            "p50": 80.0,
+            "p90": 80.0,
+            "p99": 80.0,
+            "max": 80.0
+          }
+        },
+        "US": {
+          "entities": 1839,
+          "macro_f0_5": 0.9452676437493812,
+          "singleton_count": 102,
+          "singleton_false_positive_rate": 0.0784313725490196,
+          "all_empty_baseline": 0.05546492659053834,
+          "candidate_pair_recall": 0.9354738154613467,
+          "candidate_entity_recall": 0.9351771892790891,
+          "all_matches_retrieved_rate": 0.8059873344847438,
+          "blocking_oracle_macro_f0_5": 0.9776870094613763,
+          "candidate_count_quantiles": {
+            "p50": 80.0,
+            "p90": 80.0,
+            "p99": 80.0,
+            "max": 80.0
+          }
+        }
+      },
+      "feature_importance": {
+        "address_set_ratio": 16.225513406415022,
+        "name_compact_ratio": 11.340355796208241,
+        "name_right_len": 9.672186396783086,
+        "name_set_ratio": 5.422368498620077,
+        "address_number_conflict": 5.338863592726869,
+        "address_sorted_ratio": 4.962509037614891,
+        "name_ratio": 4.542325289547407,
+        "retrieval": 3.68994244828466,
+        "name_right_coverage": 3.159645209073976,
+        "address_token_overlap": 2.8821801704298227,
+        "address_number_overlap": 2.8426944080183882,
+        "name_sorted_ratio": 2.785816482404494,
+        "name_jaro_winkler": 2.5665240512334053,
+        "name_len_ratio": 2.343462592222319,
+        "address_len_ratio": 2.2314743201405065,
+        "address_compact_ratio": 2.1082405130140827,
+        "address_token_jaccard": 2.089504883180525,
+        "name_token_jaccard": 1.9901050196344112,
+        "name_token_overlap": 1.9580498294387119,
+        "address_ratio": 1.229206299328427,
+        "address_left_coverage": 1.1888887548503864,
+        "name_left_coverage": 1.1262228411200348,
+        "key_hits": 1.0437719982583806,
+        "source": 1.0207086896839737,
+        "address_right_len": 0.9747167305947215,
+        "address_left_len": 0.8974667554148803,
+        "name_left_len": 0.8454253188760107,
+        "address_left_number_coverage": 0.7654063378382427,
+        "address_jaro_winkler": 0.7330219650005613,
+        "address_last_number_equal": 0.5996573621072145,
+        "address_number_jaccard": 0.47932383719547733,
+        "address_right_number_coverage": 0.38568704111716057,
+        "address_right_coverage": 0.272753128069545,
+        "address_first_number_equal": 0.17046467659450645,
+        "address_right_missing": 0.05123951049723035,
+        "name_right_number_coverage": 0.02146127466763638,
+        "name_left_number_coverage": 0.014615176670558845,
+        "name_last_number_equal": 0.009321256459080895,
+        "name_number_jaccard": 0.009206128974550684,
+        "name_first_number_equal": 0.008302819040046266,
+        "address_exact": 0.0011255727759789636,
+        "name_number_conflict": 0.00024457987450150336,
+        "name_exact": 0.0,
+        "name_number_overlap": 0.0,
+        "name_left_missing": 0.0,
+        "name_right_missing": 0.0,
+        "address_left_missing": 0.0
+      }
+    }
+  },
+  "elapsed_seconds": 310.5316996574402
+}
