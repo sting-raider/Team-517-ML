@@ -5,22 +5,26 @@ import numpy as np
 import pandas as pd
 from catboost import CatBoostClassifier
 from .data import connect
-from .experiment import materialize,choose_threshold,mappings
+from .experiment import feature_cache_identity,materialize,choose_threshold,mappings
 from .shortlist import shortlist_mask
 from .metrics import evaluate
+from .provenance import require_manifest
 
 
 def main():
     out=Path('artifacts/wide_calibration')
+    base_meta=json.loads(Path('artifacts/address_baseline/anchors.json').read_text())
+    selected=[m['id'] for m in base_meta if m['fold']=='calibrate']
+    c=connect('artifacts/data.duckdb')
+    c.register('selection',pd.DataFrame({'id':selected}))
+    c.execute('CREATE OR REPLACE TABLE wide_anchors AS SELECT t.* FROM train t JOIN selection s ON t.entity_id=s.id')
     if not (out/'features.npz').exists():
-        meta=json.loads(Path('artifacts/address_baseline/anchors.json').read_text())
-        selected=[m['id'] for m in meta if m['fold']=='calibrate']
-        c=connect('artifacts/data.duckdb')
-        c.register('selection',pd.DataFrame({'id':selected}))
-        c.execute('CREATE OR REPLACE TABLE wide_anchors AS SELECT t.* FROM train t JOIN selection s ON t.entity_id=s.id')
         c.close()
         x,y,groups,target,meta=materialize('artifacts/data.duckdb',out,'wide_anchors','wide_candidates')
     else:
+        expected=feature_cache_identity(c,'wide_anchors','wide_candidates')
+        c.close()
+        require_manifest(out/'features.manifest.json',expected,'wide calibration feature cache')
         f=np.load(out/'features.npz')
         x,y,groups,target=(f[k] for k in ('x','y','groups','target'))
         meta=json.loads((out/'anchors.json').read_text())
