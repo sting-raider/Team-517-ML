@@ -1,5 +1,7 @@
 import math
 import unittest
+import tempfile
+from pathlib import Path
 
 import duckdb
 
@@ -9,7 +11,10 @@ from ber.provenance import PROVENANCE_FEATURE_NAMES, provenance_values
 
 class CandidateProvenanceTests(unittest.TestCase):
     def make_db(self):
-        c=duckdb.connect()
+        tempdir=tempfile.TemporaryDirectory()
+        self.addCleanup(tempdir.cleanup)
+        c=duckdb.connect(str(Path(tempdir.name)/'m002.duckdb'))
+        self.addCleanup(c.close)
         c.execute('''CREATE TABLE train(
             entity_id VARCHAR, business_name VARCHAR, business_address VARCHAR,
             country VARCHAR, source INTEGER, n VARCHAR, a VARCHAR
