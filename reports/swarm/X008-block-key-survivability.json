@@ -1,0 +1,35 @@
+{
+  "experiment": "X008",
+  "scope": "complete Source-1 train/test; S1 document-frequency proxy only; no sampling",
+  "normalization": "production block-key logic with NFD accent-fold semantic mirror because DuckDB was unavailable in this runtime",
+  "rows": {"train_US":1323633,"train_India":883188,"test_US":663106,"test_India":809986,"test_France":259452},
+  "test": {
+    "US": {
+      "mean_emitted_keys":14.1350,"mean_proxy_eligible_keys":11.1369,"mean_selected_proxy_keys":11.0957,
+      "eligible_anchor_rate":{"n":1.0,"a":1.0,"h":0.999569,"z":0.999569,"w":0.772195,"u":0.943937,"v":0.963154,"d":0.999991},
+      "highfreq_occurrence_rate_gt1000":{"n":0.0,"a":0.0,"h":0.0,"z":0.0,"w":0.588801,"u":0.414275,"v":0.0264095,"d":0.0},
+      "max_s1_df":{"n":123,"a":10,"h":40,"z":160,"w":178356,"u":38208,"v":2951,"d":244},
+      "all_four_nonexact_families_eligible_rate":0.705961,"no_eligible_nonexact_rate":0.00000150805
+    },
+    "India": {
+      "mean_emitted_keys":29.2351,"mean_proxy_eligible_keys":18.6932,"mean_selected_proxy_keys":14.1566,
+      "eligible_anchor_rate":{"n":1.0,"a":1.0,"h":0.912655,"z":0.912655,"w":0.567549,"u":0.933107,"v":0.992754,"d":0.912419},
+      "highfreq_occurrence_rate_gt1000":{"n":0.0,"a":0.0,"h":0.0,"z":0.0,"w":0.785094,"u":0.657589,"v":0.277721,"d":0.0979127},
+      "max_s1_df":{"n":99,"a":12,"h":253,"z":545,"w":478384,"u":175717,"v":87679,"d":8968},
+      "all_four_nonexact_families_eligible_rate":0.479349,"no_eligible_nonexact_rate":0.0000617295
+    },
+    "France": {
+      "mean_emitted_keys":23.2241,"mean_proxy_eligible_keys":12.8263,"mean_selected_proxy_keys":12.0119,
+      "eligible_anchor_rate":{"n":1.0,"a":1.0,"h":0.995803,"z":0.995803,"w":0.798529,"u":0.973779,"v":0.998505,"d":0.995722},
+      "highfreq_occurrence_rate_gt1000":{"n":0.0,"a":0.0,"h":0.0,"z":0.0,"w":0.685611,"u":0.767951,"v":0.499059,"d":0.276140},
+      "max_s1_df":{"n":205,"a":101,"h":264,"z":262,"w":73486,"u":170769,"v":101521,"d":4423},
+      "all_four_nonexact_families_eligible_rate":0.774197,"no_eligible_nonexact_rate":0.0000655227
+    }
+  },
+  "train_controls": {
+    "US":{"w_eligible_anchor_rate":0.678789,"u_eligible_anchor_rate":0.865466,"v_eligible_anchor_rate":0.962243,"d_eligible_anchor_rate":0.999992,"all_four_nonexact_families_eligible_rate":0.569851},
+    "India":{"w_eligible_anchor_rate":0.565800,"u_eligible_anchor_rate":0.927208,"v_eligible_anchor_rate":0.991758,"d_eligible_anchor_rate":0.912494,"all_four_nonexact_families_eligible_rate":0.474315}
+  },
+  "runtime_cpu_seconds_sum":{"map_train":187.047,"map_test":159.691,"survival_train":131.298,"survival_test":115.457},
+  "integrity":{"row_counts_match_repo_audit":true,"family_occurrence_totals_match_merged_df_sums":true,"synthetic_block_key_cases_pass":true,"exact_family_s1_df_gt1000_count":0}
+}
