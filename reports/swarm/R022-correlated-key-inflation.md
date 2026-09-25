@@ -17,7 +17,7 @@ The helper also includes an explicitly illustrative “family max” comparator 
 - Base: main at `2a2ae6ec6de943ad7e38ecc0f0a95b53a0d7f460`.
 - Tier: 0/1 static + deterministic synthetic audit.
 - Current full-data calibration context, not re-evaluated here: cap-640 pair recall **0.945863**, all-matches-retrieved rate **0.841189**, blocking-oracle macro F0.5 **0.981178** on 4,389 calibration anchors.
-- Synthetic address cases contain 1–4 eligible address words, an address number, and the `h:` name-prefix+number key. Every address-derived key is assigned `freq=1000`, the *weakest* IDF still admitted by blocker v2.
+- Synthetic address cases contain 1–4 eligible address words and a single address number. Under the current key logic that one number emits both `h:` (first number) and `z:` (last number); with one numeric token those two keys encode the same underlying number evidence. Every address-derived key is assigned `freq=1000`, the *weakest* IDF still admitted by blocker v2.
 - The competing name-only candidate receives four `w:` keys at `freq=1`, the *strongest possible* IDF under blocker v2’s four-name-token query limit.
 - Exact score arithmetic is evaluated with Python stdlib only.
 - Command:
@@ -33,12 +33,12 @@ Full train Source 2 (489,301,488 bytes) and Source 3 (503,705,637 bytes) are vis
 
 | Eligible address words | Scoring hits from same address evidence | Current summed score | Inflation vs exact-address-only | Family-max diagnostic | Four maximally rare name words |
 |---:|---:|---:|---:|---:|---:|
-| 1 | 4 | 100.841 | 2.049× | 83.631 | 64.472 |
-| 2 | 7 | 152.472 | 3.098× | 83.631 | 64.472 |
-| 3 | 10 | 204.103 | 4.148× | 83.631 | 64.472 |
-| 4 | 13 | 255.734 | 5.197× | 83.631 | 64.472 |
+| 1 | 5 | 118.052 | 2.399× | 83.631 | 64.472 |
+| 2 | 8 | 169.683 | 3.448× | 83.631 | 64.472 |
+| 3 | 11 | 221.314 | 4.497× | 83.631 | 64.472 |
+| 4 | 14 | 272.945 | 5.546× | 83.631 | 64.472 |
 
-The key result is deliberately conservative: even with every address-derived key at the blocker’s maximum eligible frequency of 1000, the **one-word address stack scores 100.841**, exceeding **64.472** from four maximally rare shared name words. At four eligible address words, the same underlying address evidence is counted across 13 scoring hits and reaches **255.734**, 5.197× the exact-address contribution alone.
+The key result is deliberately conservative: even with every address-derived key at the blocker’s maximum eligible frequency of 1000, the **one-word, single-number address stack scores 118.052**, exceeding **64.472** from four maximally rare shared name words. At four eligible address words, the same underlying address/number evidence is counted across 14 scoring hits and reaches **272.945**, 5.546× the exact-address contribution alone.
 
 This confirms the mechanism: blocker-v2 rank is sensitive not only to rarity and field agreement but also to how many correlated keys a field happens to emit.
 
@@ -48,13 +48,13 @@ No official macro F0.5, pair recall, entity recall, or oracle delta is claimed f
 
 1. **Same-building / exact-address hard negatives.** A different business at the same normalized address can accumulate exact-address plus derived address-word/bigram/number evidence even when name evidence points elsewhere. This is the highest-risk semantic case for score multiplication.
 2. **Address-length dependence.** More eligible address words mechanically create more `u:`, `v:`, and `d:` opportunities. Under the current sum, otherwise similar evidence can receive a larger score simply because the address yields more derived keys.
-3. **Repeated number evidence.** `h:` and multiple `d:` keys can all reuse the same address number while each receiving the generic +8 bonus and an IDF term.
+3. **Repeated number evidence.** With a single numeric token, `h:` (first number) and `z:` (last number) encode the same name-prefix+number evidence under different key prefixes, so both score independently. Multiple `d:` keys can reuse that same number again with different address words.
 4. **Bounded-cap relevance.** The committed calibration study has p50 candidate count 597 and p90/p99 at 640 for cap 640. Ranking changes therefore can plausibly affect which candidates survive the cap; this audit does not measure how often the correlated-key pattern crosses the cutoff.
 5. **Potential legitimate benefit.** Exact shared address plus several compatible components may genuinely be strong positive evidence. The audit proves overcounting potential, not that all such rank boosts are wrong.
 
 ## Interpretation
 
-The hypothesis is **confirmed as a scoring-structure failure mode**: blocker v2 can multiply one underlying address fact into several additive retrieval contributions, and the multiplication is large enough to outrank the strongest four-token name-only evidence in a conservative synthetic case.
+The hypothesis is **confirmed as a scoring-structure failure mode**: blocker v2 can multiply one underlying address fact into several additive retrieval contributions, including deterministic first/last-number double counting when an address has one numeric token,, and the multiplication is large enough to outrank the strongest four-token name-only evidence in a conservative synthetic case.
 
 That is useful because it identifies a distinct retrieval lever not covered by simply widening the cap or adding another retrieval channel. However, changing production scoring now would be premature. The same correlated keys may currently rescue real positives, and without the full S2/S3 inventory this runtime cannot measure the net effect on pair recall, entity recall, all-matches-retrieved rate, blocking oracle, or candidate count.
 
