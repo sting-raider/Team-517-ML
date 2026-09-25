@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "sample_order": "train source=1 ORDER BY md5('sample517:' || entity_id)",
+  "policy": "Development ranges are forbidden. Exact consumed windows require explicit reuse. Fresh disjoint windows require explicit consumption and a reason.",
+  "forbidden": [
+    {
+      "label": "development_30k",
+      "offset": 0,
+      "size": 30000,
+      "reason": "Used for fit, early stopping, calibration, and development holdout/model selection"
+    }
+  ],
+  "consumed": [
+    {
+      "label": "historical_shortlist_confirmation",
+      "offset": 30000,
+      "size": 5000,
+      "status": "consumed",
+      "report": "reports/confirmation.json",
+      "report_git_blob_sha": "2b00d48358c086630e659c0ca6da8ef5a45f7898",
+      "observed_macro_f0_5": 0.9147589908768532,
+      "reason": "Historical 30-candidate shortlist confirmation; already inspected"
+    },
+    {
+      "label": "submission_v1_confirmation",
+      "offset": 35000,
+      "size": 5000,
+      "status": "consumed",
+      "report": "reports/submission_v1_confirmation.json",
+      "report_git_blob_sha": "aef3c4a1623999051b1aa42085e3f2bcd6828132",
+      "observed_macro_f0_5": 0.928834953202575,
+      "reason": "Selected first-submission confirmation; already inspected"
+    }
+  ]
+}
