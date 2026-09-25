@@ -7,10 +7,12 @@ from itertools import groupby
 from collections import deque
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
+import numpy as np
 from catboost import CatBoostClassifier
 from .blocking import build_index,candidates
 from .data import connect
 from .features import batch_features,FEATURE_NAMES
+from .provenance import PROVENANCE_FEATURE_NAMES, provenance_values
 from .shortlist import shortlist_rows
 
 
@@ -23,16 +25,27 @@ def sha256(path):
 
 
 def prepare_groups(payload):
-    groups,cap=payload
+    groups,cap,provenance=payload
     selected=[r for group in groups for r in shortlist_rows(group,cap)]
-    return [(r[0],r[1]) for r in selected],batch_features([r[2:] for r in selected])
+    if not provenance:
+        x=batch_features([r[2:] for r in selected])
+    else:
+        base=batch_features([r[2:9] for r in selected])
+        extra=np.asarray([provenance_values(*r[9:]) for r in selected],dtype=np.float32)
+        x=np.concatenate((base,extra),axis=1)
+    return [(r[0],r[1]) for r in selected],x
 
 
-def score_batch(c,model,threshold,split,anchor_table,candidate_table,shortlist_cap=None,executor=None):
+def score_batch(c,model,threshold,split,anchor_table,candidate_table,shortlist_cap=None,executor=None,provenance=False):
     anchor_ids=[r[0] for r in c.execute(f'SELECT entity_id FROM {anchor_table} ORDER BY entity_id').fetchall()]
     selected={k:[] for k in anchor_ids}
     considered={k:[] for k in anchor_ids}
-    c.execute(f'''SELECT p.anchor,r.entity_id,l.n,l.a,r.n,r.a,p.retrieval,p.hits,r.source
+    extra = '' if not provenance else (
+        ',p.candidate_rank,p.name_exact_hits,p.address_exact_hits'
+        ',p.name_token_hits,p.address_token_hits,p.address_bigram_hits,p.name_number_hits'
+        ',p.address_number_hits,p.min_key_freq'
+    )
+    c.execute(f'''SELECT p.anchor,r.entity_id,l.n,l.a,r.n,r.a,p.retrieval,p.hits,r.source{extra}
         FROM {candidate_table} p JOIN {anchor_table} l ON p.anchor=l.entity_id
         JOIN {split} r ON p.rid=r.rowid ORDER BY p.anchor,r.entity_id''')
     def all_records():
@@ -43,10 +56,10 @@ def score_batch(c,model,threshold,split,anchor_table,candidate_table,shortlist_c
         for _,group in groupby(all_records(),key=lambda r:r[0]):
             pending.append(list(group))
             if len(pending)>=250:
-                yield pending,shortlist_cap
+                yield pending,shortlist_cap,provenance
                 pending=[]
         if pending:
-            yield pending,shortlist_cap
+            yield pending,shortlist_cap,provenance
     def feature_batches():
         if executor is None:
             for payload in grouped_batches():
@@ -84,7 +97,9 @@ def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,quer
     if partition_count<1 or not 0<=partition_index<partition_count:
         raise ValueError('Invalid partition index/count')
     config=json.loads((model_dir/'model_config.json').read_text())
-    if config['feature_names']!=FEATURE_NAMES:
+    provenance=bool(config.get('provenance',False))
+    expected_features=FEATURE_NAMES + (PROVENANCE_FEATURE_NAMES if provenance else [])
+    if config['feature_names']!=expected_features:
         raise ValueError('Feature schema does not match the saved model')
     cap=cap or config['candidate_cap']
     model=CatBoostClassifier()
@@ -127,9 +142,9 @@ def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,quer
         phase_start=time.time()
         c.execute(f'''CREATE OR REPLACE TEMP TABLE batch_anchors AS SELECT * FROM inference_anchors
             WHERE seq>{offset} AND seq<={offset+step}''')
-        candidates(c,'test','batch_anchors','batch_candidates',cap)
+        candidates(c,'test','batch_anchors','batch_candidates',cap,provenance=provenance)
         blocking_seconds=time.time()-phase_start
-        matched,considered=score_batch(c,model,config['threshold'],'test','batch_anchors','batch_candidates',config.get('shortlist_cap'),executor)
+        matched,considered=score_batch(c,model,config['threshold'],'test','batch_anchors','batch_candidates',config.get('shortlist_cap'),executor,provenance)
         ordered_ids=list(matched)
         for i,(shard,complete) in enumerate(batch_shards):
             if complete:
