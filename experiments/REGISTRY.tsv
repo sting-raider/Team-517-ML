@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+I001	#9	I	ChatGPT/Pod I	agent/i/I001-fast-benchmark	36f79706a42a9fdc4e14e15b7275a93a8273e67c	Fixed-slice benchmark reduces mismatched evaluation comparisons	Full raw S1 + ground-truth slice verification; synthetic helper tests	N/A	N/A	N/A	4389 calibration anchors; 252 singletons; 15276 positive links	S1 8.47s + truth 3.37s; full S2/S3 blocker run blocked by 256 MiB connector limit	FOLLOW-UP	reports/swarm/I001-fast-benchmark.md
