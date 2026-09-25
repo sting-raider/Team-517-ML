@@ -1,0 +1,70 @@
+{
+  "experiment_id": "F011",
+  "upstream_full_file_census": {
+    "pr": 32,
+    "branch": "agent/x/X001-france-feature-audit",
+    "head_sha": "164c2694e3b0006c4e8f5917215cb966add6c053",
+    "train_source1_bytes": 210069713,
+    "test_source1_bytes": 175022086,
+    "sampling": "none"
+  },
+  "counts": {
+    "train": {
+      "US": 1323633,
+      "India": 883188
+    },
+    "test": {
+      "US": 663106,
+      "India": 809986,
+      "France": 259452
+    }
+  },
+  "within_country_test_minus_train": {
+    "US": {
+      "name_mean_chars": -0.0018,
+      "address_mean_chars": 0.003685,
+      "name_hyphen_pp": -0.030166,
+      "name_apostrophe_pp": 0.038396,
+      "address_nonascii_pp": 0,
+      "address_hyphen_pp": 0.009127,
+      "address_apostrophe_pp": 0.00104
+    },
+    "India": {
+      "name_mean_chars": -0.011534,
+      "address_mean_chars": 0.014211,
+      "name_hyphen_pp": -0.00363,
+      "name_apostrophe_pp": 0.00039,
+      "address_nonascii_pp": -0.005319,
+      "address_hyphen_pp": 0.152428,
+      "address_apostrophe_pp": 0.005537
+    }
+  },
+  "country_mix_pct": {
+    "train": {
+      "US": 59.979173662,
+      "India": 40.020826338
+    },
+    "test_seen_only": {
+      "US": 45.0145679971,
+      "India": 54.9854320029
+    },
+    "test_all": {
+      "US": 38.273544568,
+      "India": 46.7512513391,
+      "France": 14.9752040929
+    }
+  },
+  "calibration_sensitivity": {
+    "conditional_confirmation_scores": {
+      "US": 0.948339,
+      "India": 0.900722
+    },
+    "train_mix_weighted": 0.9292822831,
+    "test_seen_mix_weighted": 0.9221565868,
+    "delta": -0.0071256963,
+    "interpretation": "Sensitivity diagnostic only; not a test-score estimate."
+  },
+  "status": "FOLLOW-UP",
+  "independent_raw_rescan": false,
+  "raw_rescan_blocker": "Chat execution backends returned TooManyActiveSessions/ClientError; no sample substituted."
+}
