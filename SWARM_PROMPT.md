@@ -41,7 +41,7 @@ Your task must have:
 
 Prefer a small decisive experiment over a sprawling rewrite.
 
-You are expected to be running as a **ChatGPT chat inside the shared Team 517 Project**. The complete challenge dataset is available there as Project TSV shards. Verify access to those Project files, then use the available file-analysis/Python tools to execute the experiment yourself. Do not assume a local filesystem path and do not send routine analysis back to the human to run manually. If Project data access is genuinely unavailable, do not hallucinate measurements; mark the task BLOCKED and leave an executable protocol.
+You are expected to be running as a **ChatGPT chat inside the shared Team 517 Project**. The complete challenge dataset is stored in the shared Google Drive folder linked from the Project instructions. Verify Drive access, locate the required raw TSVs, and use the available file-analysis/Python tools to execute the experiment yourself. Do not assume a local filesystem path and do not send routine analysis back to the human to run manually. For large files, process the raw data programmatically in chunks/streams rather than placing it into conversational context. If Drive access is genuinely unavailable, do not hallucinate measurements; mark the task BLOCKED and leave an executable protocol.
 
 Never commit raw challenge data, model binaries, predictions, large generated artifacts, or secrets.
 
