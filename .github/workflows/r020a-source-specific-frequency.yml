@@ -1,0 +1,76 @@
+name: r020a-source-specific-frequency
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run controlled R020a experiment
+        id: controlled
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/r020a-data" "$RUNNER_TEMP/r020a-work"
+          LOG="$RUNNER_TEMP/r020a-work/run.log"
+          set +e
+          {
+            echo "=== environment ==="
+            date -u
+            python --version
+            df -h .
+            free -h
+            echo "=== install ==="
+            python -m pip install --upgrade pip
+            python -m pip install duckdb==1.5.5 numpy==2.3.2 gdown==5.2.0
+            install_status=$?
+            echo "install_status=$install_status"
+            if [ "$install_status" -eq 0 ]; then
+              echo "=== experiment ==="
+              PYTHONPATH=src python experiments/r020a_source_specific_frequency.py \
+                --download \
+                --data-dir "$RUNNER_TEMP/r020a-data" \
+                --db "$RUNNER_TEMP/r020a-work/r020a.duckdb" \
+                --out "$RUNNER_TEMP/r020a-work/r020a-result.json"
+              experiment_status=$?
+            else
+              experiment_status=99
+            fi
+            echo "experiment_status=$experiment_status"
+          } >"$LOG" 2>&1
+          status=$?
+          cat "$LOG"
+          if grep -q '^experiment_status=' "$LOG"; then
+            experiment_status=$(grep '^experiment_status=' "$LOG" | tail -1 | cut -d= -f2)
+          else
+            experiment_status=$status
+          fi
+          exit "$experiment_status"
+
+      - name: Upload diagnostic log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r020a-debug
+          path: ${{ runner.temp }}/r020a-work/run.log
+          if-no-files-found: warn
+          retention-days: 3
+
+      - name: Upload aggregate result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r020a-result
+          path: ${{ runner.temp }}/r020a-work/r020a-result.json
+          if-no-files-found: ignore
+          retention-days: 3
