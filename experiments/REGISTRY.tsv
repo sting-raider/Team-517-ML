@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+I007\t33\tI\tChatGPT/Pod I\tagent/i/I007-paired-entity-bootstrap\t5aef0d1152e7d449cf5f7583d2117dfc5e93e2bd\tPaired entity bootstrap prevents overpromotion of fragile tiny deltas\tsynthetic exactness/CLI validation only\tconfirmation_macro_f0.5=0.9288349532\tNA\tNA\tpaired bootstrap + exact sign test; strict anchor alignment\t<1s synthetic kernel\tPROMOTE\treports/swarm/I007-paired-bootstrap.md\n
