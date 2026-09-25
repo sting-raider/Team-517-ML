@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+R006	#71	R	ChatGPT	agent/r/R006-bm25-address	PENDING	BM25/IDF-weighted address retrieval may recover blocker-v2 misses with bounded candidate growth	blocked before target-source load	NA	NA	NA	Drive handoff rejects S2/S3 >256 MiB; no shards found	~5m	BLOCKED	reports/swarm/R006-bm25-address-retriever.md
