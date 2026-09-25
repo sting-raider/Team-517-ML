@@ -4,7 +4,7 @@ import inspect
 import time
 from pathlib import Path
 from .data import connect
-from .provenance import fingerprint
+from .provenance import fingerprint,relation_fingerprint
 
 
 INDEX_VERSION=2
@@ -32,7 +32,7 @@ def init_macros(c):
 
 def build_index(c, split):
     init_macros(c)
-    current=index_fingerprint()
+    current=index_compatibility_fingerprint(c,split)
     c.execute('CREATE TABLE IF NOT EXISTS index_versions (split VARCHAR PRIMARY KEY, version INTEGER)')
     c.execute('CREATE TABLE IF NOT EXISTS index_signatures (split VARCHAR PRIMARY KEY, fingerprint VARCHAR)')
     version=c.execute('SELECT version FROM index_versions WHERE split=?',[split]).fetchone()
@@ -41,13 +41,8 @@ def build_index(c, split):
         print(f'Reusing {split} retrieval index ({current[:12]})', flush=True)
         return
     if version and version[0]==INDEX_VERSION and not signature:
-        # One-time migration for the pre-I002 v2 index. Current main is the known v2
-        # implementation; future code/config changes alter current and are detectable.
-        c.execute('INSERT OR REPLACE INTO index_signatures VALUES (?,?)',[split,current])
-        c.execute('CHECKPOINT')
-        print(f'Adopted legacy {split} retrieval index signature ({current[:12]})',flush=True)
-        return
-    if signature and signature[0]!=current:
+        print(f'Rebuilding unsigned legacy {split} retrieval index',flush=True)
+    elif signature and signature[0]!=current:
         print(f'Rebuilding stale {split} retrieval index: {signature[0][:12]} -> {current[:12]}',flush=True)
     start=time.time()
     # Hashes are retrieval keys only, never ML features or matching evidence.
@@ -85,8 +80,8 @@ def candidates(c, split, anchor_table='anchors', result='candidates', cap=80):
         QUALIFY row_number() OVER(PARTITION BY anchor ORDER BY retrieval DESC,t.entity_id)<={int(cap)}""")
 
 
-def index_fingerprint():
-    """Fingerprint every code/config input that defines persisted retrieval indexes."""
+def index_contract_fingerprint():
+    """Fingerprint code/config that defines persisted retrieval indexes."""
     return fingerprint({
         'index_version':INDEX_VERSION,
         'max_key_freq':MAX_KEY_FREQ,
@@ -95,10 +90,18 @@ def index_fingerprint():
     })
 
 
-def blocker_fingerprint():
-    """Fingerprint index + candidate-generation behavior for resumable outputs."""
+def index_compatibility_fingerprint(c,split):
+    """Bind an index to both its implementation and the exact rowid-backed inventory."""
     return fingerprint({
-        'index_fingerprint':index_fingerprint(),
+        'contract':index_contract_fingerprint(),
+        'records':relation_fingerprint(c,split,['rowid','entity_id','country','source','n','a']),
+    })
+
+
+def blocker_fingerprint():
+    """Fingerprint index contract + candidate-generation behavior for resumable outputs."""
+    return fingerprint({
+        'index_contract':index_contract_fingerprint(),
         'candidates':inspect.getsource(candidates),
     })
 
