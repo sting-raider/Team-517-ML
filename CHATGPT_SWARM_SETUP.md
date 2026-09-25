@@ -1,86 +1,129 @@
 # ChatGPT Swarm Setup
 
-The swarm is intended to run as many **ChatGPT chats inside one shared ChatGPT Project**, not as local autonomous processes.
+The swarm is intended to run as many **ChatGPT chats inside one shared ChatGPT Project**, launched by the four teammates. These are not assumed to be local agents.
 
-## Why this layout
+GitHub is the durable coordination plane. Google Drive is the shared raw-data plane. The ChatGPT Project is the shared instruction/context plane.
 
-A shared ChatGPT Project gives every project chat access to the project's uploaded files, project instructions, and project conversation context. The GitHub repository remains the source of truth for code, experiment state, and reports.
+## Recommended topology
 
-The raw challenge dataset is too large to be a single ChatGPT spreadsheet upload, so prepare it as lossless TSV shards. Do **not** sample it for the shared source. Agents may sample during experiments, but the project source should preserve the entire dataset.
+```
+Google Drive shared folder
+  complete raw challenge dataset
+            |
+            v
+Shared ChatGPT Project
+  project instructions + Drive folder source
+            |
+   many independent chats
+            |
+            v
+GitHub issues / claims / branches / PRs / experiment registry
+```
 
-## Prepare project-safe shards
+## Primary dataset route: Google Drive
 
-From the repository root:
+Do **not** commit the raw dataset to GitHub.
+
+Create one ordinary Google Drive folder in My Drive, for example:
+
+`Amazon ML Challenge 2026 - Dataset`
+
+Put the complete extracted challenge dataset there with the original train/test structure intact.
+
+Share that folder directly with all four teammates' Google accounts. Use an ordinary shared folder rather than relying on a Google Shared Drive because current ChatGPT Google Drive browsing support is centered on My Drive and items shared directly with the connected account.
+
+Each teammate must connect **their own** Google Drive account to ChatGPT. One teammate connecting Drive does not transfer that teammate's Google authorization to everybody else.
+
+Then add the Google Drive folder URL to the shared ChatGPT Project as a Project Source.
+
+Important: Google Drive content added in a Project is accessed live when needed; it is not pre-synced into every chat. Agents must explicitly use the Drive source when an experiment needs raw data.
+
+## How a ChatGPT research agent should read the dataset
+
+A research chat must not try to place ~1 GB of TSV text into conversational context.
+
+For an empirical task it should:
+
+1. Read `AGENTS.md` and `SWARM_PROMPT.md` from GitHub.
+2. Find and claim one experiment.
+3. Access the shared Google Drive dataset folder.
+4. Locate only the source files needed for that experiment.
+5. For a large TSV, obtain the complete raw file into the chat's working analysis environment rather than asking for the entire file inline.
+6. Use Python/data-analysis tools to scan or stream the file.
+7. For whole-dataset analysis, process files incrementally/chunkwise.
+8. Keep only aggregate statistics and selected diagnostic examples in conversational context.
+9. Write compact results to `reports/swarm/`, update `experiments/REGISTRY.tsv`, commit, and open a PR.
+
+Examples of tasks that can stream the complete dataset without loading it all into model context:
+
+- token and character n-gram frequencies,
+- source/country corruption statistics,
+- positive-pair edit patterns,
+- duplicate and near-duplicate audits,
+- hard-negative mining,
+- address-number/unit analysis,
+- retrieval miss taxonomy,
+- score/cardinality distributions,
+- train/test and France distribution shifts.
+
+An agent may use a smaller sample for a Tier-1 feasibility experiment, but it must not silently substitute a sample when the requested result is supposed to describe the full dataset.
+
+## Shared Project setup
+
+1. Create one shared ChatGPT Project for Team 517.
+2. Invite the four teammates.
+3. Add the shared Google Drive dataset folder URL as a Project Source.
+4. Add the repository URL.
+5. Put the orchestration prompt below into Project Instructions.
+6. Keep every research-agent chat inside this Project.
+7. Each teammate connects their own GitHub/Google Drive access as required.
+
+Recommended Project Instructions:
+
+```text
+You are one autonomous research agent in the Team 517 Amazon ML Challenge swarm.
+
+The complete challenge dataset is stored in the Google Drive dataset folder attached to this Project. GitHub repository sting-raider/Team-517-ML is the source of truth for code, coordination, AGENTS.md, SWARM_BACKLOG.md, reports, and experiments/REGISTRY.tsv.
+
+At the start of every task:
+1. Read AGENTS.md and SWARM_PROMPT.md from GitHub.
+2. Inspect open Issues/PRs, recent progress, active claims, and the experiment registry.
+3. Verify access to the Google Drive dataset source.
+4. Claim one unclaimed high-value atomic experiment.
+5. Execute the experiment yourself. Use the Drive dataset and Python/data-analysis tools rather than asking the human to run routine scripts locally.
+6. Do not attempt to stuff the complete dataset into model context. Read large files programmatically and stream/chunk when necessary.
+7. Never invent measurements. If data access genuinely fails, mark the task BLOCKED with exact evidence.
+8. Preserve competition rules and frozen holdouts.
+9. Commit code and compact aggregate results to your experiment branch and open a PR.
+10. Leave useful follow-up tasks, then take another unclaimed task if the session still has time and capability.
+
+Optimize official per-entity macro F0.5, retrieval oracle ceiling, unseen-country robustness, and information gained per unit wall-clock time.
+```
+
+## Launch prompt for each new chat
+
+A short launch message is enough because the rest lives in Project Instructions and the repository:
+
+```text
+Operate as a Team 517 swarm agent. Follow the Project instructions and AGENTS.md. Inspect live GitHub state, claim the highest-value unclaimed experiment you can execute end-to-end, use the shared Drive dataset yourself, run it, record measurements, commit the result on an isolated branch, open a PR, and continue onto another useful unclaimed task if time remains. Do not duplicate active work.
+```
+
+## Direct-upload fallback
+
+If Drive access proves unreliable for a particular teammate/model, the complete dataset can instead be uploaded to the shared Project as lossless TSV shards.
+
+Prepare shards with:
 
 ```powershell
 python tools/prepare_chatgpt_dataset.py --data ..\student_resource\dataset --out chatgpt_dataset
 ```
 
-The script:
+The script preserves every row, repeats headers, writes checksums, and targets files small enough for Project upload. This is a fallback because Project file-count limits are much less flexible than a shared Drive folder.
 
-- recursively finds the challenge TSVs,
-- splits them only at row boundaries,
-- repeats each original header in every shard,
-- preserves every row exactly,
-- targets files below the ChatGPT spreadsheet upload ceiling,
-- writes checksums and row counts to a local manifest,
-- and fails if the resulting shard count exceeds the configured project budget.
+## Rule of thumb
 
-Default target: 44 MiB per TSV shard, maximum 25 shards.
+GitHub stores durable intelligence.
+Drive stores bulky raw evidence.
+The ChatGPT Project tells every chat how to use both.
 
-The local `manifest.json` is for verification. If all 25 project file slots are needed for data, paste the manifest summary into the Project Instructions instead of uploading it.
-
-## Shared Project
-
-1. Create one ChatGPT Project for the challenge.
-2. Invite all four human teammates.
-3. Upload every generated `.tsv` shard to the Project.
-4. Put the orchestration prompt below into Project Instructions.
-5. Give each research hypothesis its own chat.
-6. Give every chat the repository URL and ensure the human account running that chat can access the private repository.
-7. Keep all agent chats inside this same Project so they share the dataset and instructions.
-
-Recommended Project Instructions:
-
-```text
-You are one research agent in the Team 517 Amazon ML Challenge swarm.
-
-The complete challenge dataset has been uploaded to this Project as lossless TSV shards. Treat those Project files as the canonical raw dataset. Do not assume the data is on a local filesystem and do not ask the human to rerun analysis locally merely because the dataset is large. Use the available file-analysis tools to inspect/materialize the Project files and use Python/data-analysis tools when computation is required.
-
-The GitHub repository sting-raider/Team-517-ML is the source of truth for code, experiment state, reports, AGENTS.md, SWARM_BACKLOG.md, and experiments/REGISTRY.tsv.
-
-At the start of every task:
-1. Read AGENTS.md and SWARM_PROMPT.md from the repository.
-2. Check open issues/PRs and the experiment registry.
-3. Verify you can access the Project dataset shards.
-4. Claim one unclaimed atomic experiment.
-5. Run the experiment yourself against the Project dataset whenever the available tools permit it.
-6. Never invent measurements.
-7. Commit code/report/results to your own experiment branch and open a PR.
-
-Optimize official per-entity macro F0.5 and information gained per unit time. Preserve the frozen holdout and competition rules.
-```
-
-## Dataset access inside an agent chat
-
-An agent should not try to place all ~1 GB of raw text into the language-model context. That is neither necessary nor useful.
-
-Instead it should:
-
-1. identify the needed Project shards,
-2. use file tools or Python to stream/read them,
-3. compute statistics / build an index / run the experiment,
-4. keep only summaries and selected diagnostic examples in model context,
-5. write aggregate results back to the GitHub experiment report.
-
-For analyses that truly require all files, process them incrementally. For example, token-frequency, corruption-pattern, duplicate, cardinality, and distribution audits can stream through every shard without loading the full dataset at once.
-
-## Human launch pattern
-
-Each teammate can open many chats in the same shared Project. Start each chat with the contents of `SWARM_PROMPT.md` or a short instruction such as:
-
-```text
-Follow the Project instructions and SWARM_PROMPT.md. Pick the highest-value unclaimed P0/P1 experiment you can execute end-to-end with the Project dataset. Claim it, run it, record the result, commit it on an experiment branch, and open a PR. Do not duplicate active work.
-```
-
-Agents should coordinate through GitHub claims/PRs, not by relying on another chat's transient context.
+Do not duplicate the 1 GB dataset per chat. Give every chat authorized access to the same shared source.
