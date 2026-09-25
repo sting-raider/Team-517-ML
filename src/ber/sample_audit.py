@@ -90,6 +90,12 @@ def _effects(sample: dict, population: dict) -> dict:
         }
         p = sample["by_country"][country]["singleton_rate"]
         p0 = population["by_country"][country]["singleton_rate"]
+        country_n = sample["by_country"][country]["n"]
+        out[f"singleton_rate.{country}"] = {
+            "delta_pp": 100*(p-p0), "z_hash_random": proportion_z(p, p0, country_n)
+        }
+        p = sample["by_country"][country]["singleton_rate"]
+        p0 = population["by_country"][country]["singleton_rate"]
         cn = sample["by_country"][country]["n"]
         out[f"singleton_rate.{country}"] = {
             "delta_pp": 100*(p-p0), "z_hash_random": proportion_z(p, p0, cn)
