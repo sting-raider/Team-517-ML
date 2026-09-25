@@ -10,6 +10,11 @@ from pathlib import Path
 import numpy as np
 
 
+BOOTSTRAP_METHOD = "paired_entity_percentile_bootstrap"
+DEFAULT_MAX_DRAWS_PER_CHUNK = 2_000_000
+SIGN_TEST_TIE_POLICY = "discard"
+
+
 def _as_score_mapping(scores):
     if isinstance(scores, dict):
         items = scores.items()
@@ -29,27 +34,48 @@ def _as_score_mapping(scores):
     return out
 
 
-def align_scores(baseline, candidate, *, intersection=False):
-    baseline = _as_score_mapping(baseline)
-    candidate = _as_score_mapping(candidate)
+def _align_score_mappings(baseline, candidate, *, intersection=False):
     bkeys, ckeys = set(baseline), set(candidate)
-    if bkeys != ckeys and not intersection:
-        missing_candidate = sorted(bkeys - ckeys)
-        missing_baseline = sorted(ckeys - bkeys)
+    baseline_only = bkeys - ckeys
+    candidate_only = ckeys - bkeys
+    if (baseline_only or candidate_only) and not intersection:
         raise ValueError(
             "anchor universe mismatch: "
-            f"{len(missing_candidate)} missing from candidate, "
-            f"{len(missing_baseline)} missing from baseline"
+            f"{len(baseline_only)} missing from candidate, "
+            f"{len(candidate_only)} missing from baseline"
         )
     anchors = sorted(bkeys & ckeys)
     if not anchors:
         raise ValueError("no shared anchors")
     b = np.asarray([baseline[k] for k in anchors], dtype=np.float64)
     c = np.asarray([candidate[k] for k in anchors], dtype=np.float64)
+    alignment = {
+        "intersection_mode": bool(intersection),
+        "baseline_input_entities": len(baseline),
+        "candidate_input_entities": len(candidate),
+        "shared_entities": len(anchors),
+        "baseline_only_dropped": len(baseline_only) if intersection else 0,
+        "candidate_only_dropped": len(candidate_only) if intersection else 0,
+    }
+    return anchors, b, c, alignment
+
+
+def align_scores(baseline, candidate, *, intersection=False):
+    """Return aligned anchor IDs and score vectors.
+
+    Strict equality is the default. ``intersection=True`` is deliberately
+    explicit because silently dropping anchors can manufacture tiny deltas.
+    """
+    baseline = _as_score_mapping(baseline)
+    candidate = _as_score_mapping(candidate)
+    anchors, b, c, _ = _align_score_mappings(
+        baseline, candidate, intersection=intersection
+    )
     return anchors, b, c
 
 
 def exact_sign_test(wins, losses):
+    """Exact two-sided binomial sign test after discarding ties."""
     wins, losses = int(wins), int(losses)
     if wins < 0 or losses < 0:
         raise ValueError("wins/losses must be non-negative")
@@ -62,28 +88,92 @@ def exact_sign_test(wins, losses):
     return min(1.0, numerator / denominator)
 
 
-def paired_bootstrap(baseline, candidate, *, iterations=10000, seed=517,
-                     confidence=0.95, intersection=False, chunk_size=256):
+def _bootstrap_delta_means(
+    delta,
+    *,
+    iterations,
+    rng,
+    chunk_size,
+    max_draws_per_chunk,
+):
+    """Bootstrap delta means without allocating an unbounded index matrix.
+
+    ``max_draws_per_chunk`` limits the number of sampled entity indices in any
+    single RNG allocation. If one replicate itself exceeds that bound, the
+    replicate is accumulated in multiple draw blocks.
+    """
+    if max_draws_per_chunk < 1:
+        raise ValueError("max_draws_per_chunk must be positive")
+    n = len(delta)
+    boot = np.empty(iterations, dtype=np.float64)
+
+    if n <= max_draws_per_chunk:
+        effective_chunk_size = min(
+            chunk_size, max(1, max_draws_per_chunk // n)
+        )
+        for start in range(0, iterations, effective_chunk_size):
+            end = min(iterations, start + effective_chunk_size)
+            indices = rng.integers(0, n, size=(end - start, n))
+            boot[start:end] = delta[indices].mean(axis=1)
+        return boot, effective_chunk_size
+
+    # One replicate is larger than the allocation cap. Draw it in blocks.
+    effective_chunk_size = 1
+    for iteration in range(iterations):
+        remaining = n
+        total = 0.0
+        while remaining:
+            draw_count = min(max_draws_per_chunk, remaining)
+            indices = rng.integers(0, n, size=draw_count)
+            total += float(delta[indices].sum())
+            remaining -= draw_count
+        boot[iteration] = total / n
+    return boot, effective_chunk_size
+
+
+def paired_bootstrap(
+    baseline,
+    candidate,
+    *,
+    iterations=10000,
+    seed=517,
+    confidence=0.95,
+    intersection=False,
+    chunk_size=256,
+    max_draws_per_chunk=DEFAULT_MAX_DRAWS_PER_CHUNK,
+):
     if iterations < 1:
         raise ValueError("iterations must be positive")
     if not 0.0 < confidence < 1.0:
         raise ValueError("confidence must be in (0,1)")
     if chunk_size < 1:
         raise ValueError("chunk_size must be positive")
-    anchors, b, c = align_scores(baseline, candidate, intersection=intersection)
+    if max_draws_per_chunk < 1:
+        raise ValueError("max_draws_per_chunk must be positive")
+
+    baseline = _as_score_mapping(baseline)
+    candidate = _as_score_mapping(candidate)
+    anchors, b, c, alignment = _align_score_mappings(
+        baseline, candidate, intersection=intersection
+    )
     delta = c - b
     n = len(delta)
     rng = np.random.default_rng(seed)
-    boot = np.empty(iterations, dtype=np.float64)
-    for start in range(0, iterations, chunk_size):
-        end = min(iterations, start + chunk_size)
-        indices = rng.integers(0, n, size=(end - start, n))
-        boot[start:end] = delta[indices].mean(axis=1)
+    boot, effective_chunk_size = _bootstrap_delta_means(
+        delta,
+        iterations=iterations,
+        rng=rng,
+        chunk_size=chunk_size,
+        max_draws_per_chunk=max_draws_per_chunk,
+    )
     alpha = (1.0 - confidence) / 2.0
     wins = int(np.count_nonzero(delta > 0))
     losses = int(np.count_nonzero(delta < 0))
     ties = n - wins - losses
+    non_ties = wins + losses
     return {
+        "method": BOOTSTRAP_METHOD,
+        "numpy_version": np.__version__,
         "entities": n,
         "baseline_mean": float(b.mean()),
         "candidate_mean": float(c.mean()),
@@ -92,20 +182,40 @@ def paired_bootstrap(baseline, candidate, *, iterations=10000, seed=517,
         "confidence": float(confidence),
         "bootstrap_iterations": int(iterations),
         "bootstrap_seed": int(seed),
+        "bootstrap_requested_chunk_size": int(chunk_size),
+        "bootstrap_effective_chunk_size": int(effective_chunk_size),
+        "bootstrap_max_draws_per_chunk": int(max_draws_per_chunk),
         "bootstrap_delta_interval": np.quantile(
             boot, [alpha, 1.0 - alpha]
         ).tolist(),
+        "bootstrap_standard_error": (
+            float(boot.std(ddof=1)) if iterations > 1 else 0.0
+        ),
         "bootstrap_probability_delta_gt_0": float(np.mean(boot > 0)),
         "bootstrap_probability_delta_eq_0": float(np.mean(boot == 0)),
         "wins": wins,
         "losses": losses,
         "ties": ties,
+        "sign_test_non_ties": non_ties,
+        "sign_test_tie_policy": SIGN_TEST_TIE_POLICY,
         "exact_sign_test_p": exact_sign_test(wins, losses),
+        "alignment": alignment,
     }
 
 
-def compare_slices(baseline, candidate, metadata, fields, *, iterations=10000,
-                   seed=517, confidence=0.95, intersection=False):
+def compare_slices(
+    baseline,
+    candidate,
+    metadata,
+    fields,
+    *,
+    iterations=10000,
+    seed=517,
+    confidence=0.95,
+    intersection=False,
+    chunk_size=256,
+    max_draws_per_chunk=DEFAULT_MAX_DRAWS_PER_CHUNK,
+):
     anchors, _, _ = align_scores(
         baseline, candidate, intersection=intersection
     )
@@ -127,15 +237,23 @@ def compare_slices(baseline, candidate, metadata, fields, *, iterations=10000,
             b = {k: baseline[k] for k in members}
             c = {k: candidate[k] for k in members}
             result[field][value] = paired_bootstrap(
-                b, c, iterations=iterations,
+                b,
+                c,
+                iterations=iterations,
                 seed=seed + 1009 * (field_index + 1) + value_index,
                 confidence=confidence,
+                chunk_size=chunk_size,
+                max_draws_per_chunk=max_draws_per_chunk,
             )
     return result
 
 
-def load_score_tsv(path, anchor_column="anchor", score_column="score",
-                   slice_fields=()):
+def load_score_tsv(
+    path,
+    anchor_column="anchor",
+    score_column="score",
+    slice_fields=(),
+):
     scores, metadata = {}, {}
     with Path(path).open("r", encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle, delimiter="\t")
@@ -164,6 +282,12 @@ def main():
     parser.add_argument("--seed", type=int, default=517)
     parser.add_argument("--confidence", type=float, default=0.95)
     parser.add_argument("--intersection", action="store_true")
+    parser.add_argument("--chunk-size", type=int, default=256)
+    parser.add_argument(
+        "--max-draws-per-chunk",
+        type=int,
+        default=DEFAULT_MAX_DRAWS_PER_CHUNK,
+    )
     args = parser.parse_args()
 
     baseline, baseline_meta = load_score_tsv(
@@ -178,14 +302,29 @@ def main():
 
     report = {
         "overall": paired_bootstrap(
-            baseline, candidate, iterations=args.iterations, seed=args.seed,
-            confidence=args.confidence, intersection=args.intersection,
+            baseline,
+            candidate,
+            iterations=args.iterations,
+            seed=args.seed,
+            confidence=args.confidence,
+            intersection=args.intersection,
+            chunk_size=args.chunk_size,
+            max_draws_per_chunk=args.max_draws_per_chunk,
         ),
         "slices": compare_slices(
-            baseline, candidate, baseline_meta, args.slice,
-            iterations=args.iterations, seed=args.seed,
-            confidence=args.confidence, intersection=args.intersection,
-        ) if args.slice else {},
+            baseline,
+            candidate,
+            baseline_meta,
+            args.slice,
+            iterations=args.iterations,
+            seed=args.seed,
+            confidence=args.confidence,
+            intersection=args.intersection,
+            chunk_size=args.chunk_size,
+            max_draws_per_chunk=args.max_draws_per_chunk,
+        )
+        if args.slice
+        else {},
         "intersection_mode": bool(args.intersection),
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
