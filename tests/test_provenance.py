@@ -28,7 +28,7 @@ class _FakeConnection:
 
     def execute(self, sql):
         self.sql = sql
-        return _FakeResult((7, 123456789))
+        return _FakeResult((7, 123456789, 9876543210))
 
 
 class ProvenanceTests(unittest.TestCase):
@@ -73,7 +73,7 @@ class ProvenanceTests(unittest.TestCase):
         result = relation_fingerprint(connection, "candidates", ["anchor", "rid"])
         self.assertEqual(
             result,
-            {"rows": 7, "hash_xor": 123456789, "columns": ["anchor", "rid"]},
+            {"rows": 7, "hash_xor": 123456789, "hash_sum": 9876543210, "columns": ["anchor", "rid"]},
         )
         self.assertIn('hash("anchor","rid")', connection.sql)
         with self.assertRaisesRegex(ValueError, "Unsafe"):
