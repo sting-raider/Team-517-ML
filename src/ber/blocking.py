@@ -47,7 +47,7 @@ def build_index(c, split):
     print(f'{split}: index ready in {time.time()-start:.1f}s',flush=True)
 
 
-def candidates(c, split, anchor_table='anchors', result='candidates', cap=80):
+def candidates(c, split, anchor_table='anchors', result='candidates', cap=80, provenance=False):
     init_macros(c)
     # Full-name/address/numeric keys plus four rarest eligible name tokens.
     c.execute(f"""CREATE OR REPLACE TEMP TABLE query_keys AS
@@ -59,12 +59,37 @@ def candidates(c, split, anchor_table='anchors', result='candidates', cap=80):
         JOIN {split}_freq f ON f.key=hash(country,k)
         WHERE k IS NOT NULL AND f.freq<=1000
         QUALIFY kind IN ('n:','a:','h:','z:') OR row_number() OVER(PARTITION BY entity_id,kind ORDER BY f.freq,k)<=4""")
+    if not provenance:
+        # Keep the established blocker-v2 query byte-for-byte equivalent in the
+        # default path. Experimental provenance must not perturb the baseline.
+        c.execute(f"""CREATE OR REPLACE TABLE {result} AS
+            WITH hits AS (SELECT q.anchor,r.rid,sum(q.bonus+ln(10000001.0/r.freq))::FLOAT AS retrieval,
+                count(*)::SMALLINT AS hits FROM query_keys q JOIN {split}_index r USING(key) GROUP BY q.anchor,r.rid)
+            SELECT h.* FROM hits h JOIN {split} t ON h.rid=t.rowid
+            QUALIFY row_number() OVER(PARTITION BY anchor ORDER BY retrieval DESC,t.entity_id)<={int(cap)}""")
+        return
     c.execute(f"""CREATE OR REPLACE TABLE {result} AS
-        WITH hits AS (SELECT q.anchor,r.rid,sum(q.bonus+ln(10000001.0/r.freq))::FLOAT AS retrieval,
-            count(*)::SMALLINT AS hits FROM query_keys q JOIN {split}_index r USING(key) GROUP BY q.anchor,r.rid)
-        SELECT h.* FROM hits h JOIN {split} t ON h.rid=t.rowid
-        QUALIFY row_number() OVER(PARTITION BY anchor ORDER BY retrieval DESC,t.entity_id)<={int(cap)}""")
-
+        WITH hits AS (
+            SELECT q.anchor,r.rid,
+                sum(q.bonus+ln(10000001.0/r.freq))::FLOAT AS retrieval,
+                count(*)::SMALLINT AS hits,
+                count(*) FILTER (WHERE q.kind='n:') AS name_exact_hits,
+                count(*) FILTER (WHERE q.kind='a:') AS address_exact_hits,
+                count(*) FILTER (WHERE q.kind='w:') AS name_token_hits,
+                count(*) FILTER (WHERE q.kind='u:') AS address_token_hits,
+                count(*) FILTER (WHERE q.kind='v:') AS address_bigram_hits,
+                count(*) FILTER (WHERE q.kind IN ('h:','z:')) AS name_number_hits,
+                count(*) FILTER (WHERE q.kind='d:') AS address_number_hits,
+                min(q.freq)::INTEGER AS min_key_freq
+            FROM query_keys q JOIN {split}_index r USING(key)
+            GROUP BY q.anchor,r.rid
+        ), ranked AS (
+            SELECT h.*, row_number() OVER(
+                PARTITION BY h.anchor ORDER BY h.retrieval DESC,t.entity_id
+            ) AS candidate_rank
+            FROM hits h JOIN {split} t ON h.rid=t.rowid
+        )
+        SELECT * FROM ranked WHERE candidate_rank<={int(cap)}""")
 
 def main():
     p=argparse.ArgumentParser()
@@ -72,12 +97,13 @@ def main():
     p.add_argument('--split',choices=['train','test'],default='train')
     p.add_argument('--anchors',type=int,default=30000)
     p.add_argument('--cap',type=int,default=80)
+    p.add_argument('--provenance',action='store_true',help='Emit M002 rank/key-family provenance columns')
     a=p.parse_args()
     c=connect(a.db)
     build_index(c,a.split)
     c.execute(f"""CREATE OR REPLACE TABLE anchors AS SELECT * FROM {a.split}
         WHERE source=1 ORDER BY md5('sample517:'||entity_id) LIMIT {a.anchors}""")
-    candidates(c,a.split,cap=a.cap)
+    candidates(c,a.split,cap=a.cap,provenance=a.provenance)
     print(c.execute('SELECT count(*),count(DISTINCT anchor) FROM candidates').fetchone(),flush=True)
     c.close()
 
