@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+R019	60	R	ChatGPT/Pod R	agent/r/R019-source-cap-starvation	d13e3c7ca57a75df3af85694c5f655f30a0c7a66	Joint S2/S3 candidate cap can starve one target source before matching	Tier0 source audit + Tier1 deterministic synthetic ranking cases	blocking_oracle_macro_f0.5=0.980951@cap640	NA	NA	7/7 tests PASS; source_floor=1 swaps <=1 candidate and preserves cap	0.16s	FOLLOW-UP	reports/swarm/R019-source-cap-starvation.md
