@@ -51,28 +51,23 @@ Follow the supplied challenge rules. In particular:
 
 If a proposed trick might violate a rule, stop and document the uncertainty rather than quietly doing it.
 
-## 3. Data access
+## 3. Data access: ChatGPT Project agents
 
-The repository deliberately excludes the dataset.
+The primary swarm workers are **ChatGPT chats inside one shared ChatGPT Project**. They are not assumed to be local processes.
 
-Local agents should use the challenge data already downloaded by their human operator. Prefer:
+The complete challenge dataset should be uploaded to that Project as lossless TSV shards prepared with `tools/prepare_chatgpt_dataset.py`. The repository deliberately excludes raw challenge data.
 
-```
-TEAM517_DATA=/absolute/path/to/student_resource/dataset
-```
+At the start of an empirical task, a chat agent must verify that the Project dataset files are accessible. When computation is needed, use the available file-analysis tools to locate/materialize the Project shards and Python/data-analysis tools to stream or load them. Do not ask the human to run a local script merely because the dataset is large if the chat can execute the analysis itself.
 
-Scripts must also accept an explicit `--data` argument where practical.
+Do **not** try to stuff the full ~1 GB dataset into conversational context. Read it programmatically, stream it in chunks, and retain only aggregate statistics and selected diagnostics in context.
 
-The shared Modal volume is `team517-business-er`. It is the canonical place for large shared compute artifacts. Do not copy the 1 GB+ raw dataset into Git just to make a cloud agent happy. That is how people accidentally turn a competition repo into a crime scene.
+The shared Modal volume `team517-business-er` remains useful for long or expensive jobs and large shared compute artifacts, but raw Project data access is the default for ChatGPT research agents.
 
-Cloud agents without raw-data access should:
-- inspect code and aggregate reports,
-- implement analysis scripts,
-- add tests,
-- create reproducible Modal/local commands,
-- and write reports after the script is run by an environment with dataset access.
+Scripts should accept explicit input paths and avoid assumptions about one machine's directory layout.
 
-An agent may not claim an empirical result it did not actually measure.
+If a chat truly lacks access to the Project dataset, it may implement code/protocol without claiming measurements, but it must mark the task BLOCKED rather than fabricate empirical results.
+
+See `CHATGPT_SWARM_SETUP.md` for the human setup.
 
 ## 4. Swarm topology
 
