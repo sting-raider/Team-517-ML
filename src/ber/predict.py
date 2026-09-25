@@ -11,6 +11,7 @@ from catboost import CatBoostClassifier
 from .blocking import build_index,blocker_fingerprint,candidates
 from .data import connect
 from .features import batch_features,FEATURE_NAMES
+from .provenance import source_file_sha256
 from .shortlist import shortlist_rows
 
 
@@ -90,16 +91,19 @@ def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,quer
     model=CatBoostClassifier()
     model.load_model(str(model_dir/'mixed.cbm'))
     out.mkdir(parents=True,exist_ok=True)
+    c=connect(db)
+    retrieval_index_fingerprint=build_index(c,'test')
     identity={'model_sha256':sha256(model_dir/'mixed.cbm'),'config':config,'cap':cap,
               'batch_size':batch_size,'limit':limit,'database':str(db.resolve()),
               'blocker_fingerprint':blocker_fingerprint(),
+              'retrieval_index_fingerprint':retrieval_index_fingerprint,
+              'feature_code_sha256':source_file_sha256(batch_features),
               'partition_index':partition_index,'partition_count':partition_count}
     manifest=out/'run.json'
     if manifest.exists() and json.loads(manifest.read_text())!=identity:
+        c.close()
         raise ValueError('Output folder belongs to a different run; choose a new --out directory')
     manifest.write_text(json.dumps(identity,indent=2),encoding='utf-8')
-    c=connect(db)
-    build_index(c,'test')
     sql='SELECT *,row_number() OVER(ORDER BY entity_id) AS seq FROM test WHERE source=1'
     if partition_count>1:
         sql+=f' AND hash(entity_id)%{partition_count}={partition_index}'
