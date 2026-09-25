@@ -33,7 +33,6 @@ python -m ber.data --data ../student_resource/dataset
 python -m ber.blocking --anchors 30000 --cap 80
 python -m ber.experiment --out artifacts/address_baseline --report reports/address_baseline.json --transfer
 python -m ber.cap_study
-python -m ber.confirm
 python -m unittest discover -s tests -v
 ```
 
@@ -60,6 +59,8 @@ country's labels, then evaluate the other country. These are stress tests, not
 measurements of French accuracy. Repeated development-holdout results should not be
 presented as an untouched estimate; keep a separate confirmation sample for final
 decisions.
+
+Confirmation evaluation is deliberately **not** part of routine reproduction. The two existing 5,000-anchor windows at offsets 30,000 and 35,000 have already been inspected and are recorded in `reports/CONFIRMATION_FREEZE.json`; the first 30,000 anchors are reserved for development. `ber.confirm` now requires an explicit window and refuses both silent reuse and silent consumption of a fresh window. To reproduce an already-consumed window, use a new report path plus `--allow-reuse --reason "<reproducibility reason>"`. Any genuinely fresh window requires `--consume-new --reason "<final-decision reason>"` and is appended to the freeze manifest after scoring.
 
 `reports/baseline.json` records the original narrower name-led blocker. Reproducing
 that historical run requires its earlier code; the current blocker includes address
