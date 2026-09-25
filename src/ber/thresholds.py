@@ -23,11 +23,15 @@ def choose_threshold_exact(meta, groups, target, prob, indices: Iterable[int]):
     """Return the exact best threshold over observed probability breakpoints.
 
     Semantics intentionally match experiment.choose_threshold:
+    - thresholds are probability cutoffs in [0, 1];
     - predictions use prob >= threshold;
     - truth members missing from the candidate set remain in the denominator;
     - empty-truth/empty-prediction rows score one;
     - macro averaging is over the supplied anchor indices;
     - exact score ties prefer the higher threshold.
+
+    Consequently, if max(prob) == 1.0, the empty prediction set is not a
+    reachable state: threshold 1.0 still includes those rows.
 
     The returned diagnostic dict is aggregate-only and deliberately does not
     contain row IDs or predictions.
