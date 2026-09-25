@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+I010	#44	I	ChatGPT/Pod I	agent/i/I010-integration-harness	334b227cd442ba8dfcab18c917350c44e1a81754	Disposable worktree integration with explicit SHA provenance reduces merge/slice drift	Synthetic temporary git repositories	N/A	N/A	N/A	5/5 synthetic tests passed	2.133s	PROMOTE	reports/swarm/I010-integration-harness.md
