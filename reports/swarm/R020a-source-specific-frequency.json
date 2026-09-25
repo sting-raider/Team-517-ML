@@ -1,0 +1,45 @@
+{
+  "experiment_id": "R020a",
+  "issue": 92,
+  "pr": 97,
+  "hypothesis": "Per-target-source posting frequencies improve blocker-v2 retrieval at the same global cap 640.",
+  "status": "BLOCKED",
+  "sampling": "none",
+  "expected_baseline": {
+    "anchors": 4389,
+    "singleton_count": 252,
+    "candidate_cap": 640,
+    "candidate_pair_recall": 0.9458627913066248,
+    "blocking_oracle_macro_f0_5": 0.9811781091658961
+  },
+  "empirical_result": null,
+  "blockers": {
+    "drive_target_file_limit_bytes": 268435456,
+    "train_source2_bytes": 489301488,
+    "train_source3_bytes": 503705637,
+    "local_runtime": [
+      "TooManyActiveSessionsError",
+      "ClientError"
+    ],
+    "github_actions_runs": [
+      {
+        "run_id": 36162138314,
+        "conclusion": "failure",
+        "artifacts": 0,
+        "logs_retrievable": false
+      },
+      {
+        "run_id": 36162287834,
+        "conclusion": "failure",
+        "artifacts": 0,
+        "logs_retrievable": false,
+        "diagnostic_artifact_expected": true
+      }
+    ]
+  },
+  "code": [
+    "experiments/r020a_source_specific_frequency.py",
+    ".github/workflows/r020a-source-specific-frequency.yml"
+  ],
+  "recommendation": "Run unchanged full-data experiment on an authorized working compute/data plane; require exact baseline assertions."
+}
