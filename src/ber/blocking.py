@@ -39,7 +39,7 @@ def build_index(c, split):
     signature=c.execute('SELECT fingerprint FROM index_signatures WHERE split=?',[split]).fetchone()
     if version and version[0]==INDEX_VERSION and signature and signature[0]==current:
         print(f'Reusing {split} retrieval index ({current[:12]})', flush=True)
-        return
+        return current
     if version and version[0]==INDEX_VERSION and not signature:
         print(f'Rebuilding unsigned legacy {split} retrieval index',flush=True)
     elif signature and signature[0]!=current:
@@ -59,6 +59,7 @@ def build_index(c, split):
     c.execute('INSERT OR REPLACE INTO index_signatures VALUES (?,?)',[split,current])
     c.execute('CHECKPOINT')
     print(f'{split}: index ready in {time.time()-start:.1f}s ({current[:12]})',flush=True)
+    return current
 
 
 def candidates(c, split, anchor_table='anchors', result='candidates', cap=80):
