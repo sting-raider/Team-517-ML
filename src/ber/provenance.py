@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import inspect
 import json
 import re
 from pathlib import Path
@@ -32,6 +33,14 @@ def canonical_json(value: Any) -> str:
 def fingerprint(value: Any) -> str:
     """SHA256 of canonical JSON."""
     return hashlib.sha256(canonical_json(value).encode("utf-8")).hexdigest()
+
+
+def source_file_sha256(obj: Any) -> str:
+    """Hash the complete Python source file implementing a callable/class/module."""
+    source = inspect.getsourcefile(obj)
+    if not source:
+        raise ValueError(f"Cannot locate source file for {obj!r}")
+    return hashlib.sha256(Path(source).read_bytes()).hexdigest()
 
 
 def file_signature(path: str | Path, sample_bytes: int = 65536) -> dict[str, Any]:
