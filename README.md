@@ -82,6 +82,12 @@ python ../student_resource/utils/validate_submission.py --matching output/submis
 `candidate_pairs.tsv`. The official README states that public and private scores
 use different portions of this same complete test submission.
 
+`python tools/finish_submission.py` resumes the same export, runs the streaming
+subset/coverage validator and the supplied official formatter, then writes
+`output/submission_v1/completion.json` with `PASS` and output checksums. It requires
+the optional native feature extension; use the direct `ber.predict` command above
+for the pure Python path. Neither command uploads to the leaderboard.
+
 An optional native implementation of the same 47 features is in
 `src/ber/fast_features.cpp`. On Windows with Python 3.12 and MinGW g++, run
 `tools/build_fast_features.ps1`, then set `$env:BER_FAST_FEATURES='1'` before
