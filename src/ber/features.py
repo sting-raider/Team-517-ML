@@ -5,6 +5,7 @@ from functools import lru_cache
 import numpy as np
 from rapidfuzz import fuzz
 from rapidfuzz.distance import JaroWinkler
+from .soft_alignment import ADDRESS_SOFT_ALIGNMENT_FEATURE_NAMES, address_soft_alignment_features
 
 
 @lru_cache(maxsize=50000)
@@ -24,6 +25,7 @@ for field in ('name','address'):
         'number_jaccard','number_overlap','left_number_coverage','right_number_coverage',
         'first_number_equal','last_number_equal','number_conflict','left_missing','right_missing')]
 FEATURE_NAMES += ['retrieval','key_hits','source']
+FEATURE_NAMES_SOFT_ALIGNMENT = FEATURE_NAMES + ADDRESS_SOFT_ALIGNMENT_FEATURE_NAMES
 
 
 def features(n1,a1,n2,a2,retrieval,hits,source):
@@ -41,8 +43,16 @@ def features(n1,a1,n2,a2,retrieval,hits,source):
     return result+[retrieval,hits,source]
 
 
+def features_with_soft_alignment(n1,a1,n2,a2,retrieval,hits,source):
+    return features(n1,a1,n2,a2,retrieval,hits,source) + address_soft_alignment_features(a1,a2)
+
+
 def batch_features(records):
     if os.environ.get('BER_FAST_FEATURES')=='1':
         from ._fast_features import batch
         return np.frombuffer(batch(records),dtype=np.float32).reshape(-1,len(FEATURE_NAMES))
     return np.asarray([features(*r) for r in records],dtype=np.float32)
+
+
+def batch_features_soft_alignment(records):
+    return np.asarray([features_with_soft_alignment(*r) for r in records],dtype=np.float32)
