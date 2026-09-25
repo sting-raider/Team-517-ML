@@ -54,7 +54,7 @@ No official macro F0.5, pair recall, entity recall, or oracle delta is claimed f
 
 ## Interpretation
 
-The hypothesis is **confirmed as a scoring-structure failure mode**: blocker v2 can multiply one underlying address fact into several additive retrieval contributions, including deterministic first/last-number double counting when an address has one numeric token,, and the multiplication is large enough to outrank the strongest four-token name-only evidence in a conservative synthetic case.
+The hypothesis is **confirmed as a scoring-structure failure mode**: blocker v2 can multiply one underlying address fact into several additive retrieval contributions, including deterministic first/last-number double counting when an address has one numeric token, and the multiplication is large enough to outrank the strongest four-token name-only evidence in a conservative synthetic case.
 
 That is useful because it identifies a distinct retrieval lever not covered by simply widening the cap or adding another retrieval channel. However, changing production scoring now would be premature. The same correlated keys may currently rescue real positives, and without the full S2/S3 inventory this runtime cannot measure the net effect on pair recall, entity recall, all-matches-retrieved rate, blocking oracle, or candidate count.
 
