@@ -8,7 +8,7 @@ from collections import deque
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from catboost import CatBoostClassifier
-from .blocking import build_index,candidates
+from .blocking import build_index,blocker_fingerprint,candidates
 from .data import connect
 from .features import batch_features,FEATURE_NAMES
 from .shortlist import shortlist_rows
@@ -91,7 +91,8 @@ def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,quer
     model.load_model(str(model_dir/'mixed.cbm'))
     out.mkdir(parents=True,exist_ok=True)
     identity={'model_sha256':sha256(model_dir/'mixed.cbm'),'config':config,'cap':cap,
-              'batch_size':batch_size,'limit':limit,'database':str(db.resolve()),'index_version':2,
+              'batch_size':batch_size,'limit':limit,'database':str(db.resolve()),
+              'blocker_fingerprint':blocker_fingerprint(),
               'partition_index':partition_index,'partition_count':partition_count}
     manifest=out/'run.json'
     if manifest.exists() and json.loads(manifest.read_text())!=identity:
