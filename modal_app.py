@@ -192,7 +192,7 @@ def score_test(run_name: str = "modal_v1", workers: int = 8, candidate_cap: int 
     try:
         predict(db, model_dir, out, batch_size=10000, cap=candidate_cap,
                 workers=workers, query_batches=1, partition_index=partition_index,
-                partition_count=partition_count)
+                partition_count=partition_count, profile_path=out / "profile.json")
         checked = validate(db, out, check_ids=False) if partition_count == 1 else None
         result = {"status": "PASS", "candidate_cap": candidate_cap,
                   "partition_index": partition_index, "partition_count": partition_count,

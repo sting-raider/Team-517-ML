@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+I009	#36	I	ChatGPT/Pod I	agent/i/I009-stage-profiler	858cd175a9c4bebdf782d63be6464851b8f146c0	Persisted stage timing/RSS can expose the real inference bottleneck without changing scoring semantics	Tier 0/1 synthetic validation; no holdout	N/A	N/A	N/A	2/2 focused synthetic tests PASS; no new dependency	<1s focused synthetic test	FOLLOW-UP	reports/swarm/I009-stage-profiler.md
