@@ -59,14 +59,31 @@ dashboard also supports a spend limit.
 
 Atomic research branches can run full-data Python modules against the same private
 Volume with `modal_experiment_app.py`. The launcher records the exact branch,
-commit SHA, normalized arguments, required Volume inputs, config hash, resource
-request, duration, and return code in
-`/volume/project/experiments/<experiment-id>/<run-name>/run.json`.
+commit SHA, normalized arguments, required Volume inputs, deterministic config
+hash, actual required-input fingerprint, run identity, invocation identity,
+resource request, duration, and return code in an immutable run directory:
 
-The launcher refuses a dirty Git worktree and refuses to overwrite an existing run
-directory. It executes a Python `ber.*` module directly, without a shell. This is
-deliberate: experiment provenance should not depend on whatever happened to be in a
-terminal history.
+```text
+/volume/project/experiments/<experiment-id>/<run-name>/<run-identity>/<invocation-id>/run.json
+```
+
+The worker reloads the mounted Volume before checking required inputs or computing
+their fingerprints. Required inputs are signed using file size plus SHA-256 over
+the first, middle, and last 64 KiB of each file; required directories recursively
+sign their contained files. This is a cheap stale-input guard for experiment
+provenance, not an adversarial content-authentication primitive.
+
+`config_hash` identifies code + arguments + declared required paths.
+`input_fingerprint` identifies the observed required-input snapshot.
+`run_identity_hash` combines those two deterministic identities. Every actual
+execution gets a random 20-hex `invocation_id`, so concurrent or repeated attempts
+write to different immutable directories instead of racing to overwrite one
+shared `run.json`. A killed worker can therefore leave a visible `RUNNING`
+attempt without blocking an intentional retry.
+
+The launcher refuses a dirty Git worktree and detached HEAD. It executes a Python
+`ber.*` module directly, without a shell. This is deliberate: experiment
+provenance should not depend on whatever happened to be in a terminal history.
 
 Use a dry run first:
 
@@ -80,15 +97,18 @@ worker:
 - `{volume}` -> `/volume`
 - `{db}` -> `/volume/project/artifacts/data.duckdb`
 - `{dataset}` -> `/volume/dataset`
-- `{run_dir}` -> the unique experiment output directory
+- `{run_dir}` -> the immutable invocation output directory
 
 Experiment modules can also read `TEAM517_RUN_DIR`, `TEAM517_DB`,
-`TEAM517_DATASET_ROOT`, `TEAM517_CONFIG_HASH`, `TEAM517_CODE_SHA`, and
-`TEAM517_BRANCH`. Keep row-level artifacts, caches, checkpoints, and large outputs
-inside the Volume. Only aggregate reports and compact metrics belong in Git.
+`TEAM517_DATASET_ROOT`, `TEAM517_CONFIG_HASH`,
+`TEAM517_INPUT_FINGERPRINT`, `TEAM517_RUN_IDENTITY`,
+`TEAM517_INVOCATION_ID`, `TEAM517_CODE_SHA`, and `TEAM517_BRANCH`.
+Keep row-level artifacts, caches, checkpoints, and large outputs inside the
+Volume. Only aggregate reports and compact metrics belong in Git.
 
-By default the runner verifies that
-`project/artifacts/data.duckdb` exists. Pass a different JSON list to
-`--required-paths-json` when an experiment needs other staged inputs. A failed
-command still leaves a `run.json` with status `FAIL`; use a new `--run-name`
-for an intentional retry rather than overwriting the failed record.
+By default the runner verifies that `project/artifacts/data.duckdb` exists.
+Pass a different JSON list to `--required-paths-json` when an experiment needs
+other staged inputs. Ordinary command failures persist a `FAIL` record; Python
+launcher errors after the run directory is created persist `ERROR` when possible.
+Infrastructure termination can still strand a `RUNNING` record, but retries use a
+new invocation ID rather than mutating or deleting the old attempt.
