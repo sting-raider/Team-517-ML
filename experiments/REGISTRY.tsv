@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+I007	#111	I	ChatGPT/Pod I	agent/i/I007-paired-bootstrap	23d8233ce61c0c9f9f09872a94820e314f29c578	Paired entity bootstrap quantifies uncertainty of tiny same-anchor macro-F0.5 deltas	Synthetic only; no challenge holdout consumed	No reusable paired-delta utility	8/8 synthetic tests passed	N/A	constant +0.05 shift -> paired 95% interval [0.05,0.05]	0.64 s; 94,256 KiB peak RSS	PROMOTE	reports/swarm/I007-paired-bootstrap.md
