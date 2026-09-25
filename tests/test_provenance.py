@@ -1,3 +1,4 @@
+import hashlib
 import json
 import shutil
 import tempfile
@@ -10,6 +11,7 @@ from ber.provenance import (
     fingerprint,
     relation_fingerprint,
     require_manifest,
+    source_file_sha256,
     write_manifest,
 )
 
@@ -37,6 +39,11 @@ class ProvenanceTests(unittest.TestCase):
             fingerprint({"b": 2, "a": {"z": 3, "x": 1}}),
             fingerprint({"a": {"x": 1, "z": 3}, "b": 2}),
         )
+
+    def test_source_file_hash_matches_module_bytes(self):
+        import ber.provenance as provenance
+        expected = hashlib.sha256(Path(provenance.__file__).read_bytes()).hexdigest()
+        self.assertEqual(source_file_sha256(fingerprint), expected)
 
     def test_file_signature_is_copy_stable_and_content_sensitive(self):
         with tempfile.TemporaryDirectory() as tmp:
