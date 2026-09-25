@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import time
+from contextlib import nullcontext
 from itertools import groupby
 from collections import deque
 from concurrent.futures import ProcessPoolExecutor
@@ -12,6 +13,7 @@ from .blocking import build_index,candidates
 from .data import connect
 from .features import batch_features,FEATURE_NAMES
 from .shortlist import shortlist_rows
+from .profiling import StageProfiler
 
 
 def sha256(path):
@@ -28,7 +30,7 @@ def prepare_groups(payload):
     return [(r[0],r[1]) for r in selected],batch_features([r[2:] for r in selected])
 
 
-def score_batch(c,model,threshold,split,anchor_table,candidate_table,shortlist_cap=None,executor=None):
+def score_batch(c,model,threshold,split,anchor_table,candidate_table,shortlist_cap=None,executor=None,profiler=None):
     anchor_ids=[r[0] for r in c.execute(f'SELECT entity_id FROM {anchor_table} ORDER BY entity_id').fetchall()]
     selected={k:[] for k in anchor_ids}
     considered={k:[] for k in anchor_ids}
@@ -60,7 +62,11 @@ def score_batch(c,model,threshold,split,anchor_table,candidate_table,shortlist_c
             while pending:
                 yield pending.popleft().result()
     for records,x in feature_batches():
-        probabilities=model.predict_proba(x,thread_count=6)[:,1]
+        if profiler is None:
+            probabilities=model.predict_proba(x,thread_count=6)[:,1]
+        else:
+            with profiler.stage('model_predict'):
+                probabilities=model.predict_proba(x,thread_count=6)[:,1]
         for r,p in zip(records,probabilities):
             considered[r[0]].append(r[1])
             if p>=threshold:
@@ -78,7 +84,7 @@ def write_tsv(path,mapping,column):
 
 
 def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,query_batches=5,
-            partition_index=0,partition_count=1):
+            partition_index=0,partition_count=1,profile_path=None):
     if batch_size<1 or workers<1 or query_batches<1:
         raise ValueError('Batch and worker counts must be positive')
     if partition_count<1 or not 0<=partition_index<partition_count:
@@ -97,8 +103,15 @@ def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,quer
     if manifest.exists() and json.loads(manifest.read_text())!=identity:
         raise ValueError('Output folder belongs to a different run; choose a new --out directory')
     manifest.write_text(json.dumps(identity,indent=2),encoding='utf-8')
+    profiler=StageProfiler(metadata={'cap':cap,'batch_size':batch_size,'workers':workers,
+                                    'query_batches':query_batches,'partition_index':partition_index,
+                                    'partition_count':partition_count}) if profile_path else None
     c=connect(db)
-    build_index(c,'test')
+    if profiler is None:
+        build_index(c,'test')
+    else:
+        with profiler.stage('build_index'):
+            build_index(c,'test')
     sql='SELECT *,row_number() OVER(ORDER BY entity_id) AS seq FROM test WHERE source=1'
     if partition_count>1:
         sql+=f' AND hash(entity_id)%{partition_count}={partition_index}'
@@ -127,33 +140,51 @@ def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,quer
         phase_start=time.time()
         c.execute(f'''CREATE OR REPLACE TEMP TABLE batch_anchors AS SELECT * FROM inference_anchors
             WHERE seq>{offset} AND seq<={offset+step}''')
-        candidates(c,'test','batch_anchors','batch_candidates',cap)
+        if profiler is None:
+            candidates(c,'test','batch_anchors','batch_candidates',cap)
+        else:
+            with profiler.stage('candidate_retrieval'):
+                candidates(c,'test','batch_anchors','batch_candidates',cap)
         blocking_seconds=time.time()-phase_start
-        matched,considered=score_batch(c,model,config['threshold'],'test','batch_anchors','batch_candidates',config.get('shortlist_cap'),executor)
+        if profiler is None:
+            matched,considered=score_batch(c,model,config['threshold'],'test','batch_anchors','batch_candidates',config.get('shortlist_cap'),executor)
+        else:
+            with profiler.stage('score_batch'):
+                matched,considered=score_batch(c,model,config['threshold'],'test','batch_anchors','batch_candidates',config.get('shortlist_cap'),executor,profiler)
         ordered_ids=list(matched)
-        for i,(shard,complete) in enumerate(batch_shards):
-            if complete:
-                continue
-            ids=ordered_ids[i*batch_size:(i+1)*batch_size]
-            write_tsv(shard/'matching_results.tsv',{k:matched[k] for k in ids},'matched_entity_ids')
-            write_tsv(shard/'candidate_pairs.tsv',{k:considered[k] for k in ids},'candidate_entity_ids')
-            proof={name:sha256(shard/name) for name in ('matching_results.tsv','candidate_pairs.tsv')}
-            (shard/'done.json').write_text(json.dumps(proof),encoding='utf-8')
+        export_context = profiler.stage('shard_export') if profiler is not None else nullcontext()
+        with export_context:
+            for i,(shard,complete) in enumerate(batch_shards):
+                if complete:
+                    continue
+                ids=ordered_ids[i*batch_size:(i+1)*batch_size]
+                write_tsv(shard/'matching_results.tsv',{k:matched[k] for k in ids},'matched_entity_ids')
+                write_tsv(shard/'candidate_pairs.tsv',{k:considered[k] for k in ids},'candidate_entity_ids')
+                proof={name:sha256(shard/name) for name in ('matching_results.tsv','candidate_pairs.tsv')}
+                (shard/'done.json').write_text(json.dumps(proof),encoding='utf-8')
         print(f'{min(offset+step,total):,}/{total:,} anchors; elapsed {time.time()-start:.1f}s; blocking {blocking_seconds:.1f}s, scoring/export {time.time()-phase_start-blocking_seconds:.1f}s',flush=True)
     if executor is not None:
-        executor.shutdown()
-    for name in ('matching_results.tsv','candidate_pairs.tsv'):
-        temp=out/(name+'.tmp')
-        with temp.open('wb') as dest:
-            for i,shard in enumerate(paths):
-                with (shard/name).open('rb') as source:
-                    header=source.readline()
-                    if i==0:
-                        dest.write(header)
-                    for chunk in iter(lambda:source.read(1024*1024),b''):
-                        dest.write(chunk)
-        temp.replace(out/name)
+        if profiler is None:
+            executor.shutdown()
+        else:
+            with profiler.stage('executor_shutdown'):
+                executor.shutdown()
+    merge_context = profiler.stage('final_merge') if profiler is not None else nullcontext()
+    with merge_context:
+        for name in ('matching_results.tsv','candidate_pairs.tsv'):
+            temp=out/(name+'.tmp')
+            with temp.open('wb') as dest:
+                for i,shard in enumerate(paths):
+                    with (shard/name).open('rb') as source:
+                        header=source.readline()
+                        if i==0:
+                            dest.write(header)
+                        for chunk in iter(lambda:source.read(1024*1024),b''):
+                            dest.write(chunk)
+            temp.replace(out/name)
     c.close()
+    if profiler is not None:
+        profiler.write_json(Path(profile_path))
     print(f'Completed {total:,} anchors in {out}',flush=True)
 
 
@@ -169,9 +200,10 @@ def main():
     p.add_argument('--query-batches',type=int,default=5,help='Group output shards into larger retrieval queries')
     p.add_argument('--partition-index',type=int,default=0)
     p.add_argument('--partition-count',type=int,default=1)
+    p.add_argument('--profile',type=Path,help='Write stage timing/RSS JSON to this path')
     a=p.parse_args()
     predict(a.db,a.model,a.out,a.batch_size,a.limit,a.cap,a.workers,a.query_batches,
-            a.partition_index,a.partition_count)
+            a.partition_index,a.partition_count,a.profile)
 
 
 if __name__=='__main__':
