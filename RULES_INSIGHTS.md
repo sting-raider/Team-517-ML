@@ -112,3 +112,12 @@ results are in `reports/`; local RAM is 16 GB. The portal's final-submission sel
 behavior remains unverified. The supplied validator supports an optional `--check-ids`
 flag; the local streaming validator checks all candidate IDs without holding every
 candidate set in RAM. No leaderboard score has been measured.
+
+Organizer update received 25 September 2026: `candidate_pairs.tsv` is part of the
+final ranking review alongside matching score. Smaller candidate sets per Source 1
+entity are explicitly favored. A high-recall 640-candidate run therefore cannot be
+selected solely by its local F0.5 score. Re-evaluate caps with the same trained model,
+report macro F0.5, pair recall, and average/p90 candidate count, and choose the final
+blocking budget with this additional ranking criterion. The local 640-candidate
+export was stopped at the user's request; its completed shards are checkpointed and
+no full submission file exists from that run.

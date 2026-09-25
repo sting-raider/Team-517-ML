@@ -4,8 +4,10 @@ An executable business entity resolution baseline for the supplied name/address 
 The official target is **macro F0.5 per source-one entity**, including singletons.
 This is an initial measured baseline, not a claim about leaderboard position.
 
-**Current priority:** maximize validation quality. See `PROJECT_DECISIONS.md`.
-The earlier 30-candidate throughput draft was stopped and is not a final submission.
+**Current priority:** produce the first full test submission on Modal with a
+bounded candidate set. See [MODAL.md](MODAL.md) and `PROJECT_DECISIONS.md`.
+The earlier local export was stopped at the user's request; its partial shards
+are not a complete submission.
 
 ## Local setup
 
@@ -64,12 +66,15 @@ retrieval. `reports/address_baseline.json` records the current experiment.
 
 ## Generate both submission files
 
-For the first submission, use the selected depth-10 checkpoint and 640-candidate
-configuration in `artifacts/submission_v1`. Its independent 5,000-entity confirmation
-macro F0.5 is 0.928835. This checkpoint is a local artifact excluded from Git;
+For the first submission, use the selected depth-10 checkpoint in
+`artifacts/submission_v1` and the Modal 160-candidate budget documented in
+[MODAL.md](MODAL.md). The 640-candidate checkpoint's independent 5,000-entity
+confirmation macro F0.5 is 0.928835; the 160-cap calibration result is in
+`reports/candidate_budget.json` and is not an independent confirmation. The
+checkpoint is a local artifact excluded from Git;
 `python -m ber.tune` recreates `artifacts/tuned/depth10.cbm` from the documented
 development features, and `python -m ber.freeze_first` assembles the selected
-checkpoint and configuration. The first full test export is currently running.
+checkpoint and configuration. Full test export now runs on Modal.
 
 ```powershell
 $env:PYTHONPATH='src'
