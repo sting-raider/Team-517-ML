@@ -55,13 +55,13 @@ If a proposed trick might violate a rule, stop and document the uncertainty rath
 
 The primary swarm workers are **ChatGPT chats inside one shared ChatGPT Project**. They are not assumed to be local processes.
 
-The complete challenge dataset should be uploaded to that Project as lossless TSV shards prepared with `tools/prepare_chatgpt_dataset.py`. The repository deliberately excludes raw challenge data.
+The complete challenge dataset lives in one shared **Google Drive folder** that is attached to the shared ChatGPT Project as a Project Source. Every human operator must have that Drive folder shared directly to their Google account and must connect their own Google Drive access to ChatGPT. One teammate's app authorization does not become another teammate's authorization.
 
-At the start of an empirical task, a chat agent must verify that the Project dataset files are accessible. When computation is needed, use the available file-analysis tools to locate/materialize the Project shards and Python/data-analysis tools to stream or load them. Do not ask the human to run a local script merely because the dataset is large if the chat can execute the analysis itself.
+At the start of an empirical task, a chat agent must verify that the Drive dataset source is accessible. When computation is needed, locate the required raw TSVs, bring the complete raw file into the chat's analysis environment, and use Python/data-analysis tools to stream or load it. Do not ask the human to run a local script merely because the dataset is large if the chat can execute the analysis itself.
 
-Do **not** try to stuff the full ~1 GB dataset into conversational context. Read it programmatically, stream it in chunks, and retain only aggregate statistics and selected diagnostics in context.
+Do **not** try to stuff the full ~1 GB dataset into conversational context. Read it programmatically, stream/chunk it, and retain only aggregate statistics and selected diagnostics in context.
 
-The shared Modal volume `team517-business-er` remains useful for long or expensive jobs and large shared compute artifacts, but raw Project data access is the default for ChatGPT research agents.
+The shared Modal volume `team517-business-er` remains useful for long or expensive jobs and large shared compute artifacts. Lossless Project-file shards produced by `tools/prepare_chatgpt_dataset.py` are the fallback when Drive access is unavailable.
 
 Scripts should accept explicit input paths and avoid assumptions about one machine's directory layout.
 
