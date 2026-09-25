@@ -141,7 +141,8 @@ def train_catboost():
 
 @app.function(image=image, volumes={str(VOLUME_ROOT): volume}, cpu=8, memory=32768,
               timeout=4 * 60 * 60)
-def score_test(run_name: str = "modal_v1", workers: int = 8, candidate_cap: int = 160):
+def score_test(run_name: str = "modal_v1", workers: int = 8, candidate_cap: int = 160,
+               partition_index: int = 0, partition_count: int = 1):
     """Score all test anchors; export both official TSVs into the Modal Volume."""
     import shutil
     import threading
@@ -155,6 +156,8 @@ def score_test(run_name: str = "modal_v1", workers: int = 8, candidate_cap: int 
         raise ValueError("workers must be between 1 and 12")
     if not 1 <= candidate_cap <= 640:
         raise ValueError("candidate_cap must be between 1 and 640")
+    if not 1 <= partition_count <= 16 or not 0 <= partition_index < partition_count:
+        raise ValueError("Invalid partition index/count")
     source = VOLUME_ROOT / "project/artifacts"
     db_source = source / "data.duckdb"
     model_source = source / "submission_v1"
@@ -188,9 +191,12 @@ def score_test(run_name: str = "modal_v1", workers: int = 8, candidate_cap: int 
     writer.start()
     try:
         predict(db, model_dir, out, batch_size=10000, cap=candidate_cap,
-                workers=workers, query_batches=1)
-        checked = validate(db, out, check_ids=False)
-        result = {"status": "PASS", "candidate_cap": candidate_cap, "validation": checked,
+                workers=workers, query_batches=1, partition_index=partition_index,
+                partition_count=partition_count)
+        checked = validate(db, out, check_ids=False) if partition_count == 1 else None
+        result = {"status": "PASS", "candidate_cap": candidate_cap,
+                  "partition_index": partition_index, "partition_count": partition_count,
+                  "validation": checked,
                   "matching_sha256": sha256(out / "matching_results.tsv"),
                   "candidate_sha256": sha256(out / "candidate_pairs.tsv")}
         (out / "completion.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
@@ -201,15 +207,71 @@ def score_test(run_name: str = "modal_v1", workers: int = 8, candidate_cap: int 
         volume.commit()
 
 
+@app.function(image=image, volumes={str(VOLUME_ROOT): volume}, cpu=4, memory=16384,
+              timeout=60 * 60)
+def merge_score(run_name: str, partition_count: int, candidate_cap: int):
+    """Stream sorted partition outputs into one complete, validated submission."""
+    import heapq
+    import shutil
+    from contextlib import ExitStack
+    from ber.predict import sha256
+    from ber.validate import validate
+
+    out = VOLUME_ROOT / "project/output" / run_name
+    out.mkdir(parents=True, exist_ok=True)
+    with ExitStack() as stack:
+        for filename in ("matching_results.tsv", "candidate_pairs.tsv"):
+            streams = []
+            for index in range(partition_count):
+                part = VOLUME_ROOT / "project/output" / f"{run_name}_part{index}of{partition_count}"
+                streams.append(stack.enter_context((part / filename).open(encoding="utf-8", newline="")))
+            headers = [stream.readline() for stream in streams]
+            if len(set(headers)) != 1:
+                raise ValueError(f"Partition headers disagree for {filename}")
+            with (out / (filename + ".tmp")).open("w", encoding="utf-8", newline="") as dest:
+                dest.write(headers[0])
+                heap = []
+                for index, stream in enumerate(streams):
+                    if line := stream.readline():
+                        heapq.heappush(heap, (line.split("\t", 1)[0], index, line))
+                while heap:
+                    _, index, line = heapq.heappop(heap)
+                    dest.write(line)
+                    if next_line := streams[index].readline():
+                        heapq.heappush(heap, (next_line.split("\t", 1)[0], index, next_line))
+            (out / (filename + ".tmp")).replace(out / filename)
+    db = SCRATCH / "artifacts/data.duckdb"
+    db.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(VOLUME_ROOT / "project/artifacts/data.duckdb", db)
+    checked = validate(db, out, check_ids=False)
+    result = {"status": "PASS", "candidate_cap": candidate_cap,
+              "partition_count": partition_count, "validation": checked,
+              "matching_sha256": sha256(out / "matching_results.tsv"),
+              "candidate_sha256": sha256(out / "candidate_pairs.tsv")}
+    (out / "completion.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
+    volume.commit()
+    return result
+
+
 @app.local_entrypoint()
 def main(action: str = "smoke", run_name: str = "modal_v1", workers: int = 8,
-         candidate_cap: int = 160):
+         candidate_cap: int = 160, partitions: int = 8):
     actions = {"smoke": smoke, "prepare": prepare_database,
                "train": train_catboost, "score": score_test}
-    if action not in actions:
-        raise ValueError(f"Unknown action: {action}. Choose one of {', '.join(actions)}")
-    if action == "score":
+    if action == "parallel-score":
+        if not 2 <= partitions <= 16:
+            raise ValueError("partitions must be between 2 and 16")
+        calls = [score_test.spawn(run_name=f"{run_name}_part{i}of{partitions}",
+                                  workers=workers, candidate_cap=candidate_cap,
+                                  partition_index=i, partition_count=partitions)
+                 for i in range(partitions)]
+        for i, call in enumerate(calls):
+            print(f"Partition {i}: {call.get()}", flush=True)
+        result = merge_score.remote(run_name, partitions, candidate_cap)
+    elif action == "score":
         result = score_test.remote(run_name=run_name, workers=workers, candidate_cap=candidate_cap)
     else:
+        if action not in actions:
+            raise ValueError(f"Unknown action: {action}. Choose one of {', '.join(actions)}, parallel-score")
         result = actions[action].remote()
     print(json.dumps(result, indent=2))

@@ -77,9 +77,12 @@ def write_tsv(path,mapping,column):
     temp.replace(path)
 
 
-def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,query_batches=5):
+def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,query_batches=5,
+            partition_index=0,partition_count=1):
     if batch_size<1 or workers<1 or query_batches<1:
         raise ValueError('Batch and worker counts must be positive')
+    if partition_count<1 or not 0<=partition_index<partition_count:
+        raise ValueError('Invalid partition index/count')
     config=json.loads((model_dir/'model_config.json').read_text())
     if config['feature_names']!=FEATURE_NAMES:
         raise ValueError('Feature schema does not match the saved model')
@@ -88,7 +91,8 @@ def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,quer
     model.load_model(str(model_dir/'mixed.cbm'))
     out.mkdir(parents=True,exist_ok=True)
     identity={'model_sha256':sha256(model_dir/'mixed.cbm'),'config':config,'cap':cap,
-              'batch_size':batch_size,'limit':limit,'database':str(db.resolve()),'index_version':2}
+              'batch_size':batch_size,'limit':limit,'database':str(db.resolve()),'index_version':2,
+              'partition_index':partition_index,'partition_count':partition_count}
     manifest=out/'run.json'
     if manifest.exists() and json.loads(manifest.read_text())!=identity:
         raise ValueError('Output folder belongs to a different run; choose a new --out directory')
@@ -96,6 +100,8 @@ def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,quer
     c=connect(db)
     build_index(c,'test')
     sql='SELECT *,row_number() OVER(ORDER BY entity_id) AS seq FROM test WHERE source=1'
+    if partition_count>1:
+        sql+=f' AND hash(entity_id)%{partition_count}={partition_index}'
     if limit:
         sql+=' ORDER BY entity_id LIMIT '+str(int(limit))
     c.execute('CREATE OR REPLACE TABLE inference_anchors AS '+sql)
@@ -161,8 +167,11 @@ def main():
     p.add_argument('--cap',type=int)
     p.add_argument('--workers',type=int,default=4)
     p.add_argument('--query-batches',type=int,default=5,help='Group output shards into larger retrieval queries')
+    p.add_argument('--partition-index',type=int,default=0)
+    p.add_argument('--partition-count',type=int,default=1)
     a=p.parse_args()
-    predict(a.db,a.model,a.out,a.batch_size,a.limit,a.cap,a.workers,a.query_batches)
+    predict(a.db,a.model,a.out,a.batch_size,a.limit,a.cap,a.workers,a.query_batches,
+            a.partition_index,a.partition_count)
 
 
 if __name__=='__main__':
