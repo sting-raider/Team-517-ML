@@ -109,6 +109,14 @@ class ModalExperimentSpecTests(unittest.TestCase):
             self.assertNotEqual(fp1, fp3)
             self.assertNotEqual(run1, run_identity_hash(spec, fp3))
 
+    def test_modal_worker_reloads_before_volume_reads(self):
+        app_source = (Path(__file__).parents[1] / "modal_experiment_app.py").read_text(encoding="utf-8")
+        reload_pos = app_source.index("volume.reload()")
+        preflight_pos = app_source.index('missing = [rel for rel in spec["required_paths"]')
+        fingerprint_pos = app_source.index("required_inputs_fingerprint(VOLUME_ROOT")
+        self.assertLess(reload_pos, preflight_pos)
+        self.assertLess(reload_pos, fingerprint_pos)
+
     def test_invocation_ids_and_directories_are_unique_but_same_identity(self):
         spec = self._spec()
         ids = {make_invocation_id() for _ in range(64)}
