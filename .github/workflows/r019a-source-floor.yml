@@ -1,0 +1,54 @@
+name: R019a source-floor full-data
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - tools/r019a_source_floor.py
+      - .github/workflows/r019a-source-floor.yml
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    if: github.head_ref == 'agent/r/R019a-source-floor-full-data'
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install duckdb==1.5.5 gdown==5.2.0
+      - name: Download supplied challenge train TSVs ephemerally
+        run: |
+          set -euxo pipefail
+          mkdir -p /tmp/team517/train
+          gdown --fuzzy 'https://drive.google.com/file/d/1nMO8x7VhzYgEF9dAd0uRr-RhMub0BqjM/view' -O /tmp/team517/train/train_source1.tsv
+          gdown --fuzzy 'https://drive.google.com/file/d/1aV5sSICdqErwCNeMKoAmuoVXWlKycqRC/view' -O /tmp/team517/train/train_source2.tsv
+          gdown --fuzzy 'https://drive.google.com/file/d/1qRSjQNC76FaLZs9_d1r60pLf2B2z_yxn/view' -O /tmp/team517/train/train_source3.tsv
+          gdown --fuzzy 'https://drive.google.com/file/d/1xllXi0svJ-j9GWVfSBsMt1c-HivrV6uo/view' -O /tmp/team517/train/train_ground_truth.tsv
+          test "$(stat -c%s /tmp/team517/train/train_source1.tsv)" = 210069713
+          test "$(stat -c%s /tmp/team517/train/train_source2.tsv)" = 489301488
+          test "$(stat -c%s /tmp/team517/train/train_source3.tsv)" = 503705637
+          test "$(stat -c%s /tmp/team517/train/train_ground_truth.tsv)" = 127015583
+      - name: Run fixed-cap source-floor benchmark
+        run: |
+          mkdir -p /tmp/r019a
+          python tools/r019a_source_floor.py \
+            --data /tmp/team517/train \
+            --db /tmp/r019a/r019a.duckdb \
+            --out /tmp/r019a/result.json \
+            --cap 640 --floors 1,2,4,8
+      - name: Upload aggregate result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r019a-source-floor-result
+          path: /tmp/r019a/result.json
+          if-no-files-found: warn
+          retention-days: 1
