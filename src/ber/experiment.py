@@ -29,9 +29,11 @@ def materialize(db,out,anchor_table='anchors',candidate_table='candidates',prove
     y=np.empty(count,dtype=np.uint8)
     groups=np.empty(count,dtype=np.int32)
     target=np.empty(count,dtype=f'U{width}')
-    extra = '' if not provenance else ''',p.candidate_rank,p.name_exact_hits,p.address_exact_hits,
-        p.name_token_hits,p.address_token_hits,p.address_bigram_hits,p.name_number_hits,
-        p.address_number_hits,p.min_key_freq'''
+    extra = '' if not provenance else (
+        ',p.candidate_rank,p.name_exact_hits,p.address_exact_hits'
+        ',p.name_token_hits,p.address_token_hits,p.address_bigram_hits,p.name_number_hits'
+        ',p.address_number_hits,p.min_key_freq'
+    )
     c.execute(f'''SELECT p.anchor,r.entity_id,l.n,l.a,r.n,r.a,p.retrieval,p.hits,r.source{extra}
         FROM {candidate_table} p JOIN {anchor_table} l ON p.anchor=l.entity_id JOIN train r ON p.rid=r.rowid ORDER BY p.anchor,p.rid''')
     start=time.time()
