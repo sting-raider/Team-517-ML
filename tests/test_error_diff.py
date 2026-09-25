@@ -74,5 +74,31 @@ class ErrorDiffTests(unittest.TestCase):
                 load_rows(path)
 
 
+    def test_invalid_score_values_fail_loudly(self):
+        for bad in (float("nan"), float("inf"), float("-inf"), -0.01, 1.01):
+            with self.subTest(bad=bad):
+                with self.assertRaisesRegex(ValueError, "invalid score"):
+                    compare_rows(
+                        [{"anchor": "a", "score": 0.5}],
+                        [{"anchor": "a", "score": bad}],
+                    )
+
+    def test_negative_counts_fail_loudly(self):
+        for field in ("truth_count", "predicted_count", "candidate_count"):
+            with self.subTest(field=field):
+                row = {"anchor": "a", "score": 0.5, field: -1}
+                with self.assertRaisesRegex(ValueError, "negative"):
+                    compare_rows([row], [row])
+
+    def test_invalid_epsilon_fails_loudly(self):
+        baseline = [{"anchor": "a", "score": 0.5}]
+        challenger = [{"anchor": "a", "score": 0.5}]
+        for bad in (-1e-12, float("nan"), float("inf")):
+            with self.subTest(bad=bad):
+                with self.assertRaisesRegex(ValueError, "epsilon"):
+                    compare_rows(baseline, challenger, epsilon=bad)
+
+
+
 if __name__ == "__main__":
     unittest.main()
