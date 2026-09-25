@@ -9,6 +9,10 @@ from catboost import CatBoostClassifier
 from .data import connect
 from .features import features, FEATURE_NAMES
 from .metrics import evaluate
+from .provenance import relation_fingerprint, require_manifest, write_manifest
+
+
+FEATURE_CACHE_VERSION=1
 
 
 def fold(entity_id):
@@ -16,8 +20,20 @@ def fold(entity_id):
     return 'fit' if bucket<60 else 'early' if bucket<75 else 'calibrate' if bucket<90 else 'holdout'
 
 
+def feature_cache_identity(c,anchor_table='anchors',candidate_table='candidates'):
+    """Describe every behavior-relevant input to a materialized pair-feature cache."""
+    return {
+        'kind':'pair_features',
+        'version':FEATURE_CACHE_VERSION,
+        'feature_names':FEATURE_NAMES,
+        'anchors':relation_fingerprint(c,anchor_table,['entity_id','country','source','n','a']),
+        'candidates':relation_fingerprint(c,candidate_table,['anchor','rid','retrieval','hits']),
+    }
+
+
 def materialize(db,out,anchor_table='anchors',candidate_table='candidates'):
     c=connect(db)
+    cache_identity=feature_cache_identity(c,anchor_table,candidate_table)
     anchors=c.execute(f'SELECT a.entity_id,a.country,t.matches FROM {anchor_table} a JOIN truth t ON a.entity_id=t.anchor ORDER BY a.entity_id').fetchall()
     meta=[{'id':i,'country':country,'truth':matches.split(',') if matches else [],'fold':fold(i)} for i,country,matches in anchors]
     lookup={m['id']:i for i,m in enumerate(meta)}
@@ -44,6 +60,7 @@ def materialize(db,out,anchor_table='anchors',candidate_table='candidates'):
     out.mkdir(parents=True,exist_ok=True)
     np.savez_compressed(out/'features.npz',x=x,y=y,groups=groups,target=target)
     (out/'anchors.json').write_text(json.dumps(meta),encoding='utf-8')
+    write_manifest(out/'features.manifest.json',cache_identity)
     c.close()
     return x,y,groups,target,meta
 
@@ -87,6 +104,10 @@ def choose_threshold(meta,groups,target,prob,indices):
 def run(db,out,reports,refresh=False,transfer=False):
     start=time.time()
     if (out/'features.npz').exists() and not refresh:
+        c=connect(db)
+        expected=feature_cache_identity(c)
+        c.close()
+        require_manifest(out/'features.manifest.json',expected,'pair feature cache')
         f=np.load(out/'features.npz')
         x,y,groups,target=(f[k] for k in ('x','y','groups','target'))
         meta=json.loads((out/'anchors.json').read_text())
