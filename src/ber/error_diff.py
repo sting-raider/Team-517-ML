@@ -2,6 +2,7 @@
 import argparse
 import csv
 import json
+import math
 from collections import defaultdict
 from pathlib import Path
 
@@ -70,9 +71,15 @@ def _coerce_row(row):
         raise ValueError(f"Row {anchor} is missing 'score'")
     row["anchor"] = str(anchor)
     row["score"] = float(row["score"])
+    if not math.isfinite(row["score"]) or not 0.0 <= row["score"] <= 1.0:
+        raise ValueError(
+            f"Row {anchor} has invalid score {row['score']!r}; expected finite value in [0, 1]"
+        )
     for key in ("truth_count", "predicted_count", "candidate_count"):
         if key in row and row[key] not in (None, ""):
             row[key] = int(row[key])
+            if row[key] < 0:
+                raise ValueError(f"Row {anchor} has negative {key}: {row[key]}")
         elif key in row:
             row[key] = None
     return row
@@ -158,6 +165,9 @@ def compare_rows(
     top_n=20,
 ):
     """Compare two evaluations on the same anchor universe."""
+    epsilon = float(epsilon)
+    if not math.isfinite(epsilon) or epsilon < 0:
+        raise ValueError("epsilon must be a finite non-negative value")
     baseline = _index(baseline_rows)
     challenger = _index(challenger_rows)
     b_ids, c_ids = set(baseline), set(challenger)
@@ -253,7 +263,7 @@ def main():
         epsilon=a.epsilon,
         top_n=a.top_n,
     )
-    rendered = json.dumps(result, indent=2, sort_keys=True)
+    rendered = json.dumps(result, indent=2, sort_keys=True, allow_nan=False)
     if a.out:
         a.out.parent.mkdir(parents=True, exist_ok=True)
         a.out.write_text(rendered + "\n", encoding="utf-8")
