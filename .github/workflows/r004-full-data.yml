@@ -1,0 +1,39 @@
+name: R004 full-data probe
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/r004-full-data.yml"
+      - "tools/experiments/r004_mixed_char_ngram.py"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install downloader
+        run: python -m pip install --disable-pip-version-check gdown==5.2.0
+      - name: Download supplied large train targets
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/team517/train
+          gdown "https://drive.google.com/uc?id=1aV5sSICdqErwCNeMKoAmuoVXWlKycqRC" -O /tmp/team517/train/train_source2.tsv
+          gdown "https://drive.google.com/uc?id=1qRSjQNC76FaLZs9_d1r60pLf2B2z_yxn" -O /tmp/team517/train/train_source3.tsv
+          python - <<'PY'
+          from pathlib import Path
+          expected={"train_source2.tsv":489301488,"train_source3.tsv":503705637}
+          for name,n in expected.items():
+              p=Path("/tmp/team517/train")/name
+              size=p.stat().st_size
+              print(f"{name}: {size} bytes")
+              if size != n:
+                  raise SystemExit(f"size mismatch for {name}: {size} != {n}")
+          PY
