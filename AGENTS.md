@@ -21,6 +21,19 @@ Do not rediscover facts already established in the repo unless you are explicitl
 
 ## 1. Current measured baseline and the most important fact
 
+Coordinator update, 26 Sep 2026: the selected second-submission model is INT002
+(depth10, 53 features, cap160, threshold0.65). On the same 5,000 matcher-confirmation
+anchors it scores **0.940478**, versus **0.927580** for the actual first-submission
+model. India0.913639, US0.958045, singleton FPR5.818%, retrieval oracle0.974176.
+See `reports/SUBMISSION_2.md`, `reports/COORDINATOR_PLAN.md`, and the submission
+ledger for export/leaderboard status. Public submission1 scored0.898. Do not
+attach the historical cap640 confirmation below to the uploaded cap160 file.
+INT001 ordinal-rank checkpoints were rejected; use only score-based dense rank
+for the predictive rank feature. Hash positions40,001–45,000 are now consumed
+for matcher confirmation and must not become a tuning set.
+
+Historical context follows:
+
 As of 25 Sep 2026:
 
 - Selected matcher: CatBoost depth 10, 47 numerical features.
