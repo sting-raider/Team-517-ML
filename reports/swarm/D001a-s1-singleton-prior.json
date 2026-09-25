@@ -1,0 +1,83 @@
+{
+  "experiment_id": "D001a",
+  "rows": 2206821,
+  "singleton_count": 123247,
+  "singleton_prevalence": 0.05584820880352326,
+  "split_protocol": "fold517 SHA256: 60% fit / 15% early / 15% calibrate / 10% holdout",
+  "fold_counts": {
+    "fit": 1323457,
+    "early": 330681,
+    "calibrate": 331219,
+    "holdout": 221464
+  },
+  "singleton_by_country": {
+    "US": {
+      "rows": 1323633,
+      "singletons": 73896,
+      "prevalence": 0.055828163849042746
+    },
+    "India": {
+      "rows": 883188,
+      "singletons": 49351,
+      "prevalence": 0.05587825015738439
+    }
+  },
+  "fixed_100_tree": {
+    "fit": {
+      "auroc": 0.5232991237820109,
+      "auprc": 0.06215198139322163
+    },
+    "early": {
+      "auroc": 0.49737831165594293,
+      "auprc": 0.05523216496270707
+    },
+    "calibration": {
+      "auroc": 0.5014994344499205,
+      "auprc": 0.056439663240558754
+    },
+    "holdout": {
+      "n": 221464,
+      "prevalence": 0.05639291261785211,
+      "auroc": 0.5001422487822301,
+      "auprc": 0.05649627529508093,
+      "brier": 0.05321461783029977
+    },
+    "holdout_US": {
+      "n": 132884,
+      "prevalence": 0.05637247524156407,
+      "auroc": 0.5007594241446183,
+      "auprc": 0.056539191662810157
+    },
+    "holdout_India": {
+      "n": 88580,
+      "prevalence": 0.056423571912395575,
+      "auroc": 0.4992259244871886,
+      "auprc": 0.05644200587353111
+    },
+    "topk_holdout_precision": {
+      "100": 0.11,
+      "1000": 0.055,
+      "10000": 0.0539,
+      "50000": 0.05678
+    },
+    "elapsed_seconds": 17.10858392715454,
+    "catboost_version": "1.2.8"
+  },
+  "early_stopped_sanity": {
+    "trees": 8,
+    "holdout_auroc": 0.5046556405454481,
+    "holdout_auprc": 0.05738962719479216,
+    "holdout_US_auroc": 0.502719866840376,
+    "holdout_India_auroc": 0.5069539660519756
+  },
+  "corpus_frequency": {
+    "normalized_name_repeat_rate": 0.39282479186123387,
+    "normalized_address_repeat_rate": 0.053089942501000305,
+    "normalized_pair_repeat_rate": 0,
+    "max_name_frequency": 253,
+    "max_address_frequency": 14,
+    "max_pair_frequency": 1
+  },
+  "status": "REJECT",
+  "recommendation": "Do not use Source-1-only singleton gating. Use candidate/pair evidence and ambiguity features."
+}
