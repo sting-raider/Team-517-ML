@@ -220,6 +220,19 @@ If useful, also write compact JSON with machine-readable metrics.
 
 Negative results belong in the registry. Repeating failed experiments because nobody recorded them is an excellent way to waste the remaining 72 hours.
 
+### Reconciling concurrent registry edits
+
+Experiment branches must still update `experiments/REGISTRY.tsv` as required above. When integrating two or more branches that independently added registry rows, do not resolve a conflict by choosing one side or hand-copying rows.
+
+Export the complete registry version from each side and reconcile them with:
+
+```bash
+python tools/reconcile_registry.py /tmp/registry-main.tsv /tmp/registry-branch.tsv \
+  --output experiments/REGISTRY.tsv
+```
+
+The reconciler validates the canonical header and column count, unions rows by `experiment_id`, deduplicates byte-equivalent rows for the same ID, sorts deterministically, and fails if the same experiment ID has conflicting metadata. For an n-way integration, pass every complete registry version in one invocation. This keeps the central registry contract while making concurrent additions fail-safe.
+
 ## 11. Required report structure
 
 Every report should contain:
