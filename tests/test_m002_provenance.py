@@ -81,6 +81,7 @@ class CandidateProvenanceTests(unittest.TestCase):
         legacy_records,legacy_x=prepare_groups(([[base_row]],None,False))
         self.assertEqual(legacy_records,records)
         self.assertEqual(legacy_x.shape,(1,len(FEATURE_NAMES)))
+        self.assertTrue((x[0,:len(FEATURE_NAMES)]==legacy_x[0]).all())
 
     def test_provenance_vector_schema_and_validation(self):
         values=provenance_values(2,1,0,2,1,0,1,1,7)
@@ -91,6 +92,8 @@ class CandidateProvenanceTests(unittest.TestCase):
             provenance_values(0,1,0,0,0,0,0,0,1)
         with self.assertRaises(ValueError):
             provenance_values(1,-1,0,0,0,0,0,0,1)
+        with self.assertRaises(ValueError):
+            provenance_values(1,0,0,0,0,0,0,0,0)
 
 
 if __name__=='__main__':
