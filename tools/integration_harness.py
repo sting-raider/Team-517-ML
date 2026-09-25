@@ -101,7 +101,7 @@ def integrate_and_run(repo: Path, base_ref: str, refs: Sequence[str],
         duration_seconds=0.0, status="RUNNING", error=None,
         worktree=str(worktree) if keep_worktree else None,
     )
-    worktree_added = false_placeholder = False
+    worktree_added = False
     try:
         _git(repo, "worktree", "add", "--detach", str(worktree), base.sha)
         worktree_added = True
