@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import numpy as np
 
+from .candidate_budget_contract import raw_retrieval_rank
 from .experiment import choose_threshold, mappings
 from .metrics import evaluate
 
@@ -17,11 +18,8 @@ def main():
     prob = np.load("artifacts/tuned/depth10_wide_probabilities.npy")
     if len(prob) != len(groups):
         raise ValueError("Feature and prediction arrays have different lengths")
-    order = np.lexsort((target, -x[:, -3], groups))
-    starts = np.r_[0, np.flatnonzero(np.diff(groups[order])) + 1]
-    rank = np.empty(len(order), dtype=np.int32)
-    rank[order] = np.arange(len(order)) - np.repeat(starts, np.diff(np.r_[starts, len(order)])) + 1
-    del x, data, order, starts
+    rank = raw_retrieval_rank(groups, target, x[:, -3])
+    del x, data
     report = {"protocol": "Same 4,389 calibration anchors and depth-10 model at each raw retrieval cap",
               "selection_note": "Organizer review explicitly rewards smaller candidate sets; these calibration results are not independent confirmation",
               "caps": {}}
