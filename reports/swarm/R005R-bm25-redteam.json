@@ -1,0 +1,38 @@
+{
+  "experiment_id": "R005R",
+  "target": {
+    "issue": 46,
+    "pr": 66,
+    "head_sha": "0ba9a0b323dcd8d890801675916c57acbea74674"
+  },
+  "workflow": {
+    "run_id": 36160380477,
+    "conclusion": "failure",
+    "artifacts": 0,
+    "logs_available": false
+  },
+  "checks": {
+    "anchor_universe": "PASS",
+    "calibration_fold": "PASS",
+    "baseline_constants": "PASS",
+    "baseline_semantics": "PASS_SUBJECT_TO_RUNNER_REPAIR",
+    "metric_semantics": "PASS",
+    "truth_leakage": "PASS",
+    "confirmation_consumption": "PASS",
+    "cap_interpretation": "PASS_WITH_CAVEAT",
+    "tsv_delimiter_parity": "FAIL",
+    "ci_execution": "FAIL",
+    "input_content_hashes": "WARN",
+    "mean_candidate_count": "WARN",
+    "runtime_memory": "UNKNOWN"
+  },
+  "defect": {
+    "file": "experiments/r005_bm25_name.py",
+    "occurrences": 6,
+    "current_python_source": "delim='\\\\\\\\t'",
+    "main_python_source": "delim='\\\\t'",
+    "repair": "Match main delimiter spelling exactly; change no BM25 parameters in the repair commit."
+  },
+  "recommendation": "FOLLOW-UP",
+  "bm25_metric_claimed": false
+}
