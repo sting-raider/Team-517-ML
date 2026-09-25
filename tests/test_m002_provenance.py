@@ -6,6 +6,8 @@ from pathlib import Path
 import duckdb
 
 from ber.blocking import build_index, candidates
+from ber.features import FEATURE_NAMES
+from ber.predict import prepare_groups
 from ber.provenance import PROVENANCE_FEATURE_NAMES, provenance_values
 
 
@@ -62,6 +64,17 @@ class CandidateProvenanceTests(unittest.TestCase):
         candidates(c,'train','anchors','prov',cap=1,provenance=True)
         self.assertEqual(c.execute('SELECT rid FROM legacy').fetchone()[0],
                          c.execute('SELECT rid FROM prov').fetchone()[0])
+
+    def test_inference_feature_batch_appends_provenance_without_reordering_base(self):
+        base_row=('A1','T1','alpha cafe','12 main street','alpha cafe','12 main street',10.0,2,2)
+        prov=(1,1,1,0,0,0,0,0,1)
+        records,x=prepare_groups(([[base_row+prov]],None,True))
+        self.assertEqual(records,[('A1','T1')])
+        self.assertEqual(x.shape,(1,len(FEATURE_NAMES)+len(PROVENANCE_FEATURE_NAMES)))
+        self.assertEqual(float(x[0,len(FEATURE_NAMES)]),1.0)
+        legacy_records,legacy_x=prepare_groups(([[base_row]],None,False))
+        self.assertEqual(legacy_records,records)
+        self.assertEqual(legacy_x.shape,(1,len(FEATURE_NAMES)))
 
     def test_provenance_vector_schema_and_validation(self):
         values=provenance_values(2,1,0,2,1,0,1,1,7)
