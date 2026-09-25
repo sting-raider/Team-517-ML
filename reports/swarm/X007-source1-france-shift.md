@@ -5,6 +5,8 @@
 **Branch:** `agent/x/X007-source1-france-shift`  
 **Recommendation:** **FOLLOW-UP**
 
+> **Swarm coordination note:** X001 / PR #32 completed a broader France feature audit while X007 was running, and X001R / PR #51 later red-teamed parts of its census interpretation. X007 should therefore be read as an **independent full-file replication + extension**. It exactly reproduces X001's core record-level accent/non-ASCII/hyphen rates and adds explicit labeled-country train→test controls, normalization-collision diagnostics, and per-row-distinct rare-token redundancy statistics. It does not rely on raw-length claims about model features or token-occurrence counts mislabeled as document frequency.
+
 ## Hypothesis
 
 French Source-1 records may differ enough from labeled US/India records that the current lexical normalization and blocking assumptions lose useful evidence before the matcher sees a pair. The goal here is to quantify that shift on the complete accessible Source-1 inventory, without inventing France labels or using external business data.
