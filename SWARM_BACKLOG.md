@@ -111,3 +111,18 @@ If many agents are available immediately, prioritize these in parallel:
 R001, R002, R003, R005, R006, R007, R014, F001, F003, F004, F005, M001, M002, M003, M005, M006, D001, D002, D003, I001, I003, I004, I005, I006.
 
 That wave attacks the known ceiling, India weakness, singleton precision, and experiment throughput simultaneously.
+
+
+## Coordinator integration — September 26
+
+- **INT001 COMPLETE / DO NOT DEPLOY** Larger matched-pool training compared depths
+  8 and 10. Calibration improved, but ordinal rank encoded ID tie ordering;
+  archived reports remain in `reports/int001_depth*.json`.
+- **INT002 CLAIMED / RUNNING** Correct score-only dense rank; rebuild features,
+  train depth 10, confirm on predeclared 40k:45k window, export second submission.
+  Branch: `integration/submission-v2`. Follow-up code and final measured report
+  will be integrated by the coordinator.
+- **INT003 FOLLOW-UP** Train/evaluate complementary character retrieval at cap160
+  using `reports/int001_retrieval.json` as retrieval-only evidence. Compare both
+  base and source-aware rank fusion; source-aware gains overall but loses some
+  India recall. No matcher score claimed yet.

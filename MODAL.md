@@ -54,3 +54,50 @@ published Modal rates this is approximately $0.63 per worker-hour, or $5.04
 per hour while all eight workers are running, before storage/network and other
 charges. Check the actual Usage & Billing dashboard against the $30 plan; the
 dashboard also supports a spend limit.
+
+
+## Second-submission matcher (INT002)
+
+Use `modal_v2.py` for the larger matched-pool training run. It uses the existing
+complete private DuckDB inventory, rebuilds cap-160 training candidates, and
+adds four corpus-frequency features, score-only dense rank, and relative
+retrieval score. Model-facing rank never breaks score ties using record IDs.
+
+```powershell
+$env:PYTHONIOENCODING='utf-8'
+$env:PYTHONUTF8='1'
+modal run -d modal_v2.py --action train --depth 10
+modal run -d modal_v2.py --action confirm --depth 10
+# Run after inspecting the confirmation result:
+modal run -d modal_v2.py --action score --depth 10
+New-Item -ItemType Directory -Force output/submission_v2_d10 | Out-Null
+modal volume get team517-business-er project/output/submission_v2_d10/matching_results.tsv output/submission_v2_d10/matching_results.tsv
+```
+
+Training fits 108,115 reference entities / 15,431,847 candidate pairs on one L4
+GPU after eight parallel CPU feature workers. Models and feature caches live in
+`project/experiments/int002` in the private Volume. Local reports use the
+`reports/int002_` prefix. GPU floating-point reductions can cause small variation
+between retraining runs even with seed 517; preserve checkpoint hashes.
+
+The original development folds select depth and threshold. The 5,000-entity
+confirmation window is hash positions 40,001–45,000; it is excluded from model
+fitting and selection. `prepare-confirmation` can compute those features while
+training runs, without evaluating labels or models. Do not repeatedly use this
+window to tune future models.
+
+Inference runs eight partitions and streams both merged TSVs through coverage,
+format, duplicate-target, and prediction-subset checks. The ID membership scan
+is skipped because candidate IDs are joined directly from the test database.
+The full candidate file remains in the Volume for final-package download:
+
+```powershell
+modal volume get team517-business-er project/output/submission_v2_d10/candidate_pairs.tsv output/submission_v2_d10/candidate_pairs.tsv
+modal volume get team517-business-er project/output/submission_v2_d10/completion.json output/submission_v2_d10/completion.json
+```
+
+For a new experiment, change the experiment/output paths; never reuse an old
+folder after changing a model, feature definition, input database, or blocker.
+INT001's ordinal-rank checkpoints are archived research and must not be used.
+The `retrieval` action is an independent diagnostic study, not the selected
+submission blocker. The production second-file candidate cap stays at 160.

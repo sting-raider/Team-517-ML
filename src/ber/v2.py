@@ -14,7 +14,7 @@ from .metrics import evaluate
 
 V2_NAMES = FEATURE_NAMES + ['log_anchor_name_frequency', 'log_anchor_address_frequency',
     'log_target_name_frequency', 'log_target_address_frequency',
-    'log_candidate_rank', 'relative_retrieval_score']
+    'log_candidate_score_rank', 'relative_retrieval_score']
 
 
 def frequency_tables(c, split):
@@ -27,7 +27,7 @@ def frequency_tables(c, split):
 
 def pair_query(split, anchors, pairs):
     return f'''WITH ranked AS (
-        SELECT p.*,row_number() OVER(PARTITION BY anchor ORDER BY retrieval DESC,r.entity_id) AS ranking,
+        SELECT p.*,dense_rank() OVER(PARTITION BY anchor ORDER BY retrieval DESC) AS ranking,
                max(retrieval) OVER(PARTITION BY anchor) AS top_retrieval
         FROM {pairs} p JOIN {split} r ON p.rid=r.rowid)
         SELECT p.anchor,r.entity_id,l.n,l.a,r.n,r.a,p.retrieval,p.hits,r.source,
