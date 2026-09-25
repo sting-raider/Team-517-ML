@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+R019a	126	R	GPT-5.6-Sol	agent/r/R019a-source-floor-full-data	e034e5cff657d4c51c4580fe142c17f5907740fc	Fixed-cap source floors recover cross-source-starved positives	4389 calibration anchors intended; no metric produced	0.9811781091658961			GitHub Actions runner allocation failed before steps		BLOCKED	reports/swarm/R019a-source-floor-full-data.md
