@@ -23,6 +23,7 @@ class CandidateProvenanceTests(unittest.TestCase):
         )''')
         c.executemany('INSERT INTO train VALUES (?,?,?,?,?,?,?)', [
             ('A1','Alpha Cafe','12 Main Street','US',1,'alpha cafe','12 main street'),
+            ('T0','Alpha Cafe','12 Main Street','US',3,'alpha cafe','12 main street'),
             ('T1','Alpha Cafe','12 Main Street','US',2,'alpha cafe','12 main street'),
             ('T2','Alpha Cafe Annex','12 Main Avenue','US',2,'alpha cafe annex','12 main avenue'),
             ('T3','Beta Shop','99 Side Road','US',3,'beta shop','99 side road'),
@@ -43,20 +44,25 @@ class CandidateProvenanceTests(unittest.TestCase):
             self.assertAlmostEqual(left[2],right[2],places=6)
             self.assertEqual(left[3],right[3])
 
-    def test_hit_families_partition_key_hits_and_rank_is_deterministic(self):
+    def test_hit_families_partition_key_hits_and_rank_is_id_independent(self):
         c=self.make_db()
         candidates(c,'train','anchors','prov',cap=10,provenance=True)
         rows=c.execute('''SELECT p.hits,p.name_exact_hits,p.address_exact_hits,p.name_token_hits,
             p.address_token_hits,p.address_bigram_hits,p.name_number_hits,p.address_number_hits,
             p.min_key_freq,p.candidate_rank,t.entity_id,p.retrieval
-            FROM prov p JOIN train t ON p.rid=t.rowid ORDER BY p.candidate_rank''').fetchall()
+            FROM prov p JOIN train t ON p.rid=t.rowid ORDER BY p.retrieval DESC,t.entity_id''').fetchall()
         self.assertTrue(rows)
-        self.assertEqual([r[9] for r in rows],list(range(1,len(rows)+1)))
         for r in rows:
             self.assertEqual(r[0],sum(r[1:8]))
             self.assertGreaterEqual(r[8],1)
-        ordering=[(-r[11],r[10]) for r in rows]
-        self.assertEqual(ordering,sorted(ordering))
+        scores=sorted({r[11] for r in rows},reverse=True)
+        expected_rank={score:i+1 for i,score in enumerate(scores)}
+        for r in rows:
+            self.assertEqual(r[9],expected_rank[r[11]])
+        exact_ties=[r for r in rows if r[10] in ('T0','T1')]
+        self.assertEqual(len(exact_ties),2)
+        self.assertEqual(len({r[9] for r in exact_ties}),1)
+        self.assertEqual(len({r[11] for r in exact_ties}),1)
 
     def test_cap_uses_same_top_candidate(self):
         c=self.make_db()
