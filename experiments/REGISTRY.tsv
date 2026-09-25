@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+F004	#19	R	ChatGPT	agent/r/F004-same-address-hard-negatives		Same-address distinct-business groups concentrate precision-risk hard negatives	full train_source1 intended; raw file fetched but compute session unavailable	N/A	N/A	N/A	Drive file 210069713 bytes transferred; no analysis executed	N/A	BLOCKED	reports/swarm/F004-same-address-hard-negatives.md
