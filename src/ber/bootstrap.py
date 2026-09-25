@@ -96,6 +96,8 @@ def paired_entity_bootstrap(
     tail = (1.0 - confidence) / 2.0
     lo, hi = np.quantile(boot, [tail, 1.0 - tail])
     return {
+        "method": "paired_entity_percentile_bootstrap",
+        "numpy_version": np.__version__,
         "entities": len(anchors),
         "baseline_mean": float(np.mean([base[a] for a in anchors])),
         "candidate_mean": float(np.mean([cand[a] for a in anchors])),
