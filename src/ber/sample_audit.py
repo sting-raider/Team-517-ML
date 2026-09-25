@@ -118,7 +118,7 @@ def _effects(sample: dict, population: dict) -> dict:
 
 def audit(source1: Path, truth: Path, db: Path) -> dict:
     con = connect(db)
-    con.execute("""CREATE OR REPLACE TABLE i018_population AS
+    con.execute("""CREATE OR REPLACE TABLE i020_population AS
         WITH s AS (
             SELECT entity_id,coalesce(business_name,'') AS business_name,
                    coalesce(business_address,'') AS business_address,coalesce(country,'') AS country
@@ -130,7 +130,7 @@ def audit(source1: Path, truth: Path, db: Path) -> dict:
         SELECT s.*,CASE WHEN matches='' THEN 0 ELSE len(string_split(matches,',')) END::INTEGER AS truth_count
         FROM s JOIN g USING(entity_id)""", [str(source1.resolve()), str(truth.resolve())])
     total, distinct_ids = con.execute(
-        "SELECT count(*),count(DISTINCT entity_id) FROM i018_population"
+        "SELECT count(*),count(DISTINCT entity_id) FROM i020_population"
     ).fetchone()
     truth_rows = con.execute(
         "SELECT count(*) FROM read_csv(?,delim='\\t',header=true,all_varchar=true)",
@@ -139,35 +139,35 @@ def audit(source1: Path, truth: Path, db: Path) -> dict:
     if total != distinct_ids or total != truth_rows:
         raise RuntimeError(f"Source-1/truth integrity mismatch: {total=}, {distinct_ids=}, {truth_rows=}")
 
-    con.execute("""CREATE OR REPLACE TABLE i018_selected AS
+    con.execute("""CREATE OR REPLACE TABLE i020_selected AS
         SELECT entity_id,business_name,business_address,country,truth_count,rn-1 AS sample_pos
         FROM (
             SELECT *,row_number() OVER (ORDER BY md5('sample517:'||entity_id)) AS rn
-            FROM i018_population
+            FROM i020_population
         ) q WHERE rn<=40000""")
     dev_ids = [r[0] for r in con.execute(
-        "SELECT entity_id FROM i018_selected WHERE sample_pos<30000 ORDER BY sample_pos"
+        "SELECT entity_id FROM i020_selected WHERE sample_pos<30000 ORDER BY sample_pos"
     ).fetchall()]
-    con.execute("CREATE OR REPLACE TABLE i018_folds(entity_id VARCHAR,fold VARCHAR)")
-    con.executemany("INSERT INTO i018_folds VALUES (?,?)", [(x, fold(x)) for x in dev_ids])
+    con.execute("CREATE OR REPLACE TABLE i020_folds(entity_id VARCHAR,fold VARCHAR)")
+    con.executemany("INSERT INTO i020_folds VALUES (?,?)", [(x, fold(x)) for x in dev_ids])
 
-    con.execute("CREATE OR REPLACE VIEW i018_dev AS SELECT * FROM i018_selected WHERE sample_pos<30000")
-    con.execute("CREATE OR REPLACE VIEW i018_conf1 AS SELECT * FROM i018_selected WHERE sample_pos BETWEEN 30000 AND 34999")
-    con.execute("CREATE OR REPLACE VIEW i018_conf2 AS SELECT * FROM i018_selected WHERE sample_pos BETWEEN 35000 AND 39999")
+    con.execute("CREATE OR REPLACE VIEW i020_dev AS SELECT * FROM i020_selected WHERE sample_pos<30000")
+    con.execute("CREATE OR REPLACE VIEW i020_conf1 AS SELECT * FROM i020_selected WHERE sample_pos BETWEEN 30000 AND 34999")
+    con.execute("CREATE OR REPLACE VIEW i020_conf2 AS SELECT * FROM i020_selected WHERE sample_pos BETWEEN 35000 AND 39999")
     for f in ("fit","early","calibrate","holdout"):
-        con.execute(f"""CREATE OR REPLACE VIEW i018_{f} AS
-            SELECT s.* FROM i018_selected s JOIN i018_folds f USING(entity_id)
+        con.execute(f"""CREATE OR REPLACE VIEW i020_{f} AS
+            SELECT s.* FROM i020_selected s JOIN i020_folds f USING(entity_id)
             WHERE f.fold='{f}'""")
 
     relations = {
-        "full": "i018_population",
-        "dev30k": "i018_dev",
-        "confirm_30k_35k": "i018_conf1",
-        "confirm_35k_40k": "i018_conf2",
-        "dev_fit": "i018_fit",
-        "dev_early": "i018_early",
-        "dev_calibrate": "i018_calibrate",
-        "dev_holdout": "i018_holdout",
+        "full": "i020_population",
+        "dev30k": "i020_dev",
+        "confirm_30k_35k": "i020_conf1",
+        "confirm_35k_40k": "i020_conf2",
+        "dev_fit": "i020_fit",
+        "dev_early": "i020_early",
+        "dev_calibrate": "i020_calibrate",
+        "dev_holdout": "i020_holdout",
     }
     summaries = {name: _summarize(con, rel) for name, rel in relations.items()}
     for name, summary in summaries.items():
@@ -189,7 +189,7 @@ def audit(source1: Path, truth: Path, db: Path) -> dict:
     }
     con.close()
     return {
-        "experiment": "I018",
+        "experiment": "I020",
         "protocol": {
             "anchor_order": "md5('sample517:'||entity_id)",
             "development": "positions [0,30000)",
@@ -206,8 +206,8 @@ def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--source1", type=Path, required=True)
     p.add_argument("--truth", type=Path, required=True)
-    p.add_argument("--db", type=Path, default=Path("artifacts/i018.duckdb"))
-    p.add_argument("--out", type=Path, default=Path("reports/swarm/I018-sample-representativeness.json"))
+    p.add_argument("--db", type=Path, default=Path("artifacts/i020.duckdb"))
+    p.add_argument("--out", type=Path, default=Path("reports/swarm/I020-sample-representativeness.json"))
     a = p.parse_args()
     result = audit(a.source1, a.truth, a.db)
     a.out.parent.mkdir(parents=True, exist_ok=True)
