@@ -1,1 +1,2 @@
 experiment_id	issue_or_task	pod	owner	branch	commit	hypothesis	data_slice	baseline_metric	new_metric	delta	secondary_metric	runtime	status	report_path
+X008	#147	X/R	GPT-5.6-Sol	agent/x/X008-block-key-survivability	6b1d8e82dae802b8ef4d4ceac1881f6017e342ba	Blocker-v2 key-family survivability/collision pressure differs by country	complete train_source1.tsv + test_source1.tsv	N/A	N/A	N/A	S1 census not executed; compute backends ClientError	N/A	BLOCKED	reports/swarm/X008-block-key-survivability.md
