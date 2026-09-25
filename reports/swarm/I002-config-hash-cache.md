@@ -20,7 +20,8 @@ The main branch previously had several weak reuse boundaries:
 - `ber.experiment` reused `features.npz` whenever the file existed and `--refresh` was absent;
 - `ber.wide_evaluate` likewise reused a wide feature cache by existence;
 - `ber.tune` skipped completed depth trials when report/model/probability files existed;
-- inference `run.json` recorded a hard-coded `index_version: 2`, not the actual blocker/feature/shortlist implementation or indexed record inventory.
+- inference `run.json` recorded a hard-coded `index_version: 2`, not the actual blocker/feature/shortlist implementation or indexed record inventory;
+- `ber.data` reused a prepared `train`/`test` table solely because sources 1/2/3 were present, without proving those rows came from the current raw TSVs or preprocessing code.
 
 I006 independently identified stale-cache provenance as a high research-integrity risk; I002 is the bounded implementation response.
 
@@ -38,6 +39,17 @@ Added deterministic provenance helpers:
 - identifier validation so relation names/columns cannot be interpolated unsafely.
 
 The file signature is intentionally a cheap accidental-staleness guard, not an adversarial whole-file hash.
+
+### `src/ber/data.py`
+
+Prepared DuckDB split reuse is now bound to:
+
+- sampled signatures of all three raw TSVs for that split;
+- an explicit data-preparation version;
+- the exact normalization macro SQL;
+- the exact source-loading implementation.
+
+A new `data_input_signatures` table records the intended split identity before source import. This permits safe source-by-source resume after an interrupted signed import, but an unsigned legacy table or a changed raw/preprocessing signature fails closed. `--refresh` is required to rebuild such a table explicitly. The audit report now records the prepared-input fingerprints.
 
 ### `src/ber/blocking.py`
 
@@ -99,10 +111,12 @@ Added `--refresh` to explicitly retrain completed trials. Unsigned legacy featur
 Executed in the current ChatGPT container:
 
 ```text
-PYTHONPATH=/mnt/data/i002/src python -m unittest -v /mnt/data/i002/tests/test_provenance.py
+PYTHONPATH=/mnt/data/i002/src python -m unittest -v \
+  /mnt/data/i002/tests/test_provenance.py \
+  /mnt/data/i002/tests/test_data_provenance.py
 ```
 
-Result: **6/6 tests passed** in approximately **0.006 s**.
+Result: **8/8 tests passed** in approximately **0.010 s**.
 
 Covered:
 
@@ -111,12 +125,17 @@ Covered:
 3. sampled file signature is copy-stable and detects a changed middle region;
 4. manifest rejects changed config and manifest tampering;
 5. missing manifest fails closed;
-6. relation fingerprint contract includes count/XOR/sum and rejects unsafe identifiers.
+6. relation fingerprint contract includes count/XOR/sum and rejects unsafe identifiers;
+7. prepared split identity is deterministic for unchanged raw inputs;
+8. mutating one raw source changes only the expected source signature and the split identity.
 
 The exact fetched branch sources for the changed integration modules were also syntax-compiled locally:
 
 ```text
-python -m py_compile   src/ber/provenance.py src/ber/blocking.py src/ber/predict.py   src/ber/experiment.py src/ber/tune.py src/ber/wide_evaluate.py   tests/test_provenance.py
+python -m py_compile \
+  src/ber/provenance.py src/ber/data.py src/ber/blocking.py src/ber/predict.py \
+  src/ber/experiment.py src/ber/tune.py src/ber/wide_evaluate.py \
+  tests/test_provenance.py tests/test_data_provenance.py
 ```
 
 Result: **PASS**.
@@ -132,12 +151,12 @@ No challenge metric was consumed or changed.
 | independent confirmation macro F0.5 | 0.928835 | not rerun |
 | candidate pair recall @640 | 0.947246 | not rerun |
 | blocking-oracle macro F0.5 | 0.980951 | not rerun |
-| provenance unit tests | n/a | 6/6 pass |
+| provenance unit tests | n/a | 8/8 pass |
 | changed Python files syntax compile | n/a | pass |
 
 ## Runtime / resource impact
 
-Measured pure-Python tests are negligible (~0.006 s). The new DuckDB compatibility checks scan behavior-relevant relations before cache reuse. Their full-data wall time and memory cost were **not measured** in this runtime and must be measured in the follow-up smoke.
+Measured pure-Python tests are negligible (~0.010 s). The new DuckDB compatibility checks scan behavior-relevant relations before cache reuse. Their full-data wall time and memory cost were **not measured** in this runtime and must be measured in the follow-up smoke.
 
 The sampled large-file signature reads at most three 64 KiB regions per file.
 
@@ -145,6 +164,7 @@ The sampled large-file signature reads at most three 64 KiB regions per file.
 
 The implementation specifically closes these false-gain modes:
 
+- raw split TSV/preprocessing changes while an old prepared DuckDB table remains;
 - blocker code changes without manually incrementing an integer version;
 - database record/reordering changes while an old rowid-based index remains;
 - candidate-table changes with an old pair-feature matrix present;
@@ -155,21 +175,23 @@ The implementation specifically closes these false-gain modes:
 
 Known remaining risks:
 
-1. `ber.data` still decides whether prepared split tables can be reused from the database itself; it does not yet bind that reuse decision to raw TSV file signatures. Because downstream fingerprints describe database contents, they detect DB changes, not a raw-file change that `ber.data` failed to import.
-2. The sampled large-file signature can theoretically miss a mutation outside the sampled regions. It is designed for accidental cache mismatch detection, not hostile tampering.
-3. Semantic embedding/`records.parquet` cache provenance is outside this selected-baseline patch and should be tightened before semantic models are promoted.
-4. Full-table fingerprint overhead is unknown until a normal DuckDB/Modal smoke is run.
+1. The sampled large-file signature can theoretically miss a mutation outside the sampled regions. It is designed for accidental cache mismatch detection, not hostile tampering.
+2. Semantic embedding/`records.parquet` cache provenance is outside this selected-baseline patch and should be tightened before semantic models are promoted.
+3. Full-table fingerprint overhead is unknown until a normal DuckDB/Modal smoke is run.
+4. Existing pre-I002 prepared databases are intentionally treated as unsigned. Adoption therefore requires an explicit `ber.data --refresh` rebuild once; this migration cost must be planned rather than hidden.
 
 ## Required follow-up
 
 On a machine/Modal volume with the repository's pinned DuckDB:
 
-1. create a tiny synthetic DuckDB containing `train`, `truth`, anchors, and candidates;
-2. materialize once and confirm the second run reuses the signed cache;
-3. mutate one candidate row and confirm reuse fails;
-4. build an index twice and confirm the second call reuses it;
-5. mutate/recreate the split inventory and confirm the index rebuilds;
-6. record fingerprint scan wall time on the real full `train` and `test` tables.
+1. create tiny raw train/test TSVs, prepare them once, and confirm a second run reuses the signed split tables;
+2. mutate one raw source and confirm `ber.data` refuses reuse without `--refresh`, then confirm explicit refresh rebuilds it;
+3. create a tiny synthetic DuckDB containing `train`, `truth`, anchors, and candidates;
+4. materialize features once and confirm the second run reuses the signed cache;
+5. mutate one candidate row and confirm feature-cache reuse fails;
+6. build an index twice and confirm the second call reuses it;
+7. mutate/recreate the split inventory and confirm the index rebuilds;
+8. record prepared-input signature and full-table relation-fingerprint wall time on the real dataset.
 
 If those pass with acceptable startup overhead, **PROMOTE** I002. Otherwise optimize the relation signature implementation without weakening the fail-closed contract.
 
