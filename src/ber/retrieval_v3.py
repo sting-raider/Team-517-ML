@@ -39,6 +39,11 @@ def source_candidates(c,split,anchors,result,cap):
 
 
 def build_char_index(c,split):
+    ready=c.execute('''SELECT count(*) FROM information_schema.tables
+        WHERE table_name=?''',[f'{split}_char_index']).fetchone()[0]
+    if ready:
+        print(f'Reusing {split} character index',flush=True)
+        return
     c.execute('''CREATE OR REPLACE MACRO name_grams(n) AS list_distinct(list_concat(
         list_transform(range(1,greatest(1,length(replace(n,' ',''))-1)),i->'c3:'||substr(replace(n,' ',''),i,3)),
         list_transform(range(1,greatest(1,length(replace(n,' ',''))-2)),i->'c4:'||substr(replace(n,' ',''),i,4))))''')
@@ -49,6 +54,39 @@ def build_char_index(c,split):
     c.execute(f'''CREATE OR REPLACE TABLE {split}_char_index AS
         SELECT r.rid,r.key,f.freq FROM {split}_char_raw r JOIN {split}_char_freq f USING(key) WHERE f.freq<=2000''')
     c.execute(f'DROP TABLE {split}_char_raw')
+
+
+def fused_candidates(c,split,anchors,result,cap=160):
+    """Bounded lexical and character retrieval; IDs break selection ties only."""
+    lexical_candidates(c,split,anchors,'fusion_lexical',cap)
+    char_candidates(c,split,anchors,'fusion_character',64)
+    c.execute(f'''CREATE OR REPLACE TABLE {result} AS
+        WITH ranked AS (
+          SELECT p.anchor,p.rid,1.0/(60+rank() OVER(
+            PARTITION BY p.anchor ORDER BY p.retrieval DESC)
+            +(count(*) OVER(PARTITION BY p.anchor,p.retrieval)-1.0)/2.0) AS weight,
+            p.retrieval AS base_retrieval,0.0::FLOAT AS char_retrieval,
+            p.hits AS base_hits,0::SMALLINT AS char_hits
+          FROM fusion_lexical p
+          UNION ALL
+          SELECT p.anchor,p.rid,0.5/(60+rank() OVER(
+            PARTITION BY p.anchor ORDER BY p.retrieval DESC)
+            +(count(*) OVER(PARTITION BY p.anchor,p.retrieval)-1.0)/2.0) AS weight,
+            0.0::FLOAT AS base_retrieval,p.retrieval AS char_retrieval,
+            0::SMALLINT AS base_hits,p.hits AS char_hits
+          FROM fusion_character p), fused AS (
+          SELECT anchor,rid,sum(weight)::FLOAT AS retrieval,
+            max(base_retrieval)::FLOAT AS base_retrieval,
+            max(char_retrieval)::FLOAT AS char_retrieval,
+            max(base_hits)::SMALLINT AS base_hits,
+            max(char_hits)::SMALLINT AS char_hits
+          FROM ranked GROUP BY anchor,rid)
+        SELECT p.anchor,p.rid,p.retrieval,
+          (p.base_hits+p.char_hits)::SMALLINT AS hits,
+          p.base_retrieval,p.char_retrieval,p.base_hits,p.char_hits
+        FROM fused p JOIN {split} r ON p.rid=r.rowid
+        QUALIFY row_number() OVER(PARTITION BY p.anchor
+          ORDER BY p.retrieval DESC,r.entity_id)<={int(cap)}''')
 
 
 def char_candidates(c,split,anchors,result,cap=64):

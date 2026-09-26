@@ -60,13 +60,14 @@ def feature_batches(c, query, executor):
         yield pending.popleft().result()
 
 
-def select_anchors(c, partition, partitions, training_end=200000, confirmation=False):
+def select_anchors(c, partition, partitions, training_end=200000, confirmation=False,
+                   confirmation_start=40000):
     # The 30k development population is preserved. 30k:50k never enters fitting.
     c.execute('''CREATE OR REPLACE TEMP TABLE ordered_s1 AS SELECT *,
         row_number() OVER(ORDER BY md5('sample517:'||entity_id)) AS sample_position
         FROM train WHERE source=1''')
     if confirmation:
-        condition = 'sample_position>40000 AND sample_position<=45000'
+        condition = f'sample_position>{int(confirmation_start)} AND sample_position<={int(confirmation_start)+5000}'
     else:
         condition = f'(sample_position<=30000 OR (sample_position>50000 AND sample_position<={int(training_end)}))'
     rows = c.execute(f'''SELECT entity_id,sample_position FROM ordered_s1
@@ -83,13 +84,17 @@ def select_anchors(c, partition, partitions, training_end=200000, confirmation=F
           FROM v2_anchors a JOIN truth t ON a.entity_id=t.anchor ORDER BY a.entity_id''').fetchall()]
 
 
-def materialize(db, out, partition=0, partitions=8, training_end=200000, cap=160, confirmation=False):
+def materialize(db, out, partition=0, partitions=8, training_end=200000, cap=160,
+                confirmation=False,candidate_fn=candidates,query_fn=pair_query,
+                feature_names=V2_NAMES,index_fn=None,confirmation_start=40000):
     out=Path(out); out.mkdir(parents=True,exist_ok=True)
     if (out/'ready.json').exists():
         raise ValueError('Use a fresh feature directory; no silent cache reuse')
     c=connect(db); c.execute("SET memory_limit='12GB'"); c.execute('SET threads=8')
     build_index(c,'train'); frequency_tables(c,'train')
-    meta=select_anchors(c,partition,partitions,training_end,confirmation)
+    if index_fn is not None:
+        index_fn(c,'train')
+    meta=select_anchors(c,partition,partitions,training_end,confirmation,confirmation_start)
     lookup={m['id']:i for i,m in enumerate(meta)}
     truths=[set(m['truth']) for m in meta]
     width=c.execute('SELECT max(length(entity_id)) FROM train').fetchone()[0]
@@ -98,12 +103,12 @@ def materialize(db, out, partition=0, partitions=8, training_end=200000, cap=160
         for offset in range(0,len(meta),5000):
             c.execute(f'''CREATE OR REPLACE TEMP TABLE batch_anchors AS SELECT * FROM v2_anchors
                 WHERE seq>{offset} AND seq<={offset+5000}''')
-            candidates(c,'train','batch_anchors','batch_candidates',cap)
+            candidate_fn(c,'train','batch_anchors','batch_candidates',cap)
             count=c.execute('SELECT count(*) FROM batch_candidates').fetchone()[0]
-            x=np.empty((count,len(V2_NAMES)),np.float32); y=np.empty(count,np.uint8)
+            x=np.empty((count,len(feature_names)),np.float32); y=np.empty(count,np.uint8)
             groups=np.empty(count,np.int32); targets=np.empty(count,dtype=f'U{width}')
             pos=0
-            for ids,values in feature_batches(c,pair_query('train','batch_anchors','batch_candidates'),executor):
+            for ids,values in feature_batches(c,query_fn('train','batch_anchors','batch_candidates'),executor):
                 end=pos+len(ids); x[pos:end]=values
                 for j,(anchor,target) in enumerate(ids,pos):
                     g=lookup[anchor]; groups[j]=g; targets[j]=target; y[j]=target in truths[g]
@@ -114,18 +119,19 @@ def materialize(db, out, partition=0, partitions=8, training_end=200000, cap=160
             print(f'Features part {partition}: {min(offset+5000,len(meta))}/{len(meta)} anchors; {time.time()-started:.1f}s',flush=True)
     (out/'anchors.json').write_text(json.dumps(meta),encoding='utf-8')
     receipt={'partition':partition,'partitions':partitions,'training_end':training_end,
-        'candidate_cap':cap,'feature_names':V2_NAMES,'anchors':len(meta),'chunks':chunks,
-        'confirmation':confirmation,'elapsed_seconds':time.time()-started}
+        'candidate_cap':cap,'feature_names':feature_names,'anchors':len(meta),'chunks':chunks,
+        'confirmation':confirmation,'confirmation_start':confirmation_start,
+        'elapsed_seconds':time.time()-started}
     (out/'ready.json').write_text(json.dumps(receipt,indent=2),encoding='utf-8')
     c.close(); return receipt
 
 
-def load_parts(root, partitions):
+def load_parts(root, partitions, feature_names=V2_NAMES):
     arrays=[]; meta=[]
     for part in range(partitions):
         folder=Path(root)/f'part{part}'
         receipt=json.loads((folder/'ready.json').read_text())
-        if receipt['feature_names']!=V2_NAMES:
+        if receipt['feature_names']!=feature_names:
             raise ValueError('Feature schema mismatch')
         part_meta=json.loads((folder/'anchors.json').read_text())
         for name in receipt['chunks']:
@@ -147,10 +153,12 @@ def score_slices(meta,groups,target,prob,fold_name,threshold):
     return result
 
 
-def train(root,out,baseline,partitions=8,depth=8):
+def train(root,out,baseline,partitions=8,depth=8,feature_names=V2_NAMES,
+          feature_version=2,baseline_feature_count=len(FEATURE_NAMES),
+          baseline_threshold=.5750000000000002,blocker='v2'):
     from catboost import CatBoostClassifier
     out=Path(out);out.mkdir(parents=True,exist_ok=True)
-    x,y,groups,target,meta=load_parts(root,partitions)
+    x,y,groups,target,meta=load_parts(root,partitions,feature_names)
     fit_ids=[i for i,m in enumerate(meta) if m['fold']=='fit']
     early_ids=[i for i,m in enumerate(meta) if m['fold']=='early']
     cal_ids=[i for i,m in enumerate(meta) if m['fold']=='calibrate']
@@ -168,14 +176,14 @@ def train(root,out,baseline,partitions=8,depth=8):
     p=model.predict_proba(x[ev],thread_count=8)[:,1]
     threshold,curve=choose_threshold(meta,eg,et,p,cal_ids)
     old=CatBoostClassifier();old.load_model(str(Path(baseline)/'mixed.cbm'))
-    bp=old.predict_proba(x[ev,:len(FEATURE_NAMES)],thread_count=8)[:,1]
+    bp=old.predict_proba(x[ev,:baseline_feature_count],thread_count=8)[:,1]
     report={'training_anchors':len(fit_ids),'training_pairs':int(fit.sum()),'depth':depth,
         'trees':model.tree_count_,'threshold':threshold,'candidate_cap':160,
-        'training_seconds':time.time()-started,'features':V2_NAMES,'calibration_curve':curve,
-        'baseline':{f:score_slices(meta,eg,et,bp,f,.5750000000000002) for f in ('calibrate','holdout')},
+        'training_seconds':time.time()-started,'features':feature_names,'calibration_curve':curve,
+        'baseline':{f:score_slices(meta,eg,et,bp,f,baseline_threshold) for f in ('calibrate','holdout')},
         'new':{f:score_slices(meta,eg,et,p,f,threshold) for f in ('calibrate','holdout')}}
-    config={'feature_names':V2_NAMES,'feature_version':2,'threshold':threshold,'candidate_cap':160,
-        'shortlist_cap':160,'seed':517,'depth':depth,'blocker':'v2','training_anchors':len(fit_ids)}
+    config={'feature_names':feature_names,'feature_version':feature_version,'threshold':threshold,'candidate_cap':160,
+        'shortlist_cap':160,'seed':517,'depth':depth,'blocker':blocker,'training_anchors':len(fit_ids)}
     (out/'model_config.json').write_text(json.dumps(config,indent=2),encoding='utf-8')
     (out/'anchors.json').write_text(json.dumps(meta),encoding='utf-8')
     (out/'report.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
