@@ -1,0 +1,105 @@
+{
+  "experiment_id": "X009",
+  "issue": 181,
+  "recommendation": "FOLLOW-UP",
+  "population": {
+    "train_source1_rows": 2206821,
+    "test_source1_rows": 1732544,
+    "test_country_rows": {
+      "US": 663106,
+      "India": 809986,
+      "France": 259452
+    }
+  },
+  "int002_fit": {
+    "anchors": 108115,
+    "country_anchors": {
+      "US": 64955,
+      "India": 43160
+    },
+    "anchor_name_frequency": {
+      "p50": 1,
+      "p90": 34,
+      "p99": 93,
+      "p999": 204,
+      "max": 253,
+      "mean_log1p": 1.3653455835442223
+    },
+    "anchor_address_frequency": {
+      "p50": 1,
+      "p90": 1,
+      "p99": 5,
+      "p999": 9,
+      "max": 14,
+      "mean_log1p": 0.7337480134290137
+    }
+  },
+  "test_france": {
+    "name": {
+      "collision_row_rate": 0.34405978755222544,
+      "p90": 11,
+      "p99": 71,
+      "p999": 157,
+      "max": 205,
+      "mean_log1p": 1.1585488521316214,
+      "above_fit_max_rate": 0,
+      "above_fit_p999_rate": 0.0007901268828145476
+    },
+    "address": {
+      "collision_row_rate": 0.11105715122643109,
+      "p90": 2,
+      "p99": 9,
+      "p999": 86,
+      "max": 101,
+      "mean_log1p": 0.7858677010370011,
+      "above_fit_max_rows": 989,
+      "above_fit_max_rate": 0.003811880424895549,
+      "above_fit_p999_rows": 2382,
+      "above_fit_p999_rate": 0.009180888950557329
+    }
+  },
+  "same_country_train_test": {
+    "US": {
+      "population_ratio": 0.5009742126405129,
+      "name": {
+        "weighted_ks": 0.0668690995812421,
+        "mean_log1p_delta": -0.15438966753165473,
+        "collision_rate_delta_pp": -6.686909958124209
+      },
+      "address": {
+        "weighted_ks": 0.015849699905141623,
+        "mean_log1p_delta": -0.0191282651922432,
+        "collision_rate_delta_pp": -1.5849699905141597
+      }
+    },
+    "India": {
+      "population_ratio": 0.9171161745857054,
+      "name": {
+        "weighted_ks": 0.03444221113956858,
+        "mean_log1p_delta": -0.028459196088179484,
+        "collision_rate_delta_pp": -0.6417303402587782
+      },
+      "address": {
+        "weighted_ks": 0.0014954326244621674,
+        "mean_log1p_delta": -0.001710560204419398,
+        "collision_rate_delta_pp": -0.108287637117295
+      }
+    }
+  },
+  "runtime_seconds": {
+    "train_scan": 50.39879631996155,
+    "test_scan": 33.60685348510742
+  },
+  "integrity": {
+    "fit_anchor_count_reproduced": true,
+    "known_frequency_maxima_reproduced": true,
+    "helper_assertions_passed": 7,
+    "empirical_integrity_assertions_passed": 5,
+    "normalization_note": "Python NFD semantic mirror; DuckDB unavailable in runtime"
+  },
+  "limitations": [
+    "France is unlabeled; no accuracy claim",
+    "target-side frequency features require complete S2/S3 and were not approximated",
+    "out-of-support does not imply prediction error"
+  ]
+}
