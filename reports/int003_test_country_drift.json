@@ -1,0 +1,35 @@
+{
+  "protocol": "Unlabeled test country/cardinality drift only; no score estimate",
+  "countries": {
+    "France": {
+      "entities": 259452,
+      "baseline_empty": 8661,
+      "new_empty": 8915,
+      "baseline_matches": 1186767,
+      "new_matches": 1130876,
+      "changed_cardinality": 81339,
+      "baseline_mean_matches": 4.5741293187179135,
+      "new_mean_matches": 4.35870989624285
+    },
+    "India": {
+      "entities": 809986,
+      "baseline_empty": 58027,
+      "new_empty": 55498,
+      "baseline_matches": 2415882,
+      "new_matches": 2495140,
+      "changed_cardinality": 131405,
+      "baseline_mean_matches": 2.982621921860378,
+      "new_mean_matches": 3.0804729958295574
+    },
+    "US": {
+      "entities": 663106,
+      "baseline_empty": 39585,
+      "new_empty": 38185,
+      "baseline_matches": 2156495,
+      "new_matches": 2193422,
+      "changed_cardinality": 71390,
+      "baseline_mean_matches": 3.2521120303541213,
+      "new_mean_matches": 3.307799959584139
+    }
+  }
+}

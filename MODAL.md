@@ -132,3 +132,39 @@ matching-file validator also passes on the downloaded file. The old local
 `output/modal_parallel_v1/candidate_pairs.tsv.incomplete` is intentionally
 named incomplete: it had the expected length but failed the cloud checksum.
 Use the valid Modal Volume candidate file for the final archive.
+
+## Third-submission character fusion (INT003)
+
+`modal_v3.py` builds an additional name-character index, fuses lexical top 160
+with character top 64 by ID-independent average-rank RRF, and scores at most 160
+unique candidates per anchor. It trains a 57-feature CatBoost model on this exact
+pool. The full inventory and model artifacts stay in the private Modal Volume.
+
+```powershell
+$env:PYTHONIOENCODING='utf-8'
+$env:PYTHONUTF8='1'
+modal run -d modal_v3.py --action prepare
+modal run -d modal_v3.py --action retrieval
+modal run -d modal_v3.py --action train --depth 10
+modal run -d modal_v3.py --action confirm --depth 10
+modal run -d modal_v3.py --action score --depth 10
+modal run -d modal_v3.py --action package --depth 10
+modal run -d modal_v3.py --action download --depth 10
+modal run -d modal_v3.py --action resume-download --depth 10
+```
+
+The `download` action transfers 4 MiB chunks and verifies the cloud gzip SHA256;
+`resume-download` verifies the decompressed SHA256 and creates
+`output/submission_v3_d10/matching_results.tsv`. A full-length file from the
+Volume CLI previously failed its checksum, so use this verified chunk route. The large
+`candidate_pairs.tsv` audit file remains at
+`project/output/submission_v3_d10/candidate_pairs.tsv` in the private Volume;
+download it for the final archive. A transfer stopped near the end can also use
+`resume-download` to fetch an exact remote tail of at most 8 MiB.
+
+The v3 model's 5,000-anchor frozen confirmation (hash positions 45,001–50,000)
+scored 0.950198 macro F0.5 versus 0.942285 for the v2 model on its original
+candidate pool. The v3 candidate ceiling was 0.980917. See
+`reports/swarm/INT003-character-fusion.md` for the paired comparison, country
+slices, singleton tradeoff, and evidence limits. No public leaderboard score is
+known from that local confirmation.

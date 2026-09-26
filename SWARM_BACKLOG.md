@@ -126,3 +126,14 @@ That wave attacks the known ceiling, India weakness, singleton precision, and ex
   using `reports/int001_retrieval.json` as retrieval-only evidence. Compare both
   base and source-aware rank fusion; source-aware gains overall but loses some
   India recall. No matcher score claimed yet.
+
+
+## Coordinator integration — v3
+
+- **INT003 CLAIMED** Train and evaluate a cap-160 lexical-plus-name-character
+  retriever with score-only reciprocal-rank fusion and the full target inventory.
+  Source-1 sample 50,001:200,000 fit fold only; preserve original early,
+  calibration, and development holdout folds. Use a new 45,001:50,000
+  confirmation window only after calibration/model selection. Compare to the
+  confirmed v2 matcher on identical anchors, candidate budget, singleton and
+  country slices. Branch `integration/submission-v3`. No external entity data.
