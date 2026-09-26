@@ -49,13 +49,13 @@ def compute_rows(rows):
     return [(r[0],r[1]) for r in rows], np.concatenate((base,extra),axis=1)
 
 
-def feature_batches(c, query, executor):
+def feature_batches(c, query, executor, compute_fn=compute_rows):
     c.execute(query)
     pending = deque()
     while rows := c.fetchmany(16000):
         if len(pending) >= 8:
             yield pending.popleft().result()
-        pending.append(executor.submit(compute_rows, rows))
+        pending.append(executor.submit(compute_fn, rows))
     while pending:
         yield pending.popleft().result()
 
@@ -86,7 +86,8 @@ def select_anchors(c, partition, partitions, training_end=200000, confirmation=F
 
 def materialize(db, out, partition=0, partitions=8, training_end=200000, cap=160,
                 confirmation=False,candidate_fn=candidates,query_fn=pair_query,
-                feature_names=V2_NAMES,index_fn=None,confirmation_start=40000):
+                feature_names=V2_NAMES,index_fn=None,confirmation_start=40000,
+                compute_fn=compute_rows):
     out=Path(out); out.mkdir(parents=True,exist_ok=True)
     if (out/'ready.json').exists():
         raise ValueError('Use a fresh feature directory; no silent cache reuse')
@@ -108,7 +109,7 @@ def materialize(db, out, partition=0, partitions=8, training_end=200000, cap=160
             x=np.empty((count,len(feature_names)),np.float32); y=np.empty(count,np.uint8)
             groups=np.empty(count,np.int32); targets=np.empty(count,dtype=f'U{width}')
             pos=0
-            for ids,values in feature_batches(c,query_fn('train','batch_anchors','batch_candidates'),executor):
+            for ids,values in feature_batches(c,query_fn('train','batch_anchors','batch_candidates'),executor,compute_fn):
                 end=pos+len(ids); x[pos:end]=values
                 for j,(anchor,target) in enumerate(ids,pos):
                     g=lookup[anchor]; groups[j]=g; targets[j]=target; y[j]=target in truths[g]
