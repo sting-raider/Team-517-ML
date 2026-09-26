@@ -39,13 +39,14 @@ python -m ber.data --data ../student_resource/dataset
 python -m ber.blocking --anchors 30000 --cap 80
 python -m ber.experiment --out artifacts/address_baseline --report reports/address_baseline.json --transfer
 python -m ber.cap_study
-python -m ber.confirm
 python -m unittest discover -s tests -v
 ```
 
 Preparation reads TSVs explicitly, preserves raw fields, builds additional text
 representations, and audits IDs, labels, country agreement, missingness, and
 cardinality. See `reports/data_audit.json` for the complete aggregate audit.
+
+Confirmation is deliberately **not** part of routine reproduction. The four 5,000-anchor windows from hash offsets 30,000 through 50,000 have already been inspected and are recorded in `reports/CONFIRMATION_FREEZE.json`. Current INT002/INT003 fitting also uses fit-fold anchors from positions 50,001 through 200,000, so those positions are reserved against ad-hoc confirmation. Historical Modal confirmation can only be reproduced with an explicit non-empty `reason`; both feature-cache access and score observation fail closed without it. Any genuinely new confirmation window must go through the guarded ledger path and must not overlap a forbidden training range.
 
 Candidate generation searches **every training S2/S3 record**, even though only
 30,000 S1 anchors are sampled for this first experiment. It uses full names,
