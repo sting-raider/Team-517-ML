@@ -2,16 +2,26 @@
 
 An executable business entity resolution baseline for the supplied name/address data.
 The official target is **macro F0.5 per source-one entity**, including singletons.
-The historical baseline commands remain below; the current measured integration
-is the INT003 v3 pipeline.
+The historical baseline commands remain below. The current integrated research
+pipeline is INT006, which combines the INT003 matcher with multilingual retrieval
+and a cross-encoder at a final cap of 32 candidates.
 
 **Submission 1 scored 0.898 on the public leaderboard.** Submission 2 remains
 available at `output/submission_v2_d10/matching_results.tsv`. The selected v3
 pipeline uses bounded lexical plus character retrieval and a 57-feature matcher.
 Its fresh 5,000-anchor confirmation score is **0.950198** versus **0.942285**
-for v2 on the same anchors; its public score is not yet known. The v3 matching
+for v2 on the same anchors; the user reported a **0.917 public score** for v3.
+The v3 matching
 file is generated under `output/submission_v3_d10/` and the candidate audit stays
 on the private Modal Volume. See [submission-3 evidence](reports/SUBMISSION_3.md).
+The integrated INT006 system scored **0.970702 macro F0.5** on 3,051
+development holdout businesses, versus 0.944783 for v3 on those same anchors.
+This is not a leaderboard score, and France has no labeled training examples.
+Its full test export is run with
+`modal run modal_neural_submission.py --threshold 0.95 --dense-prior -2 --parts-per-country 4`;
+the matching and exact candidate files are created together on the private Modal
+volume. See [INT006 methodology](Documentation_template.md) and
+[measured integration results](reports/swarm/INT006-neural32-integration.md).
 See [the integration decision](reports/COORDINATOR_PLAN.md),
 [measured results](reports/RESULTS.md), and [Modal commands](MODAL.md).
 Research branches are prototypes and evidence; they are not all production changes.

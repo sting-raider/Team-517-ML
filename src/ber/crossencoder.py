@@ -9,6 +9,7 @@ import numpy as np
 from .dense_training import serialize
 
 MODEL = 'cross-encoder/mmarco-mMiniLMv2-L12-H384-v1'
+REVISION = '1427fd652930e4ba29e8149678df786c240d8825'
 
 
 def train(data_root, out, max_seconds=3000, callback=None):
@@ -19,13 +20,14 @@ def train(data_root, out, max_seconds=3000, callback=None):
 
     random.seed(517);np.random.seed(517);torch.manual_seed(517)
     torch.set_num_threads(4)
-    info = HfApi().model_info(MODEL)
+    info = HfApi().model_info(MODEL, revision=REVISION)
     license_name = info.card_data.get('license')
     if license_name != 'apache-2.0':
-        raise ValueError('Cross-encoder checkpoint license changed')
-    revision = info.sha
-    tokenizer = AutoTokenizer.from_pretrained(MODEL, revision=revision)
-    model = AutoModelForSequenceClassification.from_pretrained(MODEL,revision=revision).cuda()
+        raise ValueError('Pinned cross-encoder checkpoint license mismatch')
+    if info.sha != REVISION:
+        raise ValueError('Pinned cross-encoder checkpoint revision mismatch')
+    tokenizer = AutoTokenizer.from_pretrained(MODEL, revision=REVISION)
+    model = AutoModelForSequenceClassification.from_pretrained(MODEL,revision=REVISION).cuda()
     if model.config.num_labels != 1:
         raise ValueError('Expected pretrained scalar ranking head')
     parameters = sum(p.numel() for p in model.parameters())
@@ -90,7 +92,7 @@ def train(data_root, out, max_seconds=3000, callback=None):
             break
     model.save_pretrained(out)
     tokenizer.save_pretrained(out)
-    report={'initialization':MODEL,'revision':revision,'license':license_name,
+    report={'initialization':MODEL,'revision':REVISION,'license':license_name,
             'parameters':parameters,'fit_anchors':anchors,'training_pairs':len(pairs),
             'positives':sum(r[2] for r in pairs),'steps':step,'planned_steps':total_steps,
             'seconds':time.monotonic()-started,'stopped_on_time_budget':step<total_steps,
