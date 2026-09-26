@@ -1,0 +1,72 @@
+{
+  "experiment_id": "X010",
+  "issue": 196,
+  "recommendation": "REJECT",
+  "population": {
+    "train_rows": 2206821,
+    "test_rows": 1732544,
+    "train_country_rows": {"US": 1323633, "India": 883188},
+    "test_country_rows": {"US": 663106, "France": 259452, "India": 809986}
+  },
+  "fit": {
+    "anchors": 108115,
+    "country_anchors": {"India": 43160, "US": 64955}
+  },
+  "same_country_train_test": {
+    "US": {
+      "name": {
+        "raw_log1p": {"weighted_ks": 0.0668690995812421, "mean_delta": -0.15438966753165473},
+        "per_million": {"weighted_ks": 0.6418758069646193, "mean_delta": 0.27276437510197815},
+        "self_information": {"weighted_ks": 0.743642686454629, "mean_delta": -0.5368102309085163}
+      },
+      "address": {
+        "raw_log1p": {"weighted_ks": 0.015849699905141623, "mean_delta": -0.0191282651922432},
+        "per_million": {"weighted_ks": 0.9437525356348776, "mean_delta": 0.3453128174298664},
+        "self_information": {"weighted_ks": 0.9668677042654573, "mean_delta": -0.6720716332479277}
+      }
+    },
+    "India": {
+      "name": {
+        "raw_log1p": {"weighted_ks": 0.03444221113956858, "mean_delta": -0.028459196088179484},
+        "per_million": {"weighted_ks": 0.5560220474010064, "mean_delta": 0.030904993394206937},
+        "self_information": {"weighted_ks": 0.5560220474010064, "mean_delta": -0.058061826491970336}
+      },
+      "address": {
+        "raw_log1p": {"weighted_ks": 0.0014954326244621674, "mean_delta": -0.001710560204419398},
+        "per_million": {"weighted_ks": 0.9516422324578685, "mean_delta": 0.046040713798507715},
+        "self_information": {"weighted_ks": 0.9516422324578685, "mean_delta": -0.08481046237572976}
+      }
+    }
+  },
+  "france_vs_fit": {
+    "name": {
+      "raw_log1p": {"fit_min": 0.6931471805599453, "fit_max": 5.537334267018537, "outside_fit_range_rows": 0, "outside_fit_range_rate": 0.0},
+      "per_million": {"fit_min": 0.5627516803774316, "fit_max": 5.25822737289493, "outside_fit_range_rows": 4985, "outside_fit_range_rate": 0.01921357322356351},
+      "self_information": {"fit_min": 8.558557275200027, "fit_max": 13.402744361658618, "outside_fit_range_rows": 5181, "outside_fit_range_rate": 0.01996901160908376}
+    },
+    "address": {
+      "raw_log1p": {"fit_min": 0.6931471805599453, "fit_max": 2.70805020110221, "outside_fit_range_rows": 989, "outside_fit_range_rate": 0.003811880424895549},
+      "per_million": {"fit_min": 0.5627516803774316, "fit_max": 2.7548958022108065, "outside_fit_range_rows": 10803, "outside_fit_range_rate": 0.04163775958558809},
+      "self_information": {"fit_min": 11.052237170102003, "fit_max": 13.402744361658618, "outside_fit_range_rows": 10803, "outside_fit_range_rate": 0.04163775958558809}
+    }
+  },
+  "runtime_seconds": {
+    "train_scan": 43.18505835533142,
+    "test_scan": 30.568216800689697,
+    "scan_total": 73.75327515602112
+  },
+  "integrity": {
+    "fit_anchor_count_reproduced": true,
+    "normalization_examples": true,
+    "peak_rss_kib": 2108928,
+    "x009_fit_raw_name_max_freq_equivalent": 253.0,
+    "x009_fit_raw_address_max_freq_equivalent": 14.0,
+    "focused_tests": "7/7 PASS"
+  },
+  "limitations": [
+    "No labels, France pseudo-labels, or leaderboard feedback",
+    "No S2/S3 proxy",
+    "Anchor-side frequency features only",
+    "Python NFD semantic mirror of DuckDB normalization"
+  ]
+}
