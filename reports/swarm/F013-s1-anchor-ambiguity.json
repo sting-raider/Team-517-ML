@@ -1,0 +1,56 @@
+{
+  "experiment_id": "F013",
+  "population": {
+    "train_source1_rows": 2206821,
+    "truth_rows": 2206821,
+    "test_source1_rows": 1732544
+  },
+  "normalization": "Unicode NFD + combining-mark removal + lowercase + Unicode letter/number punctuation collapse; semantic mirror of latest-main DuckDB strip_accents norm, not byte-for-byte DuckDB execution",
+  "joint_collision_affected_anchors": {
+    "train_india": 0,
+    "train_us": 0,
+    "test_india": 0,
+    "test_us": 0,
+    "test_france": 2
+  },
+  "test_field_ambiguity": {
+    "France": {
+      "name_affected_rate": 0.34405978755222544,
+      "address_affected_rate": 0.11105715122643109,
+      "address_collision_pairs": 63463,
+      "address_max_group": 101
+    },
+    "India": {
+      "name_affected_rate": 0.43756064919640586,
+      "address_affected_rate": 0.047274891,
+      "address_collision_pairs": 42840,
+      "address_max_group": 12
+    },
+    "US": {
+      "name_affected_rate": 0.2912551,
+      "address_affected_rate": 0.0403978,
+      "address_collision_pairs": 25430,
+      "address_max_group": 10
+    }
+  },
+  "france_address_ambiguity_ratios": {
+    "vs_india_affected_anchor_rate": 2.3491783582286643,
+    "vs_us_affected_anchor_rate": 2.7490915081810443,
+    "vs_india_collision_pair_burden_per_anchor": 4.6247858283089895,
+    "vs_us_collision_pair_burden_per_anchor": 6.378229951668785
+  },
+  "train_singleton_rate_delta_percentage_points": {
+    "India_name_ambiguous_minus_unambiguous": 0.06249006906978438,
+    "India_address_ambiguous_minus_unambiguous": 0.08733413644858856,
+    "US_name_ambiguous_minus_unambiguous": -0.04237927218562754,
+    "US_address_ambiguous_minus_unambiguous": 0.02922915294351
+  },
+  "train_test_ambiguity_shift_percentage_points": {
+    "India_name": -0.6417303402587782,
+    "India_address": -0.108287637117295,
+    "US_name": -6.686909958124209,
+    "US_address": -1.5849699905141597
+  },
+  "tests": "3/3 passed",
+  "recommendation": "FOLLOW-UP: reject S1 joint dedup/singleton gating; prioritize target-side competition/commonness and France-safe address ambiguity handling"
+}
