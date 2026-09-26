@@ -6,6 +6,15 @@ from .blocking import init_macros,candidates as lexical_candidates
 from .data import connect
 from .experiment import fold
 from .metrics import evaluate
+from .provenance import canonical_json,fingerprint,relation_fingerprint,source_file_sha256
+
+
+CHAR_INDEX_VERSION=1
+CHAR_INDEX_MAX_FREQ=2000
+CHAR_GRAM_MACRO_SQL="""CREATE OR REPLACE MACRO name_grams(n) AS list_distinct(list_concat(
+    list_transform(range(1,greatest(1,length(replace(n,' ',''))-1)),i->'c3:'||substr(replace(n,' ',''),i,3)),
+    list_transform(range(1,greatest(1,length(replace(n,' ',''))-2)),i->'c4:'||substr(replace(n,' ',''),i,4))))"""
+CHAR_INVENTORY_COLUMNS=('rowid','entity_id','country','source','n')
 
 
 def build_source_index(c,split):
@@ -38,22 +47,50 @@ def source_candidates(c,split,anchors,result,cap):
         QUALIFY row_number() OVER(PARTITION BY anchor ORDER BY retrieval DESC,r.entity_id)<={int(cap)}''')
 
 
+def char_index_identity(c,split):
+    """Behavior/data identity required before reusing a persisted character index."""
+    return {
+        'kind':'v3_character_index',
+        'version':CHAR_INDEX_VERSION,
+        'split':split,
+        'max_frequency':CHAR_INDEX_MAX_FREQ,
+        'gram_macro_sql':CHAR_GRAM_MACRO_SQL,
+        # Deliberately conservative: any retrieval_v3 implementation change invalidates
+        # the persisted char index rather than risking a false experimental gain.
+        'implementation_sha256':source_file_sha256(build_char_index),
+        'inventory':relation_fingerprint(c,split,CHAR_INVENTORY_COLUMNS),
+    }
+
+
 def build_char_index(c,split):
-    ready=c.execute('''SELECT count(*) FROM information_schema.tables
-        WHERE table_name=?''',[f'{split}_char_index']).fetchone()[0]
-    if ready:
-        print(f'Reusing {split} character index',flush=True)
-        return
-    c.execute('''CREATE OR REPLACE MACRO name_grams(n) AS list_distinct(list_concat(
-        list_transform(range(1,greatest(1,length(replace(n,' ',''))-1)),i->'c3:'||substr(replace(n,' ',''),i,3)),
-        list_transform(range(1,greatest(1,length(replace(n,' ',''))-2)),i->'c4:'||substr(replace(n,' ',''),i,4))))''')
+    # The macro is cheap and defines current query semantics even when the tables reuse.
+    c.execute(CHAR_GRAM_MACRO_SQL)
+    identity=char_index_identity(c,split)
+    expected=fingerprint(identity)
+    c.execute('''CREATE TABLE IF NOT EXISTS char_index_signatures(
+        split VARCHAR PRIMARY KEY,fingerprint VARCHAR NOT NULL,identity_json VARCHAR NOT NULL)''')
+    names=(f'{split}_char_freq',f'{split}_char_index')
+    ready={row[0] for row in c.execute('''SELECT table_name FROM information_schema.tables
+        WHERE table_name IN (?,?)''',list(names)).fetchall()}
+    stored=c.execute('SELECT fingerprint FROM char_index_signatures WHERE split=?',[split]).fetchone()
+    if ready==set(names) and stored and stored[0]==expected:
+        print(f'Reusing compatible {split} character index {expected[:12]}',flush=True)
+        return expected
+    if ready or stored:
+        reason='unsigned' if not stored else 'stale or partial'
+        print(f'Rebuilding {reason} {split} character index',flush=True)
     c.execute(f'''CREATE OR REPLACE TABLE {split}_char_raw AS
         SELECT rowid rid,hash(country,k) AS key FROM {split},unnest(name_grams(n)) u(k) WHERE source>1''')
     c.execute(f'''CREATE OR REPLACE TABLE {split}_char_freq AS
         SELECT key,count(*)::INTEGER freq FROM {split}_char_raw GROUP BY key''')
     c.execute(f'''CREATE OR REPLACE TABLE {split}_char_index AS
-        SELECT r.rid,r.key,f.freq FROM {split}_char_raw r JOIN {split}_char_freq f USING(key) WHERE f.freq<=2000''')
+        SELECT r.rid,r.key,f.freq FROM {split}_char_raw r JOIN {split}_char_freq f USING(key)
+        WHERE f.freq<={CHAR_INDEX_MAX_FREQ}''')
     c.execute(f'DROP TABLE {split}_char_raw')
+    c.execute('DELETE FROM char_index_signatures WHERE split=?',[split])
+    c.execute('INSERT INTO char_index_signatures VALUES (?,?,?)',
+        [split,expected,canonical_json(identity)])
+    return expected
 
 
 def fused_candidates(c,split,anchors,result,cap=160):
@@ -93,7 +130,7 @@ def char_candidates(c,split,anchors,result,cap=64):
     c.execute(f'''CREATE OR REPLACE TEMP TABLE char_query AS
         SELECT entity_id anchor,hash(country,k) AS key,f.freq,left(k,3) kind,k
         FROM {anchors},unnest(name_grams(n)) u(k)
-        JOIN {split}_char_freq f ON f.key=hash(country,k) WHERE f.freq<=2000
+        JOIN {split}_char_freq f ON f.key=hash(country,k) WHERE f.freq<={CHAR_INDEX_MAX_FREQ}
         QUALIFY row_number() OVER(PARTITION BY entity_id,kind ORDER BY f.freq,k)<=6''')
     c.execute(f'''CREATE OR REPLACE TABLE {result} AS
         WITH hits AS (SELECT q.anchor,r.rid,sum(ln(10000001.0/r.freq))::FLOAT retrieval,
