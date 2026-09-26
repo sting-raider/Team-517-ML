@@ -1,0 +1,20 @@
+{
+  "initialization": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+  "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+  "license": "apache-2.0",
+  "parameters": 117641089,
+  "fit_anchors": 102125,
+  "training_pairs": 402483,
+  "positives": 198324.0,
+  "steps": 12578,
+  "planned_steps": 12578,
+  "seconds": 1289.5971767209999,
+  "stopped_on_time_budget": false,
+  "batch_size": 32,
+  "max_length": 160,
+  "seed": 517,
+  "initial_loss_100": 1.43122346252203,
+  "final_loss_100": 0.0862750758510083,
+  "peak_gpu_bytes": 2557281792,
+  "note": "Training loss only; no held-out entity F0.5 established."
+}

@@ -1,0 +1,9 @@
+{
+  "anchors": 1732544,
+  "original_edges": 5819438,
+  "retained_edges": 5607389,
+  "removed_edges": 212049,
+  "matching_sha256": "86e394a10dd7b0bec62ed95115bf56aa31a3336768d9657f3cc3041bbac7d8ea",
+  "v3_matching_sha256": "bf712f4d4fee94e56487b614ef302752bbcb2d2699e2fb65637aaf7fc32f4539",
+  "compressed_sha256": "1a26cb4529462a85a02416e4a0fe652e3dc30886fa55483509673c38c522ea7f"
+}
