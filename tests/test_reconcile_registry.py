@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.reconcile_registry import HEADER, RegistryError, read_registry, reconcile, render
+from tools.reconcile_registry import HEADER, RegistryError, read_registry, reconcile, render, write_atomic
 
 
 def make_row(experiment_id, status="PROMOTE", note=""):
@@ -104,6 +104,19 @@ class RegistryReconcilerTests(unittest.TestCase):
 
             rendered.write_text(render(reconcile([source, other])), encoding="utf-8")
             self.assertEqual(read_registry(rendered), [row])
+
+    def test_output_may_replace_one_input_after_all_inputs_are_read(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            a = Path(tmp) / "a.tsv"
+            b = Path(tmp) / "b.tsv"
+            write_registry(a, [make_row("R002")])
+            write_registry(b, [make_row("I001")])
+
+            content = render(reconcile([a, b]))
+            write_atomic(a, content)
+
+            self.assertEqual([row[0] for row in read_registry(a)], ["I001", "R002"])
+            self.assertFalse(Path(str(a) + ".tmp").exists())
 
     def test_requires_two_versions(self):
         with tempfile.TemporaryDirectory() as tmp:
