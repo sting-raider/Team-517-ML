@@ -10,6 +10,13 @@ DF counting so repeated address numbers do not inflate commonness.
 import math
 
 
+# Match Python re \\d semantics used by ber.features.parts(): Unicode decimal
+# digits (General_Category=Nd), not only ASCII 0-9. The production normalizer
+# preserves Unicode numeric characters, so narrowing this feature to ASCII
+# would make commonness disagree with the existing number-overlap features.
+NUMBER_TOKEN_REGEX = r"\\p{Nd}+"
+
+
 NUMBER_COMMONNESS_NAMES = [
     f"{field}_{name}"
     for field in ("name", "address")
@@ -79,7 +86,7 @@ def build_number_commonness(c, split):
                     WITH docs AS (
                         SELECT s.country,s.rowid AS rid,u.token
                         FROM {split} s,
-                        unnest(list_distinct(regexp_extract_all(s.{field}, '[0-9]+'))) u(token)
+                        unnest(list_distinct(regexp_extract_all(s.{field}, '{NUMBER_TOKEN_REGEX}'))) u(token)
                         WHERE {condition} AND s.{field}<>'' AND u.token<>''
                     )
                     SELECT country,token,count(*)::INTEGER AS freq
@@ -90,7 +97,7 @@ def build_number_commonness(c, split):
                     WITH values AS (
                         SELECT DISTINCT s.country,s.{field} AS value,u.token
                         FROM {split} s,
-                        unnest(list_distinct(regexp_extract_all(s.{field}, '[0-9]+'))) u(token)
+                        unnest(list_distinct(regexp_extract_all(s.{field}, '{NUMBER_TOKEN_REGEX}'))) u(token)
                         WHERE {condition} AND s.{field}<>'' AND u.token<>''
                     )
                     SELECT v.country,v.value,
@@ -106,7 +113,7 @@ def build_number_commonness(c, split):
                     WITH docs AS (
                         SELECT s.country,s.source,s.rowid AS rid,u.token
                         FROM {split} s,
-                        unnest(list_distinct(regexp_extract_all(s.{field}, '[0-9]+'))) u(token)
+                        unnest(list_distinct(regexp_extract_all(s.{field}, '{NUMBER_TOKEN_REGEX}'))) u(token)
                         WHERE {condition} AND s.{field}<>'' AND u.token<>''
                     )
                     SELECT country,source,token,count(*)::INTEGER AS freq
@@ -117,7 +124,7 @@ def build_number_commonness(c, split):
                     WITH values AS (
                         SELECT DISTINCT s.country,s.source,s.{field} AS value,u.token
                         FROM {split} s,
-                        unnest(list_distinct(regexp_extract_all(s.{field}, '[0-9]+'))) u(token)
+                        unnest(list_distinct(regexp_extract_all(s.{field}, '{NUMBER_TOKEN_REGEX}'))) u(token)
                         WHERE {condition} AND s.{field}<>'' AND u.token<>''
                     )
                     SELECT v.country,v.source,v.value,
