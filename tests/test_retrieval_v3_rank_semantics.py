@@ -13,7 +13,7 @@ def _ordinal_rrf(ids, base_scores, char_scores):
     return dict(weights)
 
 
-def _dense_rrf(base_scores, char_scores):
+def _dense_rrf(ids, base_scores, char_scores):
     weights = defaultdict(float)
     for scores, multiplier in ((base_scores, 1.0), (char_scores, 0.5)):
         rank_by_score = {
@@ -33,7 +33,7 @@ class RrfRankSemanticsTest(unittest.TestCase):
         ids_b = {"x": "C", "y": "A", "z": "B"}
 
         self.assertNotEqual(_ordinal_rrf(ids_a, base, char), _ordinal_rrf(ids_b, base, char))
-        self.assertEqual(_dense_rrf(base, char), _dense_rrf(base, char))
+        self.assertEqual(_dense_rrf(ids_a, base, char), _dense_rrf(ids_b, base, char))
 
     def test_production_rrf_weights_use_score_only_dense_rank(self):
         source = Path("src/ber/retrieval_v3.py").read_text(encoding="utf-8")
