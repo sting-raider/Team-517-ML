@@ -26,6 +26,42 @@ for field in ('name','address'):
 FEATURE_NAMES += ['retrieval','key_hits','source']
 
 
+CHAR_NGRAM_FEATURE_NAMES = []
+for field in ('name','address'):
+    CHAR_NGRAM_FEATURE_NAMES += [f'{field}_{s}' for s in (
+        'char3_jaccard','char3_containment','char4_jaccard','char4_containment')]
+
+
+@lru_cache(maxsize=50000)
+def compact_char_ngrams(s, n):
+    """Unique compact character n-grams; short/missing strings emit no evidence."""
+    compact=s.replace(' ','')
+    if not compact or len(compact)<n:
+        return frozenset()
+    return frozenset(compact[i:i+n] for i in range(len(compact)-n+1))
+
+
+def _char_ngram_overlap(left, right, n):
+    """Jaccard and smaller-side coverage. Missing/too-short text is neutral."""
+    if not left or not right:
+        return 0.0,0.0
+    lgrams=compact_char_ngrams(left,n)
+    rgrams=compact_char_ngrams(right,n)
+    if not lgrams or not rgrams:
+        return 0.0,0.0
+    inter=len(lgrams&rgrams)
+    return inter/len(lgrams|rgrams), inter/min(len(lgrams),len(rgrams))
+
+
+def char_ngram_features(n1,a1,n2,a2):
+    """Eight language-agnostic pair features, separate from the legacy schema."""
+    result=[]
+    for left,right in ((n1,n2),(a1,a2)):
+        result.extend(_char_ngram_overlap(left,right,3))
+        result.extend(_char_ngram_overlap(left,right,4))
+    return result
+
+
 def features(n1,a1,n2,a2,retrieval,hits,source):
     result=[]
     for l,r in ((n1,n2),(a1,a2)):
@@ -46,3 +82,9 @@ def batch_features(records):
         from ._fast_features import batch
         return np.frombuffer(batch(records),dtype=np.float32).reshape(-1,len(FEATURE_NAMES))
     return np.asarray([features(*r) for r in records],dtype=np.float32)
+
+
+def batch_char_ngram_features(records):
+    """Opt-in char n-gram block; callers append it explicitly to their schema."""
+    return np.asarray([char_ngram_features(r[0],r[1],r[2],r[3]) for r in records],
+        dtype=np.float32)
