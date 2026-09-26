@@ -25,6 +25,8 @@ Candidate pair recall on holdout is 0.978484 at 32 pairs, compared with v3's 0.9
 
 A cheaper compact variant that retrieves only 32 v3 candidates internally scored 0.969242 on holdout, 0.001460 below the selected full-rank variant. Both variants write at most 32 final candidates. The selected production code uses the full-rank variant because accuracy is the priority, while the small final candidate file addresses the organizer's ranking criterion.
 
+The selected model's holdout pair precision differs by retrieval channel. On India, it selected 271 neural-only links, of which 236 are true (87.08% pair precision), while 3,621 of 3,635 selected lexical/character links are true (99.61%). On US, neural-only is 99/107 (92.52%) and lexical/character is 5,885/5,901 (99.73%). Neural-only retrieval recovers genuinely missed links, but these harder decisions contribute more false positives and could be less reliable in unseen France. These are selected-pair diagnostics, not per-entity F0.5; see `reports/capped_match_evaluation.json`.
+
 ## Risks and next step
 
 The local splits have been used repeatedly and France has no labeled data. The 0.970702 number is a development holdout result, **not** a public/private leaderboard score or a claim that 0.998 has been reached. The full test output must finish, pass format and candidate-subset validation, and then be uploaded to measure the actual leaderboard effect. Preserve the v3/v4 files until that score is known. The final archive must include the exact candidate file from this same run, the final matching file, runnable code, and the organizer's methodology template.

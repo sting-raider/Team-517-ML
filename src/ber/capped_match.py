@@ -108,10 +108,32 @@ def evaluate_capped_match(baseline, retrieval_root, cross_root, dense_score_root
                          'calibration':score_slices(meta,groups,targets,probability,'calibrate',threshold),
                          'holdout':score_slices(meta,groups,targets,probability,'holdout',threshold)})
     best=max(variants,key=lambda r:r['calibration']['all']['macro_f0_5'])
+    best_prior=best['dense_prior']
+    chosen_logits=(cross if best_prior is None else
+                   oldlogit+cross+np.where(dense,best_prior,0.))
+    chosen=chosen_logits>=np.log(best['threshold']/(1-best['threshold']))
+    truth=np.array([t in meta[int(g)]['truth'] for g,t in zip(groups,targets)],bool)
+    diagnostics={}
+    for fold_name in ('calibrate','holdout'):
+        for country in ('India','US'):
+            entity_mask=np.array([m['fold']==fold_name and m['country']==country
+                                  for m in meta],bool)
+            in_slice=entity_mask[groups]
+            for channel,channel_mask in [('dense_only',dense),('lexical',~dense)]:
+                mask=in_slice&channel_mask
+                predicted=mask&chosen
+                true_positive=int(np.count_nonzero(predicted&truth))
+                count=int(np.count_nonzero(predicted))
+                diagnostics[f'{fold_name}_{country}_{channel}']={
+                    'candidates':int(np.count_nonzero(mask)),
+                    'predicted':count,'true_positive':true_positive,
+                    'false_positive':count-true_positive,
+                    'selected_pair_precision':true_positive/count if count else None}
     report={'protocol':'Exact dense top16 plus top v3 lexical/character candidates, cap32; complete train target inventory; cross-encoder scores all selected pairs; threshold chosen calibration only',
             'scheme':scheme,
             'pairs':len(keys),'dense_only_pairs':int(dense.sum()),
-            'variants':variants,'selected':best}
+            'variants':variants,'selected':best,
+            'selection_diagnostics':diagnostics}
     Path(out).parent.mkdir(parents=True,exist_ok=True)
     Path(out).write_text(json.dumps(report,indent=2),encoding='utf-8')
     return report

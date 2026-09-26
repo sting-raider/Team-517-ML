@@ -1,5 +1,50 @@
 # Run the challenge pipeline on Modal
 
+## Integrated neural32 pipeline (INT005 / M017 / INT006)
+
+The current research integration starts from the prepared INT003 DuckDB and
+depth-10 model. Train the licensed multilingual record encoder and pair
+cross-encoder, build complete country-specific target indexes, then score the
+test set. The measured US/India development holdout macro F0.5 is 0.970702,
+versus 0.944783 for v3 on the same anchors. France and leaderboard accuracy
+remain unknown until organizer evaluation.
+
+```powershell
+$env:PYTHONIOENCODING='utf-8'
+$env:PYTHONUTF8='1'
+modal run modal_dense.py
+modal run modal_crossencoder.py
+modal run modal_dense_test.py
+modal run modal_neural_submission.py --threshold 0.95 --dense-prior -2 --parts-per-country 4
+```
+
+The first two commands read the supplied training labels and frozen INT003
+features; the third indexes all 9,969,589 test Source 2/3 records. The last
+command scores country/hash partitions in resumable 5,000-anchor batches,
+merges the two exact TSVs, checks that matches are inside the candidate sets,
+and creates a compressed matching download. Rerunning the same command resumes
+completed batch shards and rejects changed configurations.
+
+```powershell
+New-Item -ItemType Directory -Force output/submission_v5_neural32 | Out-Null
+modal volume get team517-business-er project/output/submission_v5_neural32/matching_results.tsv.gz output/submission_v5_neural32/matching_results.tsv.gz
+python -c "import gzip,shutil; shutil.copyfileobj(gzip.open('output/submission_v5_neural32/matching_results.tsv.gz','rb'),open('output/submission_v5_neural32/matching_results.tsv','wb'))"
+python ../student_resource/utils/validate_submission.py --matching output/submission_v5_neural32/matching_results.tsv --test-dir ../student_resource/dataset/test
+```
+
+Check the decompressed SHA-256 against `reports/neural32_submission.json`.
+Upload only `matching_results.tsv` during leaderboard submissions. For the
+final archive, download its **same-run** `candidate_pairs.tsv` from
+`project/output/submission_v5_neural32/`; do not pair it with an older run's
+candidate file. That file has at most 32 pairs per Source 1 entity.
+
+`modal_neural_conflict.py` is a separate optional owner-ambiguity variant.
+It removes only v5-predicted links to targets claimed by multiple Source 1
+businesses, keeps the exact v5 candidate set, and writes
+`submission_v6_neural32_owner`. Its accuracy is unknown without a separate
+evaluation, so do not replace the selected v5 output based on its unlabeled
+conflict counts alone.
+
 The Modal app uses a private Volume named `team517-business-er`. It mounts the
 project code from this repository; datasets, models, and predictions stay outside
 Git. The dataset staging command uploads the supplied ZIP, **not the PDFs**.

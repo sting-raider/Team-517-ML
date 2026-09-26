@@ -28,9 +28,10 @@ CROSS=VOLUME_ROOT/'project/experiments/m017'
               memory=12288,gpu='L4',timeout=900)
 def score(country:str,prefix:str,scheme:str='capped'):
     from ber.capped_match import score_dense_only
+    score_root=ROOT if scheme=='capped' else ROOT/scheme
     result=score_dense_only(VOLUME_ROOT/'project/artifacts/data_v3.duckdb',
                             RETRIEVAL/country/f'{scheme}_{prefix}_pairs.jsonl',
-                            CROSS/'model',ROOT/scheme/f'{country}_{prefix}.npz')
+                            CROSS/'model',score_root/f'{country}_{prefix}.npz')
     volume.commit()
     return result
 
@@ -39,21 +40,25 @@ def score(country:str,prefix:str,scheme:str='capped'):
               memory=16384,timeout=900)
 def evaluate(scheme:str='capped'):
     from ber.capped_match import evaluate_capped_match
-    result=evaluate_capped_match(BASE,RETRIEVAL,CROSS/'scores',ROOT/scheme,
-                                 ROOT/scheme/'evaluation.json',scheme)
+    score_root=ROOT if scheme=='capped' else ROOT/scheme
+    result=evaluate_capped_match(BASE,RETRIEVAL,CROSS/'scores',score_root,
+                                 score_root/'evaluation.json',scheme)
     volume.commit()
     return result
 
 
 @app.local_entrypoint()
-def main(scheme:str='capped'):
+def main(scheme:str='capped',action:str='run'):
     if scheme not in ('capped','compact'):
         raise ValueError('Expected capped or compact')
-    calls=[score.spawn(country,prefix,scheme) for country in ('India','US')
-           for prefix in ('cal','hold')]
-    for call in calls:
-        value=call.get()
-        print('dense-only score',value['pairs'],value['country_fold'],flush=True)
+    if action not in ('run','evaluate'):
+        raise ValueError('Expected run or evaluate')
+    if action=='run':
+        calls=[score.spawn(country,prefix,scheme) for country in ('India','US')
+               for prefix in ('cal','hold')]
+        for call in calls:
+            value=call.get()
+            print('dense-only score',value['pairs'],value['country_fold'],flush=True)
     result=evaluate.remote(scheme)
     Path(f'reports/{scheme}_match_evaluation.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
     print(json.dumps({'pairs':result['pairs'],'dense_only_pairs':result['dense_only_pairs'],
