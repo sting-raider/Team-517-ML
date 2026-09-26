@@ -26,32 +26,35 @@ CROSS=VOLUME_ROOT/'project/experiments/m017'
 
 @app.function(image=gpu_image,volumes={str(VOLUME_ROOT):volume},cpu=4,
               memory=12288,gpu='L4',timeout=900)
-def score(country:str,prefix:str):
+def score(country:str,prefix:str,scheme:str='capped'):
     from ber.capped_match import score_dense_only
     result=score_dense_only(VOLUME_ROOT/'project/artifacts/data_v3.duckdb',
-                            RETRIEVAL/country/f'capped_{prefix}_pairs.jsonl',
-                            CROSS/'model',ROOT/f'{country}_{prefix}.npz')
+                            RETRIEVAL/country/f'{scheme}_{prefix}_pairs.jsonl',
+                            CROSS/'model',ROOT/scheme/f'{country}_{prefix}.npz')
     volume.commit()
     return result
 
 
 @app.function(image=cpu_image,volumes={str(VOLUME_ROOT):volume},cpu=4,
               memory=16384,timeout=900)
-def evaluate():
+def evaluate(scheme:str='capped'):
     from ber.capped_match import evaluate_capped_match
-    result=evaluate_capped_match(BASE,RETRIEVAL,CROSS/'scores',ROOT,ROOT/'evaluation.json')
+    result=evaluate_capped_match(BASE,RETRIEVAL,CROSS/'scores',ROOT/scheme,
+                                 ROOT/scheme/'evaluation.json',scheme)
     volume.commit()
     return result
 
 
 @app.local_entrypoint()
-def main():
-    calls=[score.spawn(country,prefix) for country in ('India','US')
+def main(scheme:str='capped'):
+    if scheme not in ('capped','compact'):
+        raise ValueError('Expected capped or compact')
+    calls=[score.spawn(country,prefix,scheme) for country in ('India','US')
            for prefix in ('cal','hold')]
     for call in calls:
         value=call.get()
         print('dense-only score',value['pairs'],value['country_fold'],flush=True)
-    result=evaluate.remote()
-    Path('reports/capped_match_evaluation.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
+    result=evaluate.remote(scheme)
+    Path(f'reports/{scheme}_match_evaluation.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
     print(json.dumps({'pairs':result['pairs'],'dense_only_pairs':result['dense_only_pairs'],
                       'selected':result['selected']},indent=2),flush=True)

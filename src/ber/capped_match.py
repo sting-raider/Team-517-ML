@@ -46,7 +46,8 @@ def score_dense_only(db, pair_path, model_path, out):
             'country_fold':str(pair_path),'out':str(out)}
 
 
-def evaluate_capped_match(baseline, retrieval_root, cross_root, dense_score_root, out):
+def evaluate_capped_match(baseline, retrieval_root, cross_root, dense_score_root, out,
+                          scheme='capped'):
     from .experiment import choose_threshold
     from .v2 import score_slices
 
@@ -63,7 +64,7 @@ def evaluate_capped_match(baseline, retrieval_root, cross_root, dense_score_root
     selected={}
     for country in ('India','US'):
         for fold,prefix in [('calibrate','cal'),('holdout','hold')]:
-            path=Path(retrieval_root)/country/f'capped_{prefix}_pairs.jsonl'
+            path=Path(retrieval_root)/country/f'{scheme}_{prefix}_pairs.jsonl'
             if not path.exists():
                 raise FileNotFoundError(path)
             with path.open(encoding='utf-8') as stream:
@@ -73,7 +74,7 @@ def evaluate_capped_match(baseline, retrieval_root, cross_root, dense_score_root
     values={}
     for g,t,p,logit in zip(base_g,base_t,base_p,base_logit):
         anchor=meta[int(g)]['id'];target=str(t)
-        if (anchor,target) in selected:
+        if (anchor,target) in selected and not selected[anchor,target]:
             if not np.isfinite(logit):
                 raise ValueError('Missing cross score on retained v3 candidate')
             values[anchor,target]=(float(p),float(logit))
@@ -108,6 +109,7 @@ def evaluate_capped_match(baseline, retrieval_root, cross_root, dense_score_root
                          'holdout':score_slices(meta,groups,targets,probability,'holdout',threshold)})
     best=max(variants,key=lambda r:r['calibration']['all']['macro_f0_5'])
     report={'protocol':'Exact dense top16 plus top v3 lexical/character candidates, cap32; complete train target inventory; cross-encoder scores all selected pairs; threshold chosen calibration only',
+            'scheme':scheme,
             'pairs':len(keys),'dense_only_pairs':int(dense.sum()),
             'variants':variants,'selected':best}
     Path(out).parent.mkdir(parents=True,exist_ok=True)
