@@ -1,9 +1,11 @@
 """Opt-in numeric-token document-frequency evidence for matcher experiments.
 
-The frozen INT003/V3 path is unchanged.  These helpers build country/side-local
-number-token document frequencies from the supplied split only.  Numeric tokens
-are deduplicated per record before DF counting so repeated address numbers do
-not inflate commonness.
+The frozen INT003/V3 path is unchanged. These helpers build split-local,
+country-local numeric-token document frequencies. Source 1 frequencies are
+scoped by country; target-side frequencies are additionally scoped by the
+actual target source (S2 versus S3) so one target inventory cannot inflate the
+other's commonness signal. Numeric tokens are deduplicated per record before
+DF counting so repeated address numbers do not inflate commonness.
 """
 import math
 
@@ -36,10 +38,12 @@ def _table(split, side, field, suffix):
 def commonness_values(left_numbers, right_numbers, left_df, right_df):
     """Reference semantics for one field.
 
-    Returns shared-token rarity from each inventory side, followed by rarity of
-    unmatched tokens on the left and right.  Zero means that the corresponding
-    token set is empty; existing V3 number-overlap/conflict features disambiguate
-    absence from actual agreement/conflict.
+    Returns shared-token commonness from each inventory side, followed by
+    commonness of unmatched tokens on the left and right. Lower positive values
+    mean rarer observed tokens because the feature is log(1 + minimum DF).
+    Zero means that the corresponding token set is empty; existing V3
+    number-overlap/conflict features disambiguate absence from actual
+    agreement/conflict.
     """
     left = set(left_numbers)
     right = set(right_numbers)
@@ -58,38 +62,71 @@ def commonness_values(left_numbers, right_numbers, left_df, right_df):
 
 
 def build_number_commonness(c, split):
-    """Build split-local token-DF and normalized-value profile tables."""
+    """Build split-local token-DF and normalized-value profile tables.
+
+    Left/source-one tables are keyed by country. Right/target tables are keyed
+    by country and concrete target source so S2 and S3 retain independent
+    document-frequency evidence.
+    """
     split = _checked_split(split)
     for side, condition in (("left", "s.source=1"), ("right", "s.source>1")):
         for field in ("n", "a"):
             df_table = _table(split, side, field, "df")
             profile_table = _table(split, side, field, "profile")
-            c.execute(f"""
-                CREATE OR REPLACE TABLE {df_table} AS
-                WITH docs AS (
-                    SELECT s.country,s.rowid AS rid,u.token
-                    FROM {split} s,
-                    unnest(list_distinct(regexp_extract_all(s.{field}, '[0-9]+'))) u(token)
-                    WHERE {condition} AND s.{field}<>'' AND u.token<>''
-                )
-                SELECT country,token,count(*)::INTEGER AS freq
-                FROM docs GROUP BY country,token
-            """)
-            c.execute(f"""
-                CREATE OR REPLACE TABLE {profile_table} AS
-                WITH values AS (
-                    SELECT DISTINCT s.country,s.{field} AS value,u.token
-                    FROM {split} s,
-                    unnest(list_distinct(regexp_extract_all(s.{field}, '[0-9]+'))) u(token)
-                    WHERE {condition} AND s.{field}<>'' AND u.token<>''
-                )
-                SELECT v.country,v.value,
-                    list(v.token ORDER BY v.token) AS tokens,
-                    list(d.freq ORDER BY v.token) AS dfs
-                FROM values v
-                JOIN {df_table} d USING(country,token)
-                GROUP BY v.country,v.value
-            """)
+            if side == "left":
+                c.execute(f"""
+                    CREATE OR REPLACE TABLE {df_table} AS
+                    WITH docs AS (
+                        SELECT s.country,s.rowid AS rid,u.token
+                        FROM {split} s,
+                        unnest(list_distinct(regexp_extract_all(s.{field}, '[0-9]+'))) u(token)
+                        WHERE {condition} AND s.{field}<>'' AND u.token<>''
+                    )
+                    SELECT country,token,count(*)::INTEGER AS freq
+                    FROM docs GROUP BY country,token
+                """)
+                c.execute(f"""
+                    CREATE OR REPLACE TABLE {profile_table} AS
+                    WITH values AS (
+                        SELECT DISTINCT s.country,s.{field} AS value,u.token
+                        FROM {split} s,
+                        unnest(list_distinct(regexp_extract_all(s.{field}, '[0-9]+'))) u(token)
+                        WHERE {condition} AND s.{field}<>'' AND u.token<>''
+                    )
+                    SELECT v.country,v.value,
+                        list(v.token ORDER BY v.token) AS tokens,
+                        list(d.freq ORDER BY v.token) AS dfs
+                    FROM values v
+                    JOIN {df_table} d USING(country,token)
+                    GROUP BY v.country,v.value
+                """)
+            else:
+                c.execute(f"""
+                    CREATE OR REPLACE TABLE {df_table} AS
+                    WITH docs AS (
+                        SELECT s.country,s.source,s.rowid AS rid,u.token
+                        FROM {split} s,
+                        unnest(list_distinct(regexp_extract_all(s.{field}, '[0-9]+'))) u(token)
+                        WHERE {condition} AND s.{field}<>'' AND u.token<>''
+                    )
+                    SELECT country,source,token,count(*)::INTEGER AS freq
+                    FROM docs GROUP BY country,source,token
+                """)
+                c.execute(f"""
+                    CREATE OR REPLACE TABLE {profile_table} AS
+                    WITH values AS (
+                        SELECT DISTINCT s.country,s.source,s.{field} AS value,u.token
+                        FROM {split} s,
+                        unnest(list_distinct(regexp_extract_all(s.{field}, '[0-9]+'))) u(token)
+                        WHERE {condition} AND s.{field}<>'' AND u.token<>''
+                    )
+                    SELECT v.country,v.source,v.value,
+                        list(v.token ORDER BY v.token) AS tokens,
+                        list(d.freq ORDER BY v.token) AS dfs
+                    FROM values v
+                    JOIN {df_table} d USING(country,source,token)
+                    GROUP BY v.country,v.source,v.value
+                """)
 
 
 def profile_joins(split, left_alias="l", right_alias="r"):
@@ -99,11 +136,13 @@ def profile_joins(split, left_alias="l", right_alias="r"):
         f"LEFT JOIN {_table(split,'left','n','profile')} m003_ln ON "
         f"m003_ln.country={left_alias}.country AND m003_ln.value={left_alias}.n",
         f"LEFT JOIN {_table(split,'right','n','profile')} m003_rn ON "
-        f"m003_rn.country={right_alias}.country AND m003_rn.value={right_alias}.n",
+        f"m003_rn.country={right_alias}.country AND m003_rn.source={right_alias}.source "
+        f"AND m003_rn.value={right_alias}.n",
         f"LEFT JOIN {_table(split,'left','a','profile')} m003_la ON "
         f"m003_la.country={left_alias}.country AND m003_la.value={left_alias}.a",
         f"LEFT JOIN {_table(split,'right','a','profile')} m003_ra ON "
-        f"m003_ra.country={right_alias}.country AND m003_ra.value={right_alias}.a",
+        f"m003_ra.country={right_alias}.country AND m003_ra.source={right_alias}.source "
+        f"AND m003_ra.value={right_alias}.a",
     ])
 
 
