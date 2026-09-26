@@ -37,6 +37,8 @@ The abandoned branch was 4 commits ahead of current main with no PR or issue che
 
 The initial implementation pooled all target records with `s.source>1` when computing right-side DF. That violates the task's source-local requirement and can make a number common in S2 suppress/distort its evidence in S3, or vice versa. This recovery changed the right-side tables to group and join on `country, source, token` / `country, source, value`.
 
+A second red-team pass found a SQL-regex transport defect after the first checkpoint: `NUMBER_TOKEN_REGEX` was written as the Python raw string `r"\\\\p{Nd}+"`, which contains two backslashes. Because DuckDB ordinary SQL string literals preserve backslashes, RE2 would receive a literal double escape instead of the intended Unicode decimal-number class. The branch now uses `r"\\p{Nd}+"`, so the generated SQL contains the required single regex escape `\\p{Nd}`. The dependency-light tests were updated accordingly. A real pinned-DuckDB extraction smoke remains required before production activation because this chat runtime has no DuckDB binary/module.
+
 This correction is also consistent with the completed F003a full-Source-1 census, which recommends country/source/field-aware numeric DF rather than universal number evidence. F003a found that typical numeric collision burden differs sharply by country, with India and especially France exposing much more common address-number evidence than US records.
 
 ## Protocol
@@ -49,7 +51,9 @@ Repository branch:
 
 Relevant code commits:
 - source-local correction: `63b8d2effd959bcfc438a639b09f072fb6c2e53e`
-- focused test update: `03562e17cb48871b78a7af8dd17bb08599d3928e`
+- focused source-scope test update: `03562e17cb48871b78a7af8dd17bb08599d3928e`
+- Unicode regex escaping fix: `94910ec4c067c9100a17e46b939d1a58264ab331`
+- regex assertion update: `c4e389b9768512f6af6ace86c914003ba077bbf1`
 
 A dependency-light mirror of the branch semantics was executed in the available container because DuckDB is not installed there. Checks covered:
 
@@ -60,7 +64,9 @@ A dependency-light mirror of the branch semantics was executed in the available 
 5. right profile joins pinned to the actual candidate source;
 6. invalid split fail-closed behavior.
 
-Result: **6/6 PASS**.
+Result: **6/6 targeted semantic checks PASS**.
+
+An independent dependency-light reference harness additionally ran the branch's commonness hand cases plus 20,000 deterministic randomized token-order/repetition invariance checks (seed 517): **20,003/20,003 PASS** in 0.88 s. This validates the Python/reference commonness math, not DuckDB regex execution.
 
 The container has NumPy but no DuckDB. Therefore no claim is made that the repository's DuckDB integration test suite ran in this environment.
 
@@ -93,6 +99,7 @@ Candidate recall and blocking oracle are structurally unchanged by this matcher-
 ## Error analysis
 
 - **Cross-source contamination:** fixed. A number frequent in S2 but rare in S3 must not inherit pooled target commonness.
+- **Regex transport:** fixed at source level. The original double-escaped `\\\\p{Nd}` would not represent the intended RE2 Unicode category in an ordinary DuckDB literal. The constant now emits single-escaped `\\p{Nd}`; pinned-DuckDB execution remains an explicit smoke-test gate.
 - **Repeated numeric runs:** handled by per-record deduplication, important because F003a observed materially more repeated numeric tokens in India.
 - **Missing/empty numeric evidence:** encoded as zero commonness features; existing V3 overlap/conflict features provide the missing-vs-agreement context.
 - **Country shift:** raw DF magnitudes can differ across US/India/France inventory sizes and number regimes. This is why the empirical gate must include India/US slices and France-safe transfer analysis before promotion.
@@ -101,10 +108,11 @@ Candidate recall and blocking oracle are structurally unchanged by this matcher-
 ## Risks
 
 1. No full candidate/model ablation was possible here because complete S2/S3 files exceed the live connector transfer limit.
-2. Raw log-DF is an empirical feature, not a calibrated probability or IDF. CatBoost must demonstrate that it uses it beneficially.
-3. Test-time DF is corpus-derived from supplied challenge records, consistent with the current V2/V3 frequency-feature pattern, but train/inference parity must still be verified on the private full-data runtime.
-4. France has no labels. No French score, pseudo-label, or identity claim is made.
-5. This branch should not replace INT003 unless the same-candidate integration gate improves official macro F0.5 robustly.
+2. This runtime has no DuckDB module/CLI, so the corrected `\\p{Nd}` path has not been executed against the repository-pinned DuckDB version here. Gate V4 activation on a tiny extraction smoke before expensive materialization.
+3. Raw log-DF is an empirical feature, not a calibrated probability or IDF. CatBoost must demonstrate that it uses it beneficially.
+4. Test-time DF is corpus-derived from supplied challenge records, consistent with the current V2/V3 frequency-feature pattern, but train/inference parity must still be verified on the private full-data runtime.
+5. France has no labels. No French score, pseudo-label, or identity claim is made.
+6. This branch should not replace INT003 unless the same-candidate integration gate improves official macro F0.5 robustly.
 
 ## Required integration gate
 
