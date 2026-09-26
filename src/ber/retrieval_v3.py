@@ -113,10 +113,10 @@ def experiment(db,out):
         report['metrics'][base+'_char_union']=evaluate_table(c,'union_pool',meta)
         c.execute(f'''CREATE OR REPLACE TEMP TABLE fused AS
             WITH ranks AS (
-              SELECT p.anchor,p.rid,1.0/(60+row_number() OVER(PARTITION BY anchor ORDER BY retrieval DESC,r.entity_id)) weight
+              SELECT p.anchor,p.rid,1.0/(60+dense_rank() OVER(PARTITION BY anchor ORDER BY retrieval DESC)) weight
               FROM {base} p JOIN train r ON p.rid=r.rowid
               UNION ALL
-              SELECT p.anchor,p.rid,0.5/(60+row_number() OVER(PARTITION BY anchor ORDER BY retrieval DESC,r.entity_id)) weight
+              SELECT p.anchor,p.rid,0.5/(60+dense_rank() OVER(PARTITION BY anchor ORDER BY retrieval DESC)) weight
               FROM char64 p JOIN train r ON p.rid=r.rowid), summed AS (
                 SELECT anchor,rid,sum(weight) score FROM ranks GROUP BY anchor,rid)
             SELECT s.* FROM summed s JOIN train r ON s.rid=r.rowid
