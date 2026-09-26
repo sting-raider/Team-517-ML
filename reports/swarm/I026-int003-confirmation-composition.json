@@ -1,0 +1,68 @@
+{
+  "experiment": "I026",
+  "input_sha256": {
+    "train_source1.tsv": "591af0e1dfeb65cab71ea6ee8cb69df00f92d6ba6fa79e05746c938775d14973",
+    "train_ground_truth.tsv": "70bc1d8a16c667e0155c2105d0ab2ebe41d7e7a85d8a529e3ca81c6c3a5af037"
+  },
+  "protocol": {
+    "population_anchors": 2206821,
+    "anchor_order": "md5('sample517:' || entity_id)",
+    "window_one_based": "45001:50000",
+    "window_size": 5000,
+    "no_new_holdout_consumed": true
+  },
+  "committed_int003_parity": {
+    "all_match": true,
+    "entities": 5000,
+    "India": 2022,
+    "US": 2978,
+    "singletons": 262,
+    "India_singletons": 114,
+    "US_singletons": 148
+  },
+  "population": {
+    "India_share": 0.4002082633797666,
+    "singleton_rate": 0.05584820880352326,
+    "India_singleton_rate": 0.05587825015738439,
+    "US_singleton_rate": 0.055828163849042746,
+    "mean_truth_cardinality": 3.4612526344456573,
+    "cardinality_5plus_rate": 0.26021548643954356
+  },
+  "window": {
+    "India_share": 0.4044,
+    "singleton_rate": 0.0524,
+    "India_singleton_rate": 0.05637982195845697,
+    "US_singleton_rate": 0.04969778374748153,
+    "mean_truth_cardinality": 3.5148,
+    "cardinality_5plus_rate": 0.276
+  },
+  "window_vs_population": {
+    "India_share_delta_pp": 0.4191736620233366,
+    "India_share_z": 0.604972626103569,
+    "singleton_delta_pp": -0.3448208803523256,
+    "singleton_z": -1.0618251884925478,
+    "India_singleton_delta_pp": 0.050157180107258253,
+    "India_singleton_z": 0.09819475423202433,
+    "US_singleton_delta_pp": -0.6130380101561216,
+    "US_singleton_z": -1.4571275065533615,
+    "cardinality_5plus_delta_pp": 1.578451356045646,
+    "cardinality_5plus_z": 2.5438823207648538,
+    "mean_truth_cardinality_delta": 0.05354736555434281,
+    "mean_truth_cardinality_smd": 0.03140014243778958,
+    "max_abs_overall_text_shape_smd": 0.024627572916412918
+  },
+  "India_singleton_window_vs_population": {
+    "name_len_smd": 0.01399280097215262,
+    "name_tokens_smd": -0.05168875053075812,
+    "address_len_smd": -0.06434131449580428,
+    "address_tokens_smd": -0.06480953543909765,
+    "name_missing_delta_pp": 0.0,
+    "address_missing_delta_pp": 0.0
+  },
+  "runtime": {
+    "wall_seconds": 24.72,
+    "peak_rss_mib": 317.24,
+    "focused_tests": "3/3 PASS"
+  },
+  "recommendation": "PROMOTE"
+}
