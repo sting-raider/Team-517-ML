@@ -79,6 +79,10 @@ def build_char_index(c,split):
     if ready or stored:
         reason='unsigned' if not stored else 'stale or partial'
         print(f'Rebuilding {reason} {split} character index',flush=True)
+    # Invalidate the trust marker before mutating any cache table. If a rebuild
+    # crashes halfway through, the next process must rebuild rather than reuse
+    # a mixed old/new pair of tables under the previous matching signature.
+    c.execute('DELETE FROM char_index_signatures WHERE split=?',[split])
     c.execute(f'''CREATE OR REPLACE TABLE {split}_char_raw AS
         SELECT rowid rid,hash(country,k) AS key FROM {split},unnest(name_grams(n)) u(k) WHERE source>1''')
     c.execute(f'''CREATE OR REPLACE TABLE {split}_char_freq AS
@@ -87,7 +91,6 @@ def build_char_index(c,split):
         SELECT r.rid,r.key,f.freq FROM {split}_char_raw r JOIN {split}_char_freq f USING(key)
         WHERE f.freq<={CHAR_INDEX_MAX_FREQ}''')
     c.execute(f'DROP TABLE {split}_char_raw')
-    c.execute('DELETE FROM char_index_signatures WHERE split=?',[split])
     c.execute('INSERT INTO char_index_signatures VALUES (?,?,?)',
         [split,expected,canonical_json(identity)])
     return expected
