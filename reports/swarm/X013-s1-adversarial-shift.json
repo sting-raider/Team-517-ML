@@ -1,0 +1,193 @@
+{
+  "experiment_id": "X013",
+  "status": "REJECT",
+  "scope": "Source-1 same-country train-vs-test adversarial validation; no IDs, labels, S2/S3, confirmation, leaderboard feedback, or France labels",
+  "files": {
+    "train_source1_bytes": 210069713,
+    "test_source1_bytes": 175022086
+  },
+  "full_population": {
+    "train": {
+      "US": {
+        "n": 1323633,
+        "avg_name_len": 22.46510777534256,
+        "avg_addr_len": 34.96243218475212,
+        "empty_name_rate": 0,
+        "empty_addr_rate": 0,
+        "name_digits_per_row": 0.06889598551864452,
+        "addr_digits_per_row": 4.166717662675379,
+        "name_nonascii_per_row": 0,
+        "addr_nonascii_per_row": 0
+      },
+      "India": {
+        "n": 883188,
+        "avg_name_len": 26.386305067550737,
+        "avg_addr_len": 77.69963246783244,
+        "empty_name_rate": 0,
+        "empty_addr_rate": 0,
+        "name_digits_per_row": 0.0036322957286557336,
+        "addr_digits_per_row": 3.8571210206660416,
+        "name_nonascii_per_row": 0,
+        "addr_nonascii_per_row": 0.002305284944994724
+      }
+    },
+    "test": {
+      "US": {
+        "n": 663106,
+        "avg_name_len": 22.46330752549366,
+        "avg_addr_len": 34.96611703106291,
+        "empty_name_rate": 0,
+        "empty_addr_rate": 0,
+        "name_digits_per_row": 0.06878839883819479,
+        "addr_digits_per_row": 4.1674211966111,
+        "name_nonascii_per_row": 0,
+        "addr_nonascii_per_row": 0
+      },
+      "India": {
+        "n": 809986,
+        "avg_name_len": 26.374770675048705,
+        "avg_addr_len": 77.71384320222819,
+        "empty_name_rate": 0,
+        "empty_addr_rate": 0,
+        "name_digits_per_row": 0.0037136444333605765,
+        "addr_digits_per_row": 3.8573987698552816,
+        "name_nonascii_per_row": 0,
+        "addr_nonascii_per_row": 0.0020913941722449526
+      },
+      "France": {
+        "n": 259452,
+        "avg_name_len": 19.421349613801397,
+        "avg_addr_len": 50.07085703713982,
+        "empty_name_rate": 0,
+        "empty_addr_rate": 0,
+        "name_digits_per_row": 0.014330203660021893,
+        "addr_digits_per_row": 1.9688343123198124,
+        "name_nonascii_per_row": 0.1822302391193747,
+        "addr_nonascii_per_row": 0.3342390885404622
+      }
+    }
+  },
+  "protocol": {
+    "primary_sample_per_domain_country": 60000,
+    "replication_sample_per_domain_country": 30000,
+    "deterministic_smallest_text_hash_sampling": true,
+    "grouped_eval_fold": "fold 0 of 5 by country+normalized joint text",
+    "normalization": "NFKD mark removal + lowercase + non-word/underscore collapse; semantic mirror of production strip_accents norm",
+    "char_model": "HashingVectorizer char 3-5 grams, 2^18 bins + averaged SGD log-loss",
+    "structural_model": "22 text-structure features + standardized logistic regression",
+    "alpha_sweep": [
+      0.00001,
+      0.000001,
+      1e-7
+    ],
+    "bootstrap_replicates": 200
+  },
+  "primary": {
+    "US": {
+      "n_train": 96169,
+      "n_eval": 23831,
+      "eval_prevalence": 0.4979228735680416,
+      "structural": {
+        "auroc": 0.4998588359821602,
+        "auprc": 0.49942774574602244,
+        "balanced_accuracy": 0.49971039612206763
+      },
+      "name": {
+        "auroc": 0.49909693978638325,
+        "auprc": 0.4982092935143231,
+        "balanced_accuracy": 0.5000045570860963
+      },
+      "address": {
+        "auroc": 0.502432430985678,
+        "auprc": 0.49936450484322603,
+        "balanced_accuracy": 0.5034218046638501
+      },
+      "joint": {
+        "auroc": 0.5041401232836178,
+        "auprc": 0.49942528173024586,
+        "balanced_accuracy": 0.5029269663914548,
+        "bootstrap95": [
+          0.4957460372544254,
+          0.510123829129979
+        ]
+      },
+      "joint_label_shuffle_null": {
+        "auroc": 0.49917875251212007,
+        "auprc": 0.4969246380370663,
+        "balanced_accuracy": 0.5026452546541267
+      },
+      "alpha_sweep_auroc": {
+        "1e-5": 0.5017350383362227,
+        "1e-6": 0.5038828627431728,
+        "1e-7": 0.5021832809315387
+      }
+    },
+    "India": {
+      "n_train": 95912,
+      "n_eval": 24088,
+      "eval_prevalence": 0.49958485552972437,
+      "structural": {
+        "auroc": 0.49314381403015,
+        "auprc": 0.49514339179490885,
+        "balanced_accuracy": 0.49410251094604773
+      },
+      "name": {
+        "auroc": 0.49744159977679525,
+        "auprc": 0.49567156217630215,
+        "balanced_accuracy": 0.5003745609440913
+      },
+      "address": {
+        "auroc": 0.5050001366351556,
+        "auprc": 0.5031988991470928,
+        "balanced_accuracy": 0.5029102185144966
+      },
+      "joint": {
+        "auroc": 0.5049265039359887,
+        "auprc": 0.5022649994765704,
+        "balanced_accuracy": 0.5026184797076387,
+        "bootstrap95": [
+          0.4982063961025862,
+          0.5117005023430792
+        ]
+      },
+      "joint_label_shuffle_null": {
+        "auroc": 0.49582509972091404,
+        "auprc": 0.49683568219167085,
+        "balanced_accuracy": 0.4951024638200173
+      },
+      "alpha_sweep_auroc": {
+        "1e-5": 0.5054561202746745,
+        "1e-6": 0.5044469365998263,
+        "1e-7": 0.5034502789632129
+      }
+    }
+  },
+  "replication": {
+    "US": {
+      "n_train": 48123,
+      "n_eval": 11877,
+      "eval_prevalence": 0.5013050433611181,
+      "joint_auroc": 0.5020831382656759,
+      "joint_auprc": 0.5071631205437659,
+      "joint_balanced_accuracy": 0.49775153037489117
+    },
+    "India": {
+      "n_train": 48044,
+      "n_eval": 11956,
+      "eval_prevalence": 0.5025928404148544,
+      "joint_auroc": 0.49646409260611635,
+      "joint_auprc": 0.5015514873516962,
+      "joint_balanced_accuracy": 0.4989673020876174
+    }
+  },
+  "runtime": {
+    "census_seconds": 17.6,
+    "primary_sampling_seconds": 13.6,
+    "primary_modeling_seconds": 55.5,
+    "replication_total_seconds": 25.8,
+    "alpha_sweep_seconds": 50.1,
+    "bootstrap_seconds": 26.1,
+    "full_population_joint_stream_attempt": "aborted by 60s execution cap before a valid full-population metric"
+  },
+  "recommendation": "REJECT same-country Source-1 format-shift hypothesis at this sensitivity; FOLLOW-UP should target S2/S3/candidate-density shift and India performance, not S1 punctuation/format adaptation."
+}
