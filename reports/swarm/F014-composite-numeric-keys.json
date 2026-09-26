@@ -1,0 +1,67 @@
+{
+  "experiment": "F014",
+  "issue": 237,
+  "scope": "Cross-experiment synthesis of complete Source-1 population measurements from F003a and X008; no sampling. New raw rerun attempted but execution surfaces failed before user code.",
+  "current_main": "f08c041b274e58ae900620ac714ec8a0a06f09b0",
+  "production_semantics": {
+    "d": "first normalized address number + production address word",
+    "h": "first six characters of space-stripped normalized name + first address number",
+    "z": "first six characters of space-stripped normalized name + last address number",
+    "cutoff": "country-local target posting frequency <=1000 in production; values below are Source-1 proxy DF"
+  },
+  "test": {
+    "US": {
+      "number_only_df_le_1000": 0.854904,
+      "d_eligible_df_le_1000": 0.999991,
+      "delta_pp": 14.5087,
+      "d_highfreq_occurrence_gt_1000": 0,
+      "d_max_s1_df": 244,
+      "h_eligible": 0.999569,
+      "z_eligible": 0.999569,
+      "h_max_s1_df": 40,
+      "z_max_s1_df": 160
+    },
+    "India": {
+      "number_only_df_le_1000": 0.32879,
+      "d_eligible_df_le_1000": 0.912419,
+      "delta_pp": 58.3629,
+      "d_highfreq_occurrence_gt_1000": 0.0979127,
+      "d_max_s1_df": 8968,
+      "h_eligible": 0.912655,
+      "z_eligible": 0.912655,
+      "h_max_s1_df": 253,
+      "z_max_s1_df": 545
+    },
+    "France": {
+      "number_only_df_le_1000": 0.242719,
+      "d_eligible_df_le_1000": 0.995722,
+      "delta_pp": 75.3003,
+      "d_highfreq_occurrence_gt_1000": 0.27614,
+      "d_max_s1_df": 4423,
+      "h_eligible": 0.995803,
+      "z_eligible": 0.995803,
+      "h_max_s1_df": 264,
+      "z_max_s1_df": 262
+    }
+  },
+  "train": {
+    "US": {
+      "number_only_df_le_1000": 0.751337,
+      "d_eligible_df_le_1000": 0.999992,
+      "delta_pp": 24.8655
+    },
+    "India": {
+      "number_only_df_le_1000": 0.308302,
+      "d_eligible_df_le_1000": 0.912494,
+      "delta_pp": 60.4192
+    }
+  },
+  "caveats": [
+    "F003a number-only coverage uses the best DF among any distinct address numeric run, whereas production d: uses the first address number. This makes the number-only comparator more permissive, so the d: selectivity rescue is conservative but not an identical-key ablation.",
+    "X008 and F003a are Source-1 collision/selectivity proxies; production posting frequencies come from pooled S2/S3 target inventory.",
+    "France has no labels; no accuracy, recall, precision, or F0.5 claim is made.",
+    "The newly proposed number+full-name-token family was not empirically rescanned in this session because both local Python surfaces and the container failed with session-level ClientError before user code execution."
+  ],
+  "recommendation": "FOLLOW-UP",
+  "next_gate": "On the full target inventory, ablate existing d/h/z channels and test whether number+full-name-token or multi-number composites recover additional positives at fixed cap. Report pair/entity/all-matches recall, oracle macro F0.5, US/India/source slices, candidate counts and marginal positives per added candidate."
+}
