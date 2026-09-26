@@ -1,0 +1,125 @@
+{
+  "experiment_id": "R029",
+  "issue": 235,
+  "branch": "agent/r/R029-suffix-gated-probes",
+  "protocol": {
+    "train_rows": 2206821,
+    "test_rows": 1732544,
+    "total_rows": 3939365,
+    "sampling": "none",
+    "source1_df_proxy": true,
+    "rare_word_df_cutoff": 1000,
+    "target_side_metrics_claimed": false,
+    "labels_used": false,
+    "confirmation_used": false
+  },
+  "validation": {
+    "focused_tests": "6/6 PASS",
+    "f006a_parity_checks": "5/5 PASS",
+    "wall_seconds": 246.79234072199995,
+    "observed_peak_rss_mb": 744.8
+  },
+  "slices": {
+    "train_US": {
+      "rows": 1323633,
+      "suffix_rows": 751958,
+      "stripped_collision": 0.3892185467805383,
+      "number": {
+        "coverage": 1,
+        "collision": 0.006417911638681948,
+        "p99_group": 1
+      },
+      "rare_word": {
+        "coverage": 0.865187,
+        "collision": 0.001391057880304465,
+        "p99_group": 1
+      },
+      "number_rare_word": {
+        "coverage": 0.865187,
+        "collision": 0.00001690788583795482,
+        "p99_group": 1
+      }
+    },
+    "train_India": {
+      "rows": 883188,
+      "suffix_rows": 743843,
+      "stripped_collision": 0.5039087549388782,
+      "number": {
+        "coverage": 0.912806,
+        "collision": 0.07691050157293838,
+        "p99_group": 5
+      },
+      "rare_word": {
+        "coverage": 0.927045,
+        "collision": 0.0005728157592491617,
+        "p99_group": 1
+      },
+      "number_rare_word": {
+        "coverage": 0.840253,
+        "collision": 0.00003519909890306808,
+        "p99_group": 1
+      }
+    },
+    "test_US": {
+      "rows": 663106,
+      "suffix_rows": 376317,
+      "stripped_collision": 0.311096761506921,
+      "number": {
+        "coverage": 1,
+        "collision": 0.003324324970702892,
+        "p99_group": 1
+      },
+      "rare_word": {
+        "coverage": 0.943359,
+        "collision": 0.0008535163182179256,
+        "p99_group": 1
+      },
+      "number_rare_word": {
+        "coverage": 0.943359,
+        "collision": 0.000005633771077346043,
+        "p99_group": 1
+      }
+    },
+    "test_India": {
+      "rows": 809986,
+      "suffix_rows": 681902,
+      "stripped_collision": 0.4983164736281753,
+      "number": {
+        "coverage": 0.912697,
+        "collision": 0.07268184520462105,
+        "p99_group": 5
+      },
+      "rare_word": {
+        "coverage": 0.932892,
+        "collision": 0.0005596243600082372,
+        "p99_group": 1
+      },
+      "number_rare_word": {
+        "coverage": 0.845953,
+        "collision": 0.000031203573849324876,
+        "p99_group": 1
+      }
+    },
+    "test_France": {
+      "rows": 259452,
+      "suffix_rows": 178783,
+      "stripped_collision": 0.4513851988164423,
+      "number": {
+        "coverage": 0.995811,
+        "collision": 0.0859554916476628,
+        "p99_group": 6
+      },
+      "rare_word": {
+        "coverage": 0.974058,
+        "collision": 0.018576473628298257,
+        "p99_group": 2
+      },
+      "number_rare_word": {
+        "coverage": 0.970143,
+        "collision": 0.0005707861281674305,
+        "p99_group": 1
+      }
+    }
+  },
+  "recommendation": "FOLLOW-UP: benchmark rare_word and number_rare_word on complete S2/S3 at fixed INT003 cap160; no production promotion from Source-1 proxy alone."
+}
