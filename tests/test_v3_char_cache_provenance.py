@@ -59,6 +59,8 @@ class _CacheConnection:
             return _Result(many=[(name,) for name in sorted(self.tables)])
         if normalized.startswith("SELECT fingerprint FROM char_index_signatures"):
             return _Result(one=(self.stored,) if self.stored is not None else None)
+        if normalized.startswith("DELETE FROM char_index_signatures"):
+            self.stored = None
         if normalized.startswith("INSERT INTO char_index_signatures"):
             self.stored = params[1]
         return _Result()
@@ -68,6 +70,15 @@ class _CacheConnection:
             "CREATE OR REPLACE TABLE train_char_raw" in sql
             for sql, _ in self.statements
         )
+
+
+class _CrashOnIndexRebuildConnection(_CacheConnection):
+    def execute(self, sql, params=None):
+        normalized = " ".join(sql.split())
+        if "CREATE OR REPLACE TABLE train_char_index" in normalized:
+            self.statements.append((normalized, params))
+            raise RuntimeError("simulated rebuild interruption")
+        return super().execute(sql, params)
 
 
 class V3CharacterCacheProvenanceTests(unittest.TestCase):
@@ -115,6 +126,27 @@ class V3CharacterCacheProvenanceTests(unittest.TestCase):
         with patch("ber.retrieval_v3.char_index_identity", return_value=identity):
             build_char_index(c, "train")
         self.assertTrue(c.rebuilt_raw_table())
+
+    def test_partial_rebuild_clears_signature_before_mutation(self):
+        identity = {"kind": "test-char-index", "inventory": {"rows": 7}}
+        expected = fingerprint(identity)
+        c = _CrashOnIndexRebuildConnection(
+            tables={"train_char_index"},
+            stored=expected,
+        )
+        with patch("ber.retrieval_v3.char_index_identity", return_value=identity):
+            with self.assertRaisesRegex(RuntimeError, "simulated rebuild interruption"):
+                build_char_index(c, "train")
+        self.assertIsNone(c.stored)
+        delete_index = next(
+            i for i, (sql, _) in enumerate(c.statements)
+            if sql.startswith("DELETE FROM char_index_signatures")
+        )
+        crash_index = next(
+            i for i, (sql, _) in enumerate(c.statements)
+            if "CREATE OR REPLACE TABLE train_char_index" in sql
+        )
+        self.assertLess(delete_index, crash_index)
 
 
 if __name__ == "__main__":
