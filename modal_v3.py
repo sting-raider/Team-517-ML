@@ -134,6 +134,7 @@ def confirm_model(depth:int=10):
     from catboost import CatBoostClassifier
     from ber.v2 import V2_NAMES,load_parts,score_slices
     from ber.v3 import V3_NAMES
+    from ber.v3_compat import v2_prefix_from_v3
     from ber.experiment import mappings
     from ber.metrics import row_score
     from ber.predict import sha256
@@ -149,7 +150,10 @@ def confirm_model(depth:int=10):
     old=CatBoostClassifier()
     old.load_model(str(VOLUME_ROOT/'project/experiments/int002/depth10/mixed.cbm'))
     bp=old.predict_proba(bx,thread_count=8)[:,1]
-    bp_fused=old.predict_proba(x[:,:len(V2_NAMES)],thread_count=8)[:,1]
+    # V3 changes relative_retrieval_score normalization for sub-unit RRF scores.
+    # Restore the exact v2 feature semantics before using the frozen v2 model.
+    fused_v2_x=v2_prefix_from_v3(x,g,V2_NAMES)
+    bp_fused=old.predict_proba(fused_v2_x,thread_count=8)[:,1]
     report={'protocol':'5000 anchors at hash positions 45001:50000, excluded from v2/v3 fitting and model selection; full-S1 swarm audits may have inspected labels',
         'config':config,'model_sha256':sha256(folder/'mixed.cbm'),
         'baseline_v2_original_pool':score_slices(bmeta,bg,bt,bp,'confirmation',.6500000000000002),
