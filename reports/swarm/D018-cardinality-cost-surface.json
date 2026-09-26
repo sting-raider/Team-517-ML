@@ -1,0 +1,122 @@
+{
+  "experiment_id": "D018",
+  "protocol": "Complete train Source-1 + ground truth; no sampling; exact official row-score cardinality algebra; no candidate/model probabilities",
+  "inputs": {
+    "train_source1": {
+      "rows": 2206821,
+      "sha256": "591af0e1dfeb65cab71ea6ee8cb69df00f92d6ba6fa79e05746c938775d14973"
+    },
+    "train_ground_truth": {
+      "rows": 2206821,
+      "sha256": "70bc1d8a16c667e0155c2105d0ab2ebe41d7e7a85d8a529e3ca81c6c3a5af037"
+    }
+  },
+  "runtime": {
+    "wall_seconds": 12.69,
+    "helper_elapsed_seconds": 11.482938051223755,
+    "peak_rss_kib": 630696
+  },
+  "cardinality_histogram": {
+    "0": 123247,
+    "1": 119157,
+    "2": 375212,
+    "3": 530841,
+    "4": 484115,
+    "5": 321957,
+    "6": 164868,
+    "7": 63968,
+    "8": 18680,
+    "9": 4205,
+    "10": 534,
+    "11": 37
+  },
+  "overall": {
+    "singleton_rate": 0.05584820880352326,
+    "mean_truth_cardinality": 3.4612526344456573,
+    "p50": 3,
+    "p90": 6,
+    "p95": 6,
+    "p99": 8,
+    "max": 11,
+    "hard_cap_perfect_ranking_macro_f0_5": {
+      "1": 0.6963880336487923,
+      "2": 0.872821123664972,
+      "3": 0.9478282850246471,
+      "4": 0.9806282002104585,
+      "5": 0.9937661291263775,
+      "6": 0.9983318239939089,
+      "7": 0.9996410497486121,
+      "8": 0.999940833016186,
+      "9": 0.9999940261744213,
+      "10": 0.9999996712510003
+    },
+    "mean_loss_add_one_fp_from_perfect": 0.2484566521715029,
+    "mean_loss_drop_one_true_match_non_singletons": 0.13658138569558045,
+    "fp_costlier_than_fn_count": 1964417,
+    "fp_costlier_than_fn_share_all": 0.8901569270910509,
+    "fp_costlier_than_fn_share_non_singletons": 0.9428112464448107,
+    "anchors_above_cap": {
+      "3": 1058364,
+      "4": 574249,
+      "5": 252292,
+      "6": 87424,
+      "7": 23456
+    },
+    "one_error_cost_examples": {
+      "0": {
+        "one_fp_loss": 1,
+        "one_fn_loss": null
+      },
+      "1": {
+        "one_fp_loss": 0.4444444444444444,
+        "one_fn_loss": 1
+      },
+      "2": {
+        "one_fp_loss": 0.2857142857142857,
+        "one_fn_loss": 0.16666666666666663
+      },
+      "3": {
+        "one_fp_loss": 0.21052631578947367,
+        "one_fn_loss": 0.09090909090909094
+      },
+      "4": {
+        "one_fp_loss": 0.16666666666666663,
+        "one_fn_loss": 0.0625
+      },
+      "5": {
+        "one_fp_loss": 0.13793103448275867,
+        "one_fn_loss": 0.04761904761904767
+      },
+      "6": {
+        "one_fp_loss": 0.11764705882352944,
+        "one_fn_loss": 0.038461538461538436
+      }
+    }
+  },
+  "countries": {
+    "India": {
+      "anchors": 883188,
+      "singleton_rate": 0.05587825015738439,
+      "mean_truth_cardinality": 3.4645432229604567,
+      "cap5": 0.9937474410121478,
+      "cap6": 0.9983346610003736,
+      "cap7": 0.9996443151089935,
+      "fp_costlier_than_fn_share_all": 0.8903755485808231
+    },
+    "US": {
+      "anchors": 1323633,
+      "singleton_rate": 0.055828163849042746,
+      "mean_truth_cardinality": 3.4590570044717834,
+      "cap5": 0.9937785986842013,
+      "cap6": 0.9983299310144612,
+      "cap7": 0.9996388709519939,
+      "fp_costlier_than_fn_share_all": 0.8900110529127031
+    }
+  },
+  "validation": {
+    "focused_tests": "6/6 PASS",
+    "metric_reference": "src/ber/metrics.py::row_score",
+    "known_population_parity": "D006a singleton/count/cardinality aggregates reproduced"
+  },
+  "recommendation": "FOLLOW-UP: use as a decision-design guardrail; do not deploy a global hard output cap <=5 if the 0.998 target remains relevant. Evaluate adaptive/probabilistic set-size decisions on candidate probabilities instead."
+}
