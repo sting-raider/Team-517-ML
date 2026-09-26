@@ -1,0 +1,123 @@
+{
+  "experiment_id": "D012",
+  "status": "REJECT",
+  "inputs": {
+    "anchors": 2206821,
+    "source1_bytes": 210069713,
+    "source1_sha256": "591af0e1dfeb65cab71ea6ee8cb69df00f92d6ba6fa79e05746c938775d14973",
+    "truth_bytes": 127015583,
+    "truth_sha256": "70bc1d8a16c667e0155c2105d0ab2ebe41d7e7a85d8a529e3ca81c6c3a5af037"
+  },
+  "fold_counts": {
+    "fit": 1323457,
+    "early": 330681,
+    "calibrate": 331219,
+    "holdout": 221464
+  },
+  "protocol": {
+    "features": 24,
+    "country_feature": false,
+    "id_feature": false,
+    "model": "CatBoost depth7, 100 trees, lr=.08, seed517",
+    "normalization": "NFD combining-mark removal fallback matching D001a",
+    "no_confirmation_or_frozen_holdout": true
+  },
+  "population_prevalence": {
+    "s2_present": 0.8696110830919227,
+    "s3_present": 0.8793395567651386,
+    "both_source": 0.8047988486605846,
+    "s2_only": 0.06481223443133811,
+    "s3_only": 0.07454070810455402
+  },
+  "holdout": {
+    "both_source": {
+      "auroc": 0.5012670057788183,
+      "auprc": 0.8046353520270734,
+      "prevalence": 0.8042210020590254,
+      "brier": 0.15745819347446413,
+      "constant_brier": 0.15745001313237886,
+      "us_auroc": 0.5023737517991722,
+      "india_auroc": 0.4996331357495498,
+      "auc_ci95": [
+        0.49823856499357727,
+        0.5042954465640593
+      ]
+    },
+    "s2_present": {
+      "auroc": 0.5005841860963123,
+      "auprc": 0.8693238527965608,
+      "prevalence": 0.86909836361666,
+      "brier": 0.1137702173555282,
+      "constant_brier": 0.11376702704692057,
+      "us_auroc": 0.5030607058348182,
+      "india_auroc": 0.4965430937656563,
+      "auc_ci95": [
+        0.49702063820829084,
+        0.5041477339843337
+      ]
+    },
+    "s3_present": {
+      "auroc": 0.5013866416388711,
+      "auprc": 0.8789120269228312,
+      "prevalence": 0.8787297258245133,
+      "brier": 0.10656937433578229,
+      "constant_brier": 0.10656409901808346,
+      "us_auroc": 0.49985238720255865,
+      "india_auroc": 0.5034273203719063,
+      "auc_ci95": [
+        0.4977061683830425,
+        0.5050671148946998
+      ]
+    },
+    "s2_only": {
+      "auroc": 0.5042352741289708,
+      "auprc": 0.06596458945430655,
+      "prevalence": 0.06487736155763466,
+      "brier": 0.060669192061349936,
+      "constant_brier": 0.060668308136855933,
+      "us_auroc": 0.5040353931084338,
+      "india_auroc": 0.5039690586428006,
+      "auc_ci95": [
+        0.49934222614312457,
+        0.5091283221148172
+      ]
+    },
+    "s3_only": {
+      "auroc": 0.5018265422706498,
+      "auprc": 0.07493807125523047,
+      "prevalence": 0.07450872376548784,
+      "brier": 0.06895804537686039,
+      "constant_brier": 0.06895718489381161,
+      "us_auroc": 0.5013495402695236,
+      "india_auroc": 0.5022015396274628,
+      "auc_ci95": [
+        0.4972433174995839,
+        0.5064097670417158
+      ]
+    }
+  },
+  "s2_only_seed_replication": {
+    "seed517": {
+      "auroc": 0.5042352741289708,
+      "auprc": 0.06596458945430655,
+      "top100_precision": 0.06,
+      "top1000_precision": 0.065,
+      "top10000_precision": 0.07,
+      "top50000_precision": 0.06722
+    },
+    "seed2026": {
+      "auroc": 0.5025036955051371,
+      "auprc": 0.06528769501888054,
+      "top100_precision": 0.04,
+      "top1000_precision": 0.061,
+      "top10000_precision": 0.0649,
+      "top50000_precision": 0.06656
+    },
+    "prediction_correlation": 0.6718352310958209
+  },
+  "runtime_seconds": {
+    "primary": 120.7726,
+    "seed_replication": 21.15
+  },
+  "conclusion": "Source-1-only structural/frequency features do not provide transferable source-presence signal."
+}
