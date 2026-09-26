@@ -1,0 +1,32 @@
+{
+  "experiment_id": "F006a",
+  "rows": {"train": 2206821, "test": 1732544, "total": 3939365},
+  "headline": {
+    "train:US": {"suffix_rate": 0.5681015810, "unique_key_retention": 0.8683911458, "collision_rate": 0.3892185468, "original_duplicate_row_rate": 0.3581241930, "after_duplicate_row_rate": 0.4709402077, "max_fanout": 561, "p99_added_fanout": 222},
+    "train:India": {"suffix_rate": 0.8422249849, "unique_key_retention": 0.8577202434, "collision_rate": 0.5039087549, "original_duplicate_row_rate": 0.4439779526, "after_duplicate_row_rate": 0.5360229079, "max_fanout": 192, "p99_added_fanout": 61},
+    "test:US": {"suffix_rate": 0.5675065525, "unique_key_retention": 0.8948007619, "collision_rate": 0.3110967615, "original_duplicate_row_rate": 0.2912550935, "after_duplicate_row_rate": 0.3935645281, "max_fanout": 269, "p99_added_fanout": 116},
+    "test:India": {"suffix_rate": 0.8418688718, "unique_key_retention": 0.8591438758, "collision_rate": 0.4983164736, "original_duplicate_row_rate": 0.4375606492, "after_duplicate_row_rate": 0.5287079036, "max_fanout": 182, "p99_added_fanout": 56},
+    "test:France": {"suffix_rate": 0.6890792902, "unique_key_retention": 0.8354780655, "collision_rate": 0.4513851988, "original_duplicate_row_rate": 0.3440597876, "after_duplicate_row_rate": 0.4819234386, "max_fanout": 530, "p99_added_fanout": 246}
+  },
+  "major2": {
+    "train:US": {"coverage": 0.4487882971, "collision_rate": 0.2950165900},
+    "test:US": {"coverage": 0.4487231302, "collision_rate": 0.2370786857},
+    "train:India": {"coverage": 0.6265144001, "collision_rate": 0.4362586522},
+    "test:India": {"coverage": 0.6260429193, "collision_rate": 0.4329383970},
+    "test:France": {"coverage": 0.4846985184, "collision_rate": 0.3934205923}
+  },
+  "solo_major_suffix_collision_rate": {
+    "train:US:llc": 0.2097715932,
+    "train:US:inc": 0.2243250275,
+    "test:US:llc": 0.1797034005,
+    "test:US:inc": 0.1907278768,
+    "train:India:private limited": 0.4154338468,
+    "train:India:pvt ltd": 0.3412288718,
+    "test:India:private limited": 0.4138581127,
+    "test:India:pvt ltd": 0.3380872483,
+    "test:France:sarl": 0.2900108873,
+    "test:France:sas": 0.2924286479
+  },
+  "timing": {"stream_normalize_counter_seconds": 33.6, "fanout_pass_seconds_approx": 10.0},
+  "recommendation": "REJECT unconditional replacement-key suffix stripping; FOLLOW-UP only as additive/gated retrieval evidence."
+}
