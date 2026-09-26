@@ -18,7 +18,10 @@ def copy_database():
 
 
 @app.function(image=image,volumes={str(VOLUME_ROOT):volume},cpu=8,memory=32768,timeout=3600)
-def make_features(partition:int,partitions:int=8,confirmation:bool=False):
+def make_features(partition:int,partitions:int=8,confirmation:bool=False,reason:str=''):
+    if confirmation:
+        from ber.holdout import require_confirmation_reuse
+        require_confirmation_reuse(40000,5000,reason)
     base=RUN_ROOT/('confirmation' if confirmation else 'features')
     out=base/f'part{partition}'
     if (out/'ready.json').exists():
@@ -31,7 +34,8 @@ def make_features(partition:int,partitions:int=8,confirmation:bool=False):
     _enable_native_features()
     from ber.v2 import materialize
     db=copy_database()
-    result=materialize(db,out,partition,partitions,confirmation=confirmation)
+    result=materialize(db,out,partition,partitions,confirmation=confirmation,
+                       confirmation_reason=reason if confirmation else None)
     volume.commit()
     return result
 
@@ -54,7 +58,9 @@ def retrieval_study():
 
 
 @app.function(image=image,volumes={str(VOLUME_ROOT):volume},cpu=8,memory=16384,timeout=1800)
-def confirm_model(depth:int):
+def confirm_model(depth:int,reason:str=''):
+    from ber.holdout import require_confirmation_reuse
+    decision=require_confirmation_reuse(40000,5000,reason)
     import numpy as np
     from catboost import CatBoostClassifier
     from ber.v2 import load_parts,score_slices
@@ -68,6 +74,7 @@ def confirm_model(depth:int):
     old=CatBoostClassifier();old.load_model(str(VOLUME_ROOT/'project/artifacts/submission_v1/mixed.cbm'))
     bp=old.predict_proba(x[:,:len(FEATURE_NAMES)],thread_count=8)[:,1]
     result={'protocol':'5000 anchors at hash positions 40001:45000, excluded from INT002 fitting and selection; other swarm S1 audits inspected full training labels',
+        'holdout_guard':{'action':decision['action'],'reason':decision['reason']},
         'depth':depth,'config':config,
         'model_sha256':sha256(folder/'mixed.cbm'),
         'baseline':score_slices(meta,g,t,bp,'confirmation',.5750000000000002),
@@ -148,7 +155,7 @@ def matching_download_tail(depth:int,offset:int):
 
 
 @app.local_entrypoint()
-def main(action:str='train',depth:int=10):
+def main(action:str='train',depth:int=10,reason:str=''):
     if action=='train':
         calls=[make_features.spawn(i) for i in range(8)]
         for i,call in enumerate(calls):
@@ -169,8 +176,10 @@ def main(action:str='train',depth:int=10):
     elif action=='prepare-confirmation':
         print(make_features.remote(0,1,True))
     elif action=='confirm':
-        make_features.remote(0,1,True)
-        result=confirm_model.remote(depth)
+        if not reason.strip():
+            raise ValueError('Historical confirmation reuse requires --reason')
+        make_features.remote(0,1,True,reason)
+        result=confirm_model.remote(depth,reason)
         Path(f'reports/int002_depth{depth}_confirmation.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
         print(json.dumps(result,indent=2))
     elif action=='score':
