@@ -19,6 +19,7 @@ image = (
     .env({"PYTHONPATH": "/app/src"})
     .add_local_dir(str(ROOT / "src"), "/app/src")
     .add_local_dir(str(ROOT / "tests"), "/app/tests")
+    .add_local_file(str(ROOT / "reports" / "CONFIRMATION_FREEZE.json"), "/app/reports/CONFIRMATION_FREEZE.json")
 )
 
 
