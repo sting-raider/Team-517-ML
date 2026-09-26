@@ -11,7 +11,6 @@ No model, retriever, threshold, candidate pool, or inference behavior was change
 Added:
 - `tools/experiments/d015_threshold_plateau.py`: deterministic calibration-curve plateau audit.
 - `tests/test_d015_threshold_plateau.py`: focused tests for contiguous-component semantics, higher-threshold tie-breaking, and invalid grids.
-- `reports/swarm/D015-int003-threshold-plateau.json`: aggregate machine-readable result.
 
 ## Protocol
 
