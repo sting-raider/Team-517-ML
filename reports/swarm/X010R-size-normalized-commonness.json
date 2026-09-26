@@ -1,0 +1,52 @@
+{
+  "experiment_id": "X010R",
+  "issue": 196,
+  "population": {
+    "train_source1_rows": 2206821,
+    "test_source1_rows": 1732544,
+    "train_country_rows": {"US": 1323633, "India": 883188},
+    "test_country_rows": {"US": 663106, "India": 809986, "France": 259452},
+    "sampling": "none"
+  },
+  "fit_reconstruction": {
+    "anchors": 108115,
+    "raw_name_frequency_max": 253,
+    "raw_address_frequency_max": 14
+  },
+  "transforms": {
+    "raw_log1p": "ln(1+frequency), empty=0",
+    "per_million_log1p": "ln(1+1e6*frequency/country_rows), empty=0",
+    "self_information": "ln((country_rows+1)/(frequency+1)) for nonempty, empty=0"
+  },
+  "same_country_train_test_weighted_ks": {
+    "US": {
+      "name": {"raw_log1p": 0.0668690995812421, "per_million_log1p": 0.6418758069646193, "self_information": 0.743642686454629},
+      "address": {"raw_log1p": 0.015849699905141623, "per_million_log1p": 0.9437525356348776, "self_information": 0.9668677042654573}
+    },
+    "India": {
+      "name": {"raw_log1p": 0.03444221113956858, "per_million_log1p": 0.5560220474010064, "self_information": 0.5560220474010064},
+      "address": {"raw_log1p": 0.0014954326244621674, "per_million_log1p": 0.9516422324578685, "self_information": 0.9516422324578685}
+    }
+  },
+  "same_country_train_test_mean_delta": {
+    "US": {
+      "name": {"raw_log1p": -0.15438966753165473, "per_million_log1p": 0.27276437510197815, "self_information": -0.5368102309085163},
+      "address": {"raw_log1p": -0.0191282651922432, "per_million_log1p": 0.3453128174298664, "self_information": -0.6720716332479277}
+    },
+    "India": {
+      "name": {"raw_log1p": -0.028459196088179484, "per_million_log1p": 0.030904993394206937, "self_information": -0.058061826491970336},
+      "address": {"raw_log1p": -0.001710560204419398, "per_million_log1p": 0.046040713798507715, "self_information": -0.08481046237572976}
+    }
+  },
+  "france_outside_labeled_fit_minmax_rate": {
+    "name": {"raw_log1p": 0.0, "per_million_log1p": 0.01921357322356351, "self_information": 0.01996901160908376},
+    "address": {"raw_log1p": 0.003811880424895549, "per_million_log1p": 0.04163775958558809, "self_information": 0.04163775958558809}
+  },
+  "runtime_seconds": {"train_scan": 42.15, "test_scan": 28.66},
+  "integrity": {
+    "x009_raw_ks_parity": "pass",
+    "fit_anchor_count_parity": "pass",
+    "fit_frequency_max_parity": "pass"
+  },
+  "recommendation": "REJECT the two preregistered size-normalized replacements; retain raw feature semantics pending a separately evaluated clipped/quantized alternative"
+}
