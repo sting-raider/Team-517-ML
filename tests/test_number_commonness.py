@@ -69,7 +69,7 @@ class NumberCommonnessTests(unittest.TestCase):
         )
         self.assertEqual(NUMBER_TOKEN_REGEX, r"\p{Nd}+")
         self.assertNotIn("[0-9]+", joined)
-        self.assertNotIn(r"\\\\p{Nd}+", joined)
+        self.assertNotIn(r"\\p{Nd}+", joined)
         self.assertGreaterEqual(joined.count(r"\p{Nd}+"), 8)
         self.assertIn("m003_train_left_n_df", joined)
         self.assertIn("m003_train_right_a_profile", joined)
