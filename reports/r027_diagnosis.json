@@ -1,0 +1,23 @@
+{
+  "calibration_anchors": 4389,
+  "positive_pairs": 15276,
+  "missed_positive_pairs": 850,
+  "pair_recall": 0.944357161560618,
+  "missed_pair_categories": {
+    "missed": 850,
+    "source_3": 506,
+    "some_shared_address_number": 395,
+    "some_exact_name_token": 599,
+    "some_exact_address_token": 618,
+    "some_exact_address_word": 606,
+    "inside_lexical160_but_pruned": 20,
+    "inside_union_but_pruned": 72,
+    "address_ratio_at_least_70": 161,
+    "source_2": 344,
+    "same_first_address_number": 237,
+    "name_ratio_at_least_70": 450,
+    "same_number_no_name_token": 141,
+    "same_number_no_address_word": 12,
+    "inside_char64_but_pruned": 52
+  }
+}
