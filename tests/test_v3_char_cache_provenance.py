@@ -41,6 +41,8 @@ class _IdentityConnection:
         self.relation_row = relation_row
 
     def execute(self, sql, params=None):
+        if sql.strip() == "SELECT version()":
+            return _Result(one=("v1.2.3-test",))
         if "SELECT count(*)::UBIGINT" in sql:
             return _Result(one=self.relation_row)
         raise AssertionError(f"unexpected SQL in identity test: {sql}")
@@ -90,6 +92,7 @@ class V3CharacterCacheProvenanceTests(unittest.TestCase):
         self.assertNotEqual(first, changed)
         self.assertEqual(first["max_frequency"], CHAR_INDEX_MAX_FREQ)
         self.assertEqual(first["gram_macro_sql"], CHAR_GRAM_MACRO_SQL)
+        self.assertEqual(first["duckdb_version"], "v1.2.3-test")
         self.assertEqual(first["inventory"]["columns"], list(CHAR_INVENTORY_COLUMNS))
 
     def test_compatible_signed_index_reuses_without_rebuild(self):
