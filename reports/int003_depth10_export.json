@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "candidate_cap": 160,
+  "partition_count": 8,
+  "validation": {
+    "anchors": 1732544,
+    "candidates": 264828881,
+    "matches": 5819438,
+    "empty_predictions": 102598,
+    "target_ids_checked": false,
+    "status": "PASS"
+  },
+  "matching_sha256": "bf712f4d4fee94e56487b614ef302752bbcb2d2699e2fb65637aaf7fc32f4539",
+  "candidate_sha256": "56333f15abb4eecc99d11db07b8a5a4d56d7b2763fd7b1727a6c0debe7a195e3"
+}

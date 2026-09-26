@@ -1,6 +1,17 @@
 # Current result — September 26, 2026
 
-**Submission 2 selected:** INT002 depth10 CatBoost, 53 features, cap160,
+**Submission 3 selected:** INT003 depth10 CatBoost, 57 features, lexical plus
+character reciprocal-rank fusion, cap160, threshold0.625. On a fresh same-anchor
+5,000-reference confirmation it scores **0.950198** macro F0.5 versus
+**0.942285** for the actual v2 pipeline; paired gain **0.007914** with
+95% entity-bootstrap interval **[0.005892, 0.009956]**. India0.932699,
+US0.962081. The full test export passes cloud streaming validation with
+1,732,544 rows and 264,828,881 candidate pairs. See
+[submission-3 evidence](SUBMISSION_3.md) and
+`int003_depth10_confirmation.json`. No public/private score is known for v3.
+
+
+**Earlier submission 2:** INT002 depth10 CatBoost, 53 features, cap160,
 threshold0.65. Matched 5,000-anchor confirmation macro F0.5 is **0.940478**,
 versus **0.927580** for the uploaded-v1 model on identical anchors.
 India0.913639; US0.958045; singleton FPR5.818%. Full export and the organizer's format check passed.

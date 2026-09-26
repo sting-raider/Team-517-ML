@@ -2,11 +2,16 @@
 
 An executable business entity resolution baseline for the supplied name/address data.
 The official target is **macro F0.5 per source-one entity**, including singletons.
-This is an initial measured baseline, not a claim about leaderboard position.
+The historical baseline commands remain below; the current measured integration
+is the INT003 v3 pipeline.
 
-**Submission 1 scored 0.898 on the public leaderboard.** Submission 2 is ready
-at `output/submission_v2_d10/matching_results.tsv`. It uses a larger cap-160
-training pool and 53 features; its public score is not yet known.
+**Submission 1 scored 0.898 on the public leaderboard.** Submission 2 remains
+available at `output/submission_v2_d10/matching_results.tsv`. The selected v3
+pipeline uses bounded lexical plus character retrieval and a 57-feature matcher.
+Its fresh 5,000-anchor confirmation score is **0.950198** versus **0.942285**
+for v2 on the same anchors; its public score is not yet known. The v3 matching
+file is generated under `output/submission_v3_d10/` and the candidate audit stays
+on the private Modal Volume. See [submission-3 evidence](reports/SUBMISSION_3.md).
 See [the integration decision](reports/COORDINATOR_PLAN.md),
 [measured results](reports/RESULTS.md), and [Modal commands](MODAL.md).
 Research branches are prototypes and evidence; they are not all production changes.

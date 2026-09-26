@@ -149,17 +149,18 @@ modal run -d modal_v3.py --action train --depth 10
 modal run -d modal_v3.py --action confirm --depth 10
 modal run -d modal_v3.py --action score --depth 10
 modal run -d modal_v3.py --action package --depth 10
-New-Item -ItemType Directory -Force output/submission_v3_d10 | Out-Null
-modal volume get team517-business-er project/output/submission_v3_d10/matching_results.tsv.gz output/submission_v3_d10/matching_results.tsv.gz
+modal run -d modal_v3.py --action download --depth 10
 modal run -d modal_v3.py --action resume-download --depth 10
 ```
 
-The `resume-download` action verifies the compressed and decompressed SHA256
-digests and creates `output/submission_v3_d10/matching_results.tsv`. The large
+The `download` action transfers 4 MiB chunks and verifies the cloud gzip SHA256;
+`resume-download` verifies the decompressed SHA256 and creates
+`output/submission_v3_d10/matching_results.tsv`. A full-length file from the
+Volume CLI previously failed its checksum, so use this verified chunk route. The large
 `candidate_pairs.tsv` audit file remains at
 `project/output/submission_v3_d10/candidate_pairs.tsv` in the private Volume;
-download it for the final archive. If a transfer stops with more than 8 MiB
-remaining, restart the Volume CLI download before running `resume-download`.
+download it for the final archive. A transfer stopped near the end can also use
+`resume-download` to fetch an exact remote tail of at most 8 MiB.
 
 The v3 model's 5,000-anchor frozen confirmation (hash positions 45,001–50,000)
 scored 0.950198 macro F0.5 versus 0.942285 for the v2 model on its original

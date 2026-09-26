@@ -228,6 +228,19 @@ def matching_download_tail(depth:int,offset:int):
     return remaining
 
 
+@app.function(image=image,volumes={str(VOLUME_ROOT):volume},cpu=1,memory=1024,timeout=300)
+def matching_download_chunk(depth:int,offset:int,length:int):
+    if length<1 or length>4*1024*1024 or offset<0:
+        raise ValueError('Invalid download range')
+    source=VOLUME_ROOT/'project/output'/f'submission_v3_d{depth}'/'matching_results.tsv.gz'
+    with source.open('rb') as stream:
+        stream.seek(offset)
+        chunk=stream.read(length)
+    if len(chunk)!=length:
+        raise ValueError('Remote compressed file is incomplete')
+    return chunk
+
+
 @app.local_entrypoint()
 def main(action:str='prepare',depth:int=10):
     if action=='prepare':
@@ -265,6 +278,23 @@ def main(action:str='prepare',depth:int=10):
         result=package_matching.remote(depth)
         Path(f'reports/int003_depth{depth}_download.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
         print(json.dumps(result,indent=2),flush=True)
+    elif action=='download':
+        import hashlib
+        dest=Path(f'output/submission_v3_d{depth}')
+        dest.mkdir(parents=True,exist_ok=True)
+        receipt=json.loads(Path(f'reports/int003_depth{depth}_download.json').read_text())
+        temporary=dest/'matching_results.tsv.gz.tmp'
+        step=4*1024*1024
+        with temporary.open('wb') as stream:
+            for offset in range(0,receipt['compressed_bytes'],step):
+                size=min(step,receipt['compressed_bytes']-offset)
+                stream.write(matching_download_chunk.remote(depth,offset,size))
+                print(f'Downloaded {offset+size:,}/{receipt["compressed_bytes"]:,} bytes',flush=True)
+        with temporary.open('rb') as stream:
+            if hashlib.file_digest(stream,'sha256').hexdigest()!=receipt['compressed_sha256']:
+                raise ValueError('Chunked transfer checksum mismatch')
+        temporary.replace(dest/'matching_results.tsv.gz')
+        print('Compressed transfer SHA256 PASS',flush=True)
     elif action=='resume-download':
         import gzip
         import hashlib

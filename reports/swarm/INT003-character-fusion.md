@@ -44,7 +44,7 @@ Frozen model SHA256: `9e25404658ae5fd0723d4beda55766c40f45b69d33ecf3f039d250994f
 
 ## Risks and next decision
 
-France appears in test but has no training labels, so the US/India comparison cannot establish French performance. Equal-score candidates at a hard cap still need a deterministic tie break, currently entity ID; no ID enters any numeric model feature. The fused character index increases the private DuckDB from 8.86 GB to 16.71 GB. See `reports/int003_retrieval.json` and `reports/int003_database.json` for machine-readable aggregates.
+France appears in test but has no training labels, so the US/India comparison cannot establish French performance. An unlabeled output audit found 4.36 v3 predictions per French reference entity on average versus 4.57 for v2, with no large change in empty predictions (8,915 versus 8,661); this indicates a changed decision distribution but cannot establish whether recall or precision improved. Equal-score candidates at a hard cap still need a deterministic tie break, currently entity ID; no ID enters any numeric model feature. The fused character index increases the private DuckDB from 8.86 GB to 16.71 GB. See `reports/int003_retrieval.json`, `reports/int003_database.json`, and `reports/int003_test_country_drift.json` for machine-readable aggregates.
 
 ## Frozen matcher confirmation
 
@@ -63,8 +63,8 @@ The paired entity-level gain is 0.007914; a 2,000-resample bootstrap (seed 517) 
 
 ## Error analysis and interpretation
 
-The retrieval channel recovers substantially more true pairs at the same hard cap, especially in India, and retraining on its actual candidate distribution converts this into a confirmed end-to-end gain. The v2 model scored only 0.932394 on the fused calibration pool versus the v3 model's 0.949121, so simply changing the blocker without retraining would have failed. Candidate misses still impose a 0.980917 oracle on confirmation, and matcher decisions leave another 0.030718 score points below that ceiling. These are different failure sources; a larger pair model alone cannot close the candidate gap.
+The retrieval channel recovers substantially more true pairs at the same hard cap, especially in India, and retraining on its actual candidate distribution converts this into a confirmed end-to-end gain. On the fresh confirmation, the frozen v2 model dropped to 0.930872 when applied directly to v3's fused pool, compared with 0.942285 on its original pool. This isolates why simply changing the blocker without retraining would have failed. Candidate misses still impose a 0.980917 oracle on confirmation, and matcher decisions leave another 0.030718 score points below that ceiling. These are different failure sources; a larger pair model alone cannot close the candidate gap.
 
 ## Recommendation and follow-up
 
-**PROMOTE v3** for the next submission after full test export and format validation. Preserve the v2 file and checkpoint. Next retrieval work should target remaining India misses and France transfer with reverse retrieval, mixed name/address character channels, and a licensed multilingual encoder, each measured against complete target inventory at an auditable small cap. Next matcher work should target ambiguity and singleton false merges among retrieved pairs. Do not use this confirmation window for tuning.
+**PROMOTE v3** for the next submission. The full test export and organizer's matching-file format validation passed. Preserve the v2 file and checkpoint. Next retrieval work should target remaining India misses and France transfer with reverse retrieval, mixed name/address character channels, and a licensed multilingual encoder, each measured against complete target inventory at an auditable small cap. Next matcher work should target ambiguity and singleton false merges among retrieved pairs. Do not use this confirmation window for tuning.

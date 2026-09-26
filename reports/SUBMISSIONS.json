@@ -26,6 +26,20 @@
       "baseline_on_same_confirmation": 0.9275796443884201,
       "validation": "Cloud PASS; organizer matching validator PASS",
       "candidate_remote": "project/output/submission_v2_d10/candidate_pairs.tsv"
+    },
+    {
+      "number": 3,
+      "status": "Prepared, not yet uploaded",
+      "file": "output/submission_v3_d10/matching_results.tsv",
+      "sha256": "bf712f4d4fee94e56487b614ef302752bbcb2d2699e2fb65637aaf7fc32f4539",
+      "public_score": null,
+      "private_score": null,
+      "candidate_cap": 160,
+      "threshold": 0.6250000000000002,
+      "confirmation_macro_f0_5": 0.9501984899746141,
+      "baseline_on_same_confirmation": 0.942284948006719,
+      "validation": "Cloud full-pair PASS; organizer matching validator PASS; local SHA256 PASS",
+      "candidate_remote": "project/output/submission_v3_d10/candidate_pairs.tsv"
     }
   ]
 }
