@@ -44,21 +44,15 @@ def extract_metric(row: dict) -> dict:
     }
 
 
-def load_slices(train_report: dict, confirmation: dict, model_key: str) -> dict:
-    if model_key == "v3":
-        cal = train_report["new"]["calibrate"]
-        hold = train_report["new"]["holdout"]
-        conf = confirmation["new"]
-    elif model_key == "v2_fused":
-        cal = train_report["baseline"]["calibrate"]
-        hold = train_report["baseline"]["holdout"]
-        conf = confirmation["baseline_v2_fused_pool"]
-    else:
-        raise ValueError(model_key)
+def load_v3_slices(train_report: dict, confirmation: dict) -> dict:
+    sources = {
+        "calibrate": train_report["new"]["calibrate"],
+        "holdout": train_report["new"]["holdout"],
+        "confirmation": confirmation["new"],
+    }
     return {
-        "calibrate": {c: extract_metric(cal[c]) for c in COUNTRIES},
-        "holdout": {c: extract_metric(hold[c]) for c in COUNTRIES},
-        "confirmation": {c: extract_metric(conf[c]) for c in COUNTRIES},
+        split: {country: extract_metric(rows[country]) for country in COUNTRIES}
+        for split, rows in sources.items()
     }
 
 
@@ -80,34 +74,12 @@ def pooled_descriptive(rows: dict, country: str) -> dict:
 
 
 def analyze(train_report: dict, confirmation: dict) -> dict:
-    v3 = load_slices(train_report, confirmation, "v3")
-    v2 = load_slices(train_report, confirmation, "v2_fused")
-    pooled = {}
-    same_pool_delta = {}
-    for country in COUNTRIES:
-        p3 = pooled_descriptive(v3, country)
-        p2 = pooled_descriptive(v2, country)
-        pooled[country] = {
-            "v3": p3,
-            "v2_fused": p2,
-            "v3_minus_v2_fused_rate_pp": 100.0 * (p3["false_positive_rate"] - p2["false_positive_rate"]),
-        }
-        same_pool_delta[country] = {}
-        for split in SLICES:
-            a, b = v3[split][country], v2[split][country]
-            score_gain = a["macro_f0_5"] - b["macro_f0_5"]
-            singleton_penalty = (a["false_positives"] - b["false_positives"]) / a["entities"]
-            same_pool_delta[country][split] = {
-                "v3_minus_v2_fused_fp_count": a["false_positives"] - b["false_positives"],
-                "v3_minus_v2_fused_singleton_component": -singleton_penalty,
-                "v3_minus_v2_fused_macro_gain": score_gain,
-                "non_singleton_net_component": score_gain + singleton_penalty,
-            }
+    v3 = load_v3_slices(train_report, confirmation)
+    pooled = {country: pooled_descriptive(v3, country) for country in COUNTRIES}
 
-    conf = v3["confirmation"]
     confirmation_headroom = {}
     for country in COUNTRIES:
-        row = conf[country]
+        row = v3["confirmation"][country]
         total_deficit = 1.0 - row["macro_f0_5"]
         within = row["blocking_oracle_macro_f0_5"] - row["macro_f0_5"]
         headroom = row["perfect_singleton_fix_macro_headroom"]
@@ -123,10 +95,24 @@ def analyze(train_report: dict, confirmation: dict) -> dict:
         "experiment_id": "D016",
         "recommendation": "FOLLOW-UP",
         "protocol": "committed INT003 aggregate artifacts only; no new labels/probabilities/tuning",
+        "dependency_correction": {
+            "status": "WITHDRAWN_COMPARISON",
+            "reason": "I028 found baseline_v2_fused_pool used v3 relative_retrieval_score semantics; it is not a feature-contract-pure frozen-v2 counterfactual",
+            "invalidated_outputs": [
+                "v2_fused pooled singleton comparison",
+                "same-fused-pool retraining attribution",
+                "derived non-singleton retraining component",
+            ],
+            "unaffected_outputs": [
+                "INT003 singleton counts/rates",
+                "Wilson intervals",
+                "cross-slice descriptive stability",
+                "perfect singleton-fix headroom",
+                "I027 current-v3 actual-vs-oracle error budget",
+            ],
+        },
         "v3": v3,
-        "v2_fused": v2,
         "pooled_descriptive": pooled,
-        "same_fused_pool_retraining_attribution": same_pool_delta,
         "confirmation_headroom": confirmation_headroom,
     }
 
