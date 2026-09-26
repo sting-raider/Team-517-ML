@@ -17,32 +17,26 @@ Behavior:
 - silently deduplicates only identical duplicate rows;
 - fails loudly if the same experiment ID has conflicting row contents, naming both input paths;
 - emits rows in deterministic lexicographic experiment-ID order;
-- writes the output atomically;
+- writes output atomically;
 - preserves empty TSV fields.
 
-Added `tests/test_reconcile_registry.py` with seven focused cases:
-1. deterministic union of disjoint registries;
-2. identical duplicate deduplication;
-3. conflicting duplicate-ID rejection with source paths;
-4. malformed-header rejection;
-5. malformed-row rejection;
-6. empty-field render/read round trip;
-7. rejection of a one-input invocation at the library layer.
+The recovery adds one regression test for the only high-risk path identified but not executed by the originating agent: replacing one input path with the merged output after all inputs have been read. The focused suite is now eight tests.
 
-Updated `AGENTS.md` with coordinator usage while explicitly retaining the rule that experiment branches must update `experiments/REGISTRY.tsv`.
+`AGENTS.md` documents coordinator usage while explicitly retaining the rule that experiment branches update `experiments/REGISTRY.tsv`.
 
 ## Protocol
 Branch: `agent/i/I019-registry-reconciler`.
 
-Expected validation command:
+Recovery claim: 2026-09-26T01:54Z after the previous validation-blocked lease had been idle for more than eight hours.
+
+Repository Python requirement: `>=3.11`.
+Validation runtime: CPython 3.13.5.
+
+Commands:
 
 ```bash
-python -m unittest tests.test_reconcile_registry -v
-```
+PYTHONPATH=. python -m unittest tests.test_reconcile_registry -v
 
-Expected coordinator usage:
-
-```bash
 python tools/reconcile_registry.py \
   /tmp/registry-main.tsv \
   /tmp/registry-branch-a.tsv \
@@ -50,45 +44,57 @@ python tools/reconcile_registry.py \
   --output experiments/REGISTRY.tsv
 ```
 
+Additional adversarial CLI checks:
+1. use one input path itself as `--output`;
+2. supply conflicting rows for the same experiment ID and verify nonzero exit, no output file, and both source paths in the diagnostic.
+
 No challenge data, model artifacts, confirmation/frozen holdouts, or leaderboard feedback are involved.
 
 ## Results
-Implementation and tests are committed.
+**8/8 focused tests pass.**
 
-**Execution validation is BLOCKED in this chat runtime.** A fresh retry after implementation returned a platform `ClientError` before even `print("compute-ok")` executed. Earlier in the same session the private Python, container, and visible-Python surfaces all failed before user code execution. Therefore no false claim of passing tests is made.
+The unittest body completed in 0.006 s. Interpreter startup in this ChatGPT runtime emits an unrelated spreadsheet-runtime warmup warning; it does not affect the test process or exit status.
 
-Static contract review:
-- canonical header exactly matches current `experiments/REGISTRY.tsv`;
-- output union is deterministic;
-- the tool never chooses one conflicting experiment row over another;
-- current central-registry workflow remains valid;
-- challenge/model semantics are untouched.
+Covered cases:
+1. deterministic union of disjoint registries;
+2. identical duplicate deduplication;
+3. conflicting duplicate-ID rejection with both source paths;
+4. malformed-header rejection;
+5. malformed-row rejection;
+6. empty-field render/read round trip;
+7. atomic replacement of an input file after reconciliation;
+8. rejection of a one-input invocation at the library layer.
+
+Adversarial CLI results:
+- same-path output: exit 0; merged IDs `I001, R002` in deterministic order; temporary `.tmp` file removed after atomic replace;
+- conflicting duplicate: exit 2; output file not created; error message contains the experiment ID and both conflicting source paths.
+
+No implementation defect was found.
 
 ## Error analysis
-The remaining uncertainty is executable validation, not an identified logic failure.
+The original blocker was compute availability, not code correctness. Recovery exercised the exact authored implementation and authored tests, then added the missing atomic-replacement regression.
 
-The highest-risk cases are covered by authored tests but have not run here:
-- CSV/TSV newline behavior on the repository's Python 3.12 environment;
-- import/discovery behavior for `tools.reconcile_registry`;
-- atomic overwrite behavior when `--output` is also one of the input paths.
+Potential failure modes now covered include malformed TSV shape, duplicate-ID conflict, empty fields, deterministic ordering, one-input misuse, and same-path atomic output.
 
-The implementation reads all inputs before writing the output, so same-path output is intended to be safe, but that path should still be exercised before promotion.
+The utility intentionally does not attempt to choose between scientifically conflicting rows for the same experiment ID. That remains a hard error because silently selecting one side could erase experiment provenance.
 
 ## Interpretation
-The reconciler directly addresses the measured I018 integration bottleneck without changing the experiment-record contract or requiring 67 existing PRs to be rewritten.
+The reconciler directly addresses the measured I018 integration bottleneck without changing experiment semantics or forcing dozens of open branches to migrate to a new registry scheme.
 
-It does not eliminate Git's textual conflict itself. Instead it makes conflict resolution deterministic and fail-loud: export each complete side, run the union, stage the result. That is the smallest backward-compatible mitigation available under the current central-registry requirement.
+It does not eliminate Git's textual conflict itself. It makes resolution deterministic and fail-loud: provide every complete registry version participating in the integration, union them, and stage the result.
+
+Because it uses only the Python standard library and the repository requires Python >=3.11, the successful CPython 3.13.5 validation is within the supported runtime range.
 
 ## Risks
-- Tests were not executable in this chat because the platform compute backend is unavailable.
-- This utility is only safe if coordinators pass every registry version participating in the integration; omitting one input can still omit its unique rows.
-- Conflicting metadata for the same experiment ID intentionally stops the merge and requires human/scientific reconciliation.
-- GitHub's web merge UI will not invoke this local helper automatically.
+- The coordinator must pass **every** registry version participating in an integration. Omitting an input can still omit its unique rows.
+- Conflicting metadata for one experiment ID deliberately halts and requires scientific/provenance reconciliation.
+- GitHub's web merge UI does not invoke this local helper automatically.
+- The tool prevents accidental conflict loss; it cannot detect an experiment row that was never written on its originating branch.
 
 ## Recommendation
-**FOLLOW-UP / VALIDATE, THEN PROMOTE.**
+**PROMOTE.**
 
-Run the seven focused tests in any healthy Python 3.12 environment. If they pass, this is safe infrastructure to merge independently because it changes no model/retrieval/scoring behavior and preserves the central registry contract.
+The previously missing execution gate is now satisfied. The reconciler is safe infrastructure to merge independently: it changes no model, retrieval, threshold, candidate, or submission behavior and preserves the central registry requirement.
 
 ## Follow-up tasks
-No new task is needed unless execution exposes a defect. The immediate follow-up is validation of this PR in a healthy runtime.
+No new implementation task is required. Coordinators should use the reconciler whenever multiple registry-editing branches are integrated together.
