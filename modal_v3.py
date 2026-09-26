@@ -23,21 +23,28 @@ def copy_database():
 @app.function(image=image,volumes={str(VOLUME_ROOT):volume},cpu=8,memory=32768,timeout=3600)
 def prepare_database():
     from ber.data import connect
+    from ber.provenance import file_signature,source_file_sha256
     from ber.retrieval_v3 import build_char_index
     receipt=ROOT/'database_ready.json'
-    if receipt.exists():
+    identity={
+        'version':2,
+        'base_database':file_signature(BASE_DB),
+        'retrieval_v3_sha256':source_file_sha256(build_char_index),
+    }
+    if receipt.exists() and V3_DB.exists():
         meta=json.loads(receipt.read_text())
-        if meta['source_bytes']!=BASE_DB.stat().st_size or meta['version']!=1:
-            raise ValueError('Prepared database is stale')
-        return meta
+        if meta.get('identity')==identity:
+            return meta
+        print('Rebuilding stale v3 prepared database',flush=True)
     work=SCRATCH/'artifacts/data_v3.duckdb'
     work.parent.mkdir(parents=True,exist_ok=True)
     shutil.copy2(BASE_DB,work)
     c=connect(work)
     c.execute("SET memory_limit='20GB'")
     c.execute('SET threads=8')
+    char_index_fingerprints={}
     for split in ('train','test'):
-        build_char_index(c,split)
+        char_index_fingerprints[split]=build_char_index(c,split)
         rows=c.execute(f'SELECT count(*) FROM {split}_char_index').fetchone()[0]
         print(f'{split} character postings: {rows:,}',flush=True)
     c.execute('CHECKPOINT')
@@ -46,8 +53,10 @@ def prepare_database():
     shutil.copy2(work,staging)
     staging.replace(V3_DB)
     ROOT.mkdir(parents=True,exist_ok=True)
-    meta={'version':1,'source_bytes':BASE_DB.stat().st_size,
-          'database_bytes':V3_DB.stat().st_size,'target_index':'name character 3/4 grams, DF<=2000'}
+    meta={'version':2,'identity':identity,'source_bytes':BASE_DB.stat().st_size,
+          'database_bytes':V3_DB.stat().st_size,
+          'char_index_fingerprints':char_index_fingerprints,
+          'target_index':'name character 3/4 grams, DF<=2000'}
     receipt.write_text(json.dumps(meta,indent=2),encoding='utf-8')
     volume.commit()
     return meta
