@@ -1,10 +1,19 @@
+# Current result — September 26, 2026
+
+**Submission 2 selected:** INT002 depth10 CatBoost, 53 features, cap160,
+threshold0.65. Matched 5,000-anchor confirmation macro F0.5 is **0.940478**,
+versus **0.927580** for the uploaded-v1 model on identical anchors.
+India0.913639; US0.958045; singleton FPR5.818%. Full export and the organizer's format check passed.
+See [submission-2 evidence](SUBMISSION_2.md) and int002_depth10_confirmation.json.
+Submission1 has public score0.898. No public/private score is known for submission2.
+
 # Measured entity resolution results — 25 September 2026
 
-**Selected first submission:** 640 raw blocking candidates per anchor, 47 numerical
+**Historical cap-640 selection (not the uploaded first file):** 640 raw blocking candidates per anchor, 47 numerical
 features, CatBoost depth 10, and threshold 0.625. On 4,389 calibration anchors it
 scores **0.930679 macro F0.5**. A separate, previously untouched 5,000-anchor
 confirmation sample scores **0.928835**, with entity-bootstrap 95% interval
-**[0.924276, 0.933230]**. The full test export is in progress. See
+**[0.924276, 0.933230]**. The uploaded first file instead used cap 160 and threshold 0.575, scoring 0.898 publicly. See
 `submission_v1_confirmation.json`, `tuning.json`, and `retrieval_study.json`.
 
 The 640-candidate pair recall on confirmation is **0.947246**, with an oracle macro
@@ -86,5 +95,5 @@ establish a French score. The test set also has a different country mixture.
 
 No AWS credits, external business lookup, geocoding, or external training records
 were used. The local RTX 3060 was used to encode supplied text for an experimental
-semantic feature that is not in the selected first submission. No leaderboard score
-is claimed.
+semantic feature that is not in the selected first submission. The first uploaded cap-160 file scored 0.898 publicly; historical scores above
+must not be conflated with that submitted configuration.

@@ -25,16 +25,24 @@ def sha256(path):
 def prepare_groups(payload):
     groups,cap=payload
     selected=[r for group in groups for r in shortlist_rows(group,cap)]
+    if selected and len(selected[0])>9:
+        from .v2 import compute_rows
+        return compute_rows(selected)
     return [(r[0],r[1]) for r in selected],batch_features([r[2:] for r in selected])
 
 
-def score_batch(c,model,threshold,split,anchor_table,candidate_table,shortlist_cap=None,executor=None):
+def score_batch(c,model,threshold,split,anchor_table,candidate_table,shortlist_cap=None,executor=None,feature_version=1):
     anchor_ids=[r[0] for r in c.execute(f'SELECT entity_id FROM {anchor_table} ORDER BY entity_id').fetchall()]
     selected={k:[] for k in anchor_ids}
     considered={k:[] for k in anchor_ids}
-    c.execute(f'''SELECT p.anchor,r.entity_id,l.n,l.a,r.n,r.a,p.retrieval,p.hits,r.source
+    if feature_version==2:
+        from .v2 import pair_query
+        query=pair_query(split,anchor_table,candidate_table)
+    else:
+        query=f'''SELECT p.anchor,r.entity_id,l.n,l.a,r.n,r.a,p.retrieval,p.hits,r.source
         FROM {candidate_table} p JOIN {anchor_table} l ON p.anchor=l.entity_id
-        JOIN {split} r ON p.rid=r.rowid ORDER BY p.anchor,r.entity_id''')
+        JOIN {split} r ON p.rid=r.rowid ORDER BY p.anchor,r.entity_id'''
+    c.execute(query)
     def all_records():
         while records:=c.fetchmany(20000):
             yield from records
@@ -84,7 +92,12 @@ def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,quer
     if partition_count<1 or not 0<=partition_index<partition_count:
         raise ValueError('Invalid partition index/count')
     config=json.loads((model_dir/'model_config.json').read_text())
-    if config['feature_names']!=FEATURE_NAMES:
+    feature_version=config.get('feature_version',1)
+    expected_features=FEATURE_NAMES
+    if feature_version==2:
+        from .v2 import V2_NAMES,frequency_tables
+        expected_features=V2_NAMES
+    if config['feature_names']!=expected_features:
         raise ValueError('Feature schema does not match the saved model')
     cap=cap or config['candidate_cap']
     model=CatBoostClassifier()
@@ -99,6 +112,8 @@ def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,quer
     manifest.write_text(json.dumps(identity,indent=2),encoding='utf-8')
     c=connect(db)
     build_index(c,'test')
+    if feature_version==2:
+        frequency_tables(c,'test')
     sql='SELECT *,row_number() OVER(ORDER BY entity_id) AS seq FROM test WHERE source=1'
     if partition_count>1:
         sql+=f' AND hash(entity_id)%{partition_count}={partition_index}'
@@ -129,7 +144,7 @@ def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,quer
             WHERE seq>{offset} AND seq<={offset+step}''')
         candidates(c,'test','batch_anchors','batch_candidates',cap)
         blocking_seconds=time.time()-phase_start
-        matched,considered=score_batch(c,model,config['threshold'],'test','batch_anchors','batch_candidates',config.get('shortlist_cap'),executor)
+        matched,considered=score_batch(c,model,config['threshold'],'test','batch_anchors','batch_candidates',config.get('shortlist_cap'),executor,feature_version)
         ordered_ids=list(matched)
         for i,(shard,complete) in enumerate(batch_shards):
             if complete:
