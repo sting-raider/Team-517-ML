@@ -1,0 +1,115 @@
+{
+  "experiment_id": "M001b",
+  "issue": 265,
+  "status": "PROMOTE-EMPIRICAL-GATE",
+  "scope": "Full train/test Source-1 token-IDF transfer audit; train profiles reused from complete M001a census, test profiles scanned completely in this run.",
+  "transfer": {
+    "US": {
+      "name": {
+        "train_vocab": 70685,
+        "test_vocab": 56840,
+        "shared_vocab": 48748,
+        "test_vocab_unseen_rate": 0.14236453201970442,
+        "test_posting_unseen_rate": 0.004386763958539088,
+        "shared_df_spearman": 0.8673659973801328,
+        "posting_weighted_abs_idf_drift_mean": 0.06433808003457911,
+        "drift_median": 0.017060681925400445,
+        "drift_p90": 0.15609796194703307,
+        "drift_p95": 0.3082076461840657,
+        "drift_p99": 0.6950944626797195,
+        "posting_mass_drift_gt_0_5": 0.025758020817418795,
+        "train_idf_median": 6.660125349498055,
+        "test_idf_median": 6.667075360920488
+      },
+      "address": {
+        "train_vocab": 148006,
+        "test_vocab": 109655,
+        "shared_vocab": 82182,
+        "test_vocab_unseen_rate": 0.25054033103825635,
+        "test_posting_unseen_rate": 0.008135110248880285,
+        "shared_df_spearman": 0.8659510555296036,
+        "posting_weighted_abs_idf_drift_mean": 0.06416603214676035,
+        "drift_median": 0.014807579126649095,
+        "drift_p90": 0.16184776814457447,
+        "drift_p95": 0.28573479033200755,
+        "drift_p99": 0.6911998984401713,
+        "posting_mass_drift_gt_0_5": 0.023174475099482925,
+        "train_idf_median": 6.884680180425541,
+        "test_idf_median": 6.878512730432247
+      }
+    },
+    "India": {
+      "name": {
+        "train_vocab": 50639,
+        "test_vocab": 49738,
+        "shared_vocab": 43204,
+        "test_vocab_unseen_rate": 0.13136837026016326,
+        "test_posting_unseen_rate": 0.003332048650515287,
+        "shared_df_spearman": 0.8398100419344187,
+        "posting_weighted_abs_idf_drift_mean": 0.04903292714625772,
+        "drift_median": 0.006410781561998924,
+        "drift_p90": 0.13602888074987085,
+        "drift_p95": 0.27744435462126127,
+        "drift_p99": 0.6743076874822691,
+        "posting_mass_drift_gt_0_5": 0.018443328149498187,
+        "train_idf_median": 5.417322267496306,
+        "test_idf_median": 5.41780409148417
+      },
+      "address": {
+        "train_vocab": 321044,
+        "test_vocab": 303518,
+        "shared_vocab": 144169,
+        "test_vocab_unseen_rate": 0.5250067541299034,
+        "test_posting_unseen_rate": 0.019528948257548678,
+        "shared_df_spearman": 0.8010226117523833,
+        "posting_weighted_abs_idf_drift_mean": 0.04350047092320368,
+        "drift_median": 0.007678740738967349,
+        "drift_p90": 0.09884203123585422,
+        "drift_p95": 0.21327272821929455,
+        "drift_p99": 0.6066261579797949,
+        "posting_mass_drift_gt_0_5": 0.013854974375130705,
+        "train_idf_median": 5.210621693624412,
+        "test_idf_median": 5.208119527097438
+      }
+    }
+  },
+  "france": {
+    "rows": 259452,
+    "name": {
+      "vocab": 34435,
+      "postings": 799536,
+      "posting_weighted_idf_median": 4.88710226531491,
+      "p90": 10.69374212541082,
+      "deletion_gap_mean": 0.32647332448473015,
+      "deletion_gap_median": 0.3320354910368442,
+      "gap_ge_0_10": 0.9662592648266133,
+      "rare_df_median": 61,
+      "common_df_median": 22672
+    },
+    "address": {
+      "vocab": 15079,
+      "postings": 2166152,
+      "posting_weighted_idf_median": 3.014837500224198,
+      "p90": 8.678839104868555,
+      "deletion_gap_mean": 0.24926289540249397,
+      "deletion_gap_median": 0.2462948297520478,
+      "gap_ge_0_10": 0.9992484158919569,
+      "rare_df_median": 61,
+      "common_df_median": 201962
+    }
+  },
+  "checks": {
+    "authored_semantic_checks": "4/4 PASS after correcting an initially too-strict smoothing expectation",
+    "randomized_tied_rank_spearman": "1000/1000 PASS versus scipy.stats.spearmanr",
+    "test_source1_population": "complete 1,732,544 rows"
+  },
+  "incremental_runtime_seconds": {
+    "test_US_census": 17.900990962982178,
+    "test_India_census": 29.510764360427856,
+    "test_France_census": 9.71460223197937,
+    "France_probe": 12.691897869110107,
+    "total": 69.81825542449951
+  },
+  "interpretation": "Split-local Source-1 IDF is highly stable in posting-weighted US/India use despite a large novel rare-vocabulary tail. France has a more common-heavy address-IDF distribution, but controlled rare/common-token separation remains strong.",
+  "recommendation": "PROMOTE-EMPIRICAL-GATE. Use normalized split-local IDF rather than raw DF counts; still require complete target-side profiles and same-candidate INT003 scoring before production."
+}
