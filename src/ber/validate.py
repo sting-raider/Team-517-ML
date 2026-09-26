@@ -16,10 +16,12 @@ def parse(line,expected):
     return set(ids)
 
 
-def validate(db,output,check_ids=True):
+def validate(db,output,check_ids=True,max_candidates_per_anchor=None):
+    if max_candidates_per_anchor is not None and max_candidates_per_anchor<1:
+        raise ValueError('max_candidates_per_anchor must be at least 1')
     c=connect(db)
     c.execute('SELECT entity_id FROM test WHERE source=1 ORDER BY entity_id')
-    count=pairs=matches=empty=0
+    count=pairs=matches=empty=max_candidates_observed=0
     with (output/'matching_results.tsv').open(encoding='utf-8') as mf, (output/'candidate_pairs.tsv').open(encoding='utf-8') as cf:
         if mf.readline().rstrip('\r\n')!='source1_entity_id\tmatched_entity_ids':
             raise ValueError('Wrong matching header')
@@ -29,10 +31,14 @@ def validate(db,output,check_ids=True):
             for (anchor,) in rows:
                 predicted=parse(mf.readline(),anchor)
                 candidates=parse(cf.readline(),anchor)
+                candidate_count=len(candidates)
+                if max_candidates_per_anchor is not None and candidate_count>max_candidates_per_anchor:
+                    raise ValueError(f'Candidate cap exceeded under {anchor}: {candidate_count} > {max_candidates_per_anchor}')
                 if not predicted<=candidates:
                     raise ValueError(f'Prediction outside candidate set: {anchor}')
                 count+=1
-                pairs+=len(candidates)
+                pairs+=candidate_count
+                max_candidates_observed=max(max_candidates_observed,candidate_count)
                 matches+=len(predicted)
                 empty+=not predicted
         if mf.readline() or cf.readline():
@@ -47,7 +53,10 @@ def validate(db,output,check_ids=True):
         if unknown:
             raise ValueError(f'{unknown} nonexistent target IDs')
     c.close()
-    return {'anchors':count,'candidates':pairs,'matches':matches,'empty_predictions':empty,'target_ids_checked':check_ids,'status':'PASS'}
+    return {'anchors':count,'candidates':pairs,'matches':matches,'empty_predictions':empty,
+            'max_candidates_observed':max_candidates_observed,
+            'max_candidates_allowed':max_candidates_per_anchor,
+            'target_ids_checked':check_ids,'status':'PASS'}
 
 
 def main():
@@ -55,8 +64,9 @@ def main():
     p.add_argument('--db',type=Path,default=Path('artifacts/data.duckdb'))
     p.add_argument('--output',type=Path,default=Path('output/baseline'))
     p.add_argument('--skip-id-check',action='store_true')
+    p.add_argument('--max-candidates-per-anchor',type=int)
     a=p.parse_args()
-    print(validate(a.db,a.output,not a.skip_id_check))
+    print(validate(a.db,a.output,not a.skip_id_check,a.max_candidates_per_anchor))
 
 
 if __name__=='__main__':
