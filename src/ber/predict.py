@@ -23,8 +23,15 @@ def sha256(path):
 
 
 def prepare_groups(payload):
-    groups,cap=payload
+    if len(payload)==2:
+        groups,cap=payload
+        feature_version=1
+    else:
+        groups,cap,feature_version=payload
     selected=[r for group in groups for r in shortlist_rows(group,cap)]
+    if feature_version==4:
+        from .v4 import compute_rows
+        return compute_rows(selected)
     if selected and len(selected[0])>9:
         from .v2 import compute_rows
         return compute_rows(selected)
@@ -35,7 +42,7 @@ def score_batch(c,model,threshold,split,anchor_table,candidate_table,shortlist_c
     anchor_ids=[r[0] for r in c.execute(f'SELECT entity_id FROM {anchor_table} ORDER BY entity_id').fetchall()]
     selected={k:[] for k in anchor_ids}
     considered={k:[] for k in anchor_ids}
-    if feature_version==3:
+    if feature_version in (3,4):
         from .v3 import pair_query
         query=pair_query(split,anchor_table,candidate_table)
     elif feature_version==2:
@@ -54,10 +61,10 @@ def score_batch(c,model,threshold,split,anchor_table,candidate_table,shortlist_c
         for _,group in groupby(all_records(),key=lambda r:r[0]):
             pending.append(list(group))
             if len(pending)>=250:
-                yield pending,shortlist_cap
+                yield pending,shortlist_cap,feature_version
                 pending=[]
         if pending:
-            yield pending,shortlist_cap
+            yield pending,shortlist_cap,feature_version
     def feature_batches():
         if executor is None:
             for payload in grouped_batches():
@@ -97,7 +104,12 @@ def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,quer
     config=json.loads((model_dir/'model_config.json').read_text())
     feature_version=config.get('feature_version',1)
     expected_features=FEATURE_NAMES
-    if feature_version==3:
+    if feature_version==4:
+        from .v4 import V4_NAMES
+        from .v2 import frequency_tables
+        from .retrieval_v3 import build_char_index,fused_candidates
+        expected_features=V4_NAMES
+    elif feature_version==3:
         from .v3 import V3_NAMES
         from .v2 import frequency_tables
         from .retrieval_v3 import build_char_index,fused_candidates
@@ -113,7 +125,7 @@ def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,quer
     out.mkdir(parents=True,exist_ok=True)
     identity={'model_sha256':sha256(model_dir/'mixed.cbm'),'config':config,'cap':cap,
               'batch_size':batch_size,'limit':limit,'database':str(db.resolve()),
-              'index_version':3 if feature_version==3 else 2,
+              'index_version':3 if feature_version in (3,4) else 2,
               'partition_index':partition_index,'partition_count':partition_count}
     manifest=out/'run.json'
     if manifest.exists() and json.loads(manifest.read_text())!=identity:
@@ -121,9 +133,9 @@ def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,quer
     manifest.write_text(json.dumps(identity,indent=2),encoding='utf-8')
     c=connect(db)
     build_index(c,'test')
-    if feature_version in (2,3):
+    if feature_version in (2,3,4):
         frequency_tables(c,'test')
-    if feature_version==3:
+    if feature_version in (3,4):
         build_char_index(c,'test')
     sql='SELECT *,row_number() OVER(ORDER BY entity_id) AS seq FROM test WHERE source=1'
     if partition_count>1:
@@ -153,7 +165,7 @@ def predict(db,model_dir,out,batch_size=10000,limit=None,cap=None,workers=4,quer
         phase_start=time.time()
         c.execute(f'''CREATE OR REPLACE TEMP TABLE batch_anchors AS SELECT * FROM inference_anchors
             WHERE seq>{offset} AND seq<={offset+step}''')
-        candidate_fn=fused_candidates if feature_version==3 else candidates
+        candidate_fn=fused_candidates if feature_version in (3,4) else candidates
         candidate_fn(c,'test','batch_anchors','batch_candidates',cap)
         blocking_seconds=time.time()-phase_start
         matched,considered=score_batch(c,model,config['threshold'],'test','batch_anchors','batch_candidates',config.get('shortlist_cap'),executor,feature_version)

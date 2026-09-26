@@ -1,0 +1,459 @@
+{
+  "training_anchors": 108115,
+  "training_pairs": 16043969,
+  "depth": 10,
+  "trees": 1800,
+  "threshold": 0.6500000000000002,
+  "candidate_cap": 160,
+  "training_seconds": 404.5073022842407,
+  "features": [
+    "name_ratio",
+    "name_sorted_ratio",
+    "name_set_ratio",
+    "name_compact_ratio",
+    "name_jaro_winkler",
+    "name_exact",
+    "name_left_len",
+    "name_right_len",
+    "name_len_ratio",
+    "name_token_jaccard",
+    "name_token_overlap",
+    "name_left_coverage",
+    "name_right_coverage",
+    "name_number_jaccard",
+    "name_number_overlap",
+    "name_left_number_coverage",
+    "name_right_number_coverage",
+    "name_first_number_equal",
+    "name_last_number_equal",
+    "name_number_conflict",
+    "name_left_missing",
+    "name_right_missing",
+    "address_ratio",
+    "address_sorted_ratio",
+    "address_set_ratio",
+    "address_compact_ratio",
+    "address_jaro_winkler",
+    "address_exact",
+    "address_left_len",
+    "address_right_len",
+    "address_len_ratio",
+    "address_token_jaccard",
+    "address_token_overlap",
+    "address_left_coverage",
+    "address_right_coverage",
+    "address_number_jaccard",
+    "address_number_overlap",
+    "address_left_number_coverage",
+    "address_right_number_coverage",
+    "address_first_number_equal",
+    "address_last_number_equal",
+    "address_number_conflict",
+    "address_left_missing",
+    "address_right_missing",
+    "retrieval",
+    "key_hits",
+    "source",
+    "log_anchor_name_frequency",
+    "log_anchor_address_frequency",
+    "log_target_name_frequency",
+    "log_target_address_frequency",
+    "log_candidate_score_rank",
+    "relative_retrieval_score",
+    "log_lexical_retrieval",
+    "log_character_retrieval",
+    "log_lexical_hits",
+    "log_character_hits",
+    "address_soft_left_coverage",
+    "address_soft_right_coverage",
+    "address_soft_hmean",
+    "address_soft_strong_fraction",
+    "address_soft_exact_fraction"
+  ],
+  "calibration_curve": [
+    {
+      "threshold": 0.05,
+      "macro_f0_5": 0.8326005591806251
+    },
+    {
+      "threshold": 0.07500000000000001,
+      "macro_f0_5": 0.8631785007776743
+    },
+    {
+      "threshold": 0.10000000000000002,
+      "macro_f0_5": 0.8816316317344776
+    },
+    {
+      "threshold": 0.12500000000000003,
+      "macro_f0_5": 0.8954419337553479
+    },
+    {
+      "threshold": 0.15000000000000002,
+      "macro_f0_5": 0.9041155262788896
+    },
+    {
+      "threshold": 0.17500000000000004,
+      "macro_f0_5": 0.9131523562345087
+    },
+    {
+      "threshold": 0.20000000000000007,
+      "macro_f0_5": 0.9191977810830448
+    },
+    {
+      "threshold": 0.22500000000000003,
+      "macro_f0_5": 0.9234495651807266
+    },
+    {
+      "threshold": 0.25000000000000006,
+      "macro_f0_5": 0.9270028399652823
+    },
+    {
+      "threshold": 0.2750000000000001,
+      "macro_f0_5": 0.9316490456389063
+    },
+    {
+      "threshold": 0.3000000000000001,
+      "macro_f0_5": 0.9346095261382724
+    },
+    {
+      "threshold": 0.32500000000000007,
+      "macro_f0_5": 0.9369424267078081
+    },
+    {
+      "threshold": 0.3500000000000001,
+      "macro_f0_5": 0.9379861130275494
+    },
+    {
+      "threshold": 0.3750000000000001,
+      "macro_f0_5": 0.9393554077290209
+    },
+    {
+      "threshold": 0.4000000000000001,
+      "macro_f0_5": 0.9417380970422332
+    },
+    {
+      "threshold": 0.4250000000000001,
+      "macro_f0_5": 0.9434343330211032
+    },
+    {
+      "threshold": 0.4500000000000001,
+      "macro_f0_5": 0.9448142998592178
+    },
+    {
+      "threshold": 0.47500000000000014,
+      "macro_f0_5": 0.945842383078283
+    },
+    {
+      "threshold": 0.5000000000000002,
+      "macro_f0_5": 0.9466217722144151
+    },
+    {
+      "threshold": 0.5250000000000001,
+      "macro_f0_5": 0.9475104731966095
+    },
+    {
+      "threshold": 0.5500000000000003,
+      "macro_f0_5": 0.9480234751430204
+    },
+    {
+      "threshold": 0.5750000000000002,
+      "macro_f0_5": 0.9483301917139078
+    },
+    {
+      "threshold": 0.6000000000000002,
+      "macro_f0_5": 0.9486932752589501
+    },
+    {
+      "threshold": 0.6250000000000002,
+      "macro_f0_5": 0.9489605322176762
+    },
+    {
+      "threshold": 0.6500000000000002,
+      "macro_f0_5": 0.9497257115251583
+    },
+    {
+      "threshold": 0.6750000000000003,
+      "macro_f0_5": 0.9491658812497189
+    },
+    {
+      "threshold": 0.7000000000000003,
+      "macro_f0_5": 0.9482749692664298
+    },
+    {
+      "threshold": 0.7250000000000003,
+      "macro_f0_5": 0.9489673785253233
+    },
+    {
+      "threshold": 0.7500000000000002,
+      "macro_f0_5": 0.9475754399780949
+    },
+    {
+      "threshold": 0.7750000000000002,
+      "macro_f0_5": 0.9466353615259655
+    },
+    {
+      "threshold": 0.8000000000000003,
+      "macro_f0_5": 0.9453478759961171
+    },
+    {
+      "threshold": 0.8250000000000003,
+      "macro_f0_5": 0.9434337278583256
+    },
+    {
+      "threshold": 0.8500000000000003,
+      "macro_f0_5": 0.9418094198516058
+    },
+    {
+      "threshold": 0.8750000000000003,
+      "macro_f0_5": 0.9388985642173108
+    },
+    {
+      "threshold": 0.9000000000000004,
+      "macro_f0_5": 0.9358880207437897
+    },
+    {
+      "threshold": 0.9250000000000004,
+      "macro_f0_5": 0.9318432813646798
+    },
+    {
+      "threshold": 0.9500000000000004,
+      "macro_f0_5": 0.9248472784771672
+    },
+    {
+      "threshold": 0.97,
+      "macro_f0_5": 0.9100438798482597
+    },
+    {
+      "threshold": 0.98,
+      "macro_f0_5": 0.8960938622878476
+    },
+    {
+      "threshold": 0.99,
+      "macro_f0_5": 0.8627090426150064
+    },
+    {
+      "threshold": 0.995,
+      "macro_f0_5": 0.8230209902919499
+    },
+    {
+      "threshold": 0.999,
+      "macro_f0_5": 0.7188552665001071
+    }
+  ],
+  "baseline": {
+    "calibrate": {
+      "all": {
+        "entities": 4389,
+        "macro_f0_5": 0.9491209587754517,
+        "singleton_count": 252,
+        "singleton_false_positive_rate": 0.06349206349206349,
+        "all_empty_baseline": 0.05741626794258373,
+        "candidate_pair_recall": 0.944357161560618,
+        "candidate_entity_recall": 0.9443263656280335,
+        "all_matches_retrieved_rate": 0.8438481991781485,
+        "blocking_oracle_macro_f0_5": 0.9804608439335135,
+        "candidate_count_quantiles": {
+          "p50": 160.0,
+          "p90": 160.0,
+          "p99": 160.0,
+          "max": 160.0
+        }
+      },
+      "India": {
+        "entities": 1754,
+        "macro_f0_5": 0.9316875652151355,
+        "singleton_count": 100,
+        "singleton_false_positive_rate": 0.08,
+        "all_empty_baseline": 0.05701254275940707,
+        "candidate_pair_recall": 0.9180596525729269,
+        "candidate_entity_recall": 0.9184581389992514,
+        "all_matches_retrieved_rate": 0.7871825876662636,
+        "blocking_oracle_macro_f0_5": 0.9691962151346861,
+        "candidate_count_quantiles": {
+          "p50": 160.0,
+          "p90": 160.0,
+          "p99": 160.0,
+          "max": 160.0
+        }
+      },
+      "US": {
+        "entities": 2635,
+        "macro_f0_5": 0.9607255782459618,
+        "singleton_count": 152,
+        "singleton_false_positive_rate": 0.05263157894736842,
+        "all_empty_baseline": 0.057685009487666035,
+        "candidate_pair_recall": 0.9618487028558971,
+        "candidate_entity_recall": 0.9615579592019383,
+        "all_matches_retrieved_rate": 0.8815948449456303,
+        "blocking_oracle_macro_f0_5": 0.9879591964622207,
+        "candidate_count_quantiles": {
+          "p50": 160.0,
+          "p90": 160.0,
+          "p99": 160.0,
+          "max": 160.0
+        }
+      }
+    },
+    "holdout": {
+      "all": {
+        "entities": 3051,
+        "macro_f0_5": 0.9447832214793936,
+        "singleton_count": 199,
+        "singleton_false_positive_rate": 0.10552763819095477,
+        "all_empty_baseline": 0.06522451655195018,
+        "candidate_pair_recall": 0.9450685453160701,
+        "candidate_entity_recall": 0.9434017342327299,
+        "all_matches_retrieved_rate": 0.8387096774193549,
+        "blocking_oracle_macro_f0_5": 0.9793001848908854,
+        "candidate_count_quantiles": {
+          "p50": 160.0,
+          "p90": 160.0,
+          "p99": 160.0,
+          "max": 160.0
+        }
+      },
+      "India": {
+        "entities": 1212,
+        "macro_f0_5": 0.917540767557495,
+        "singleton_count": 97,
+        "singleton_false_positive_rate": 0.15463917525773196,
+        "all_empty_baseline": 0.08003300330033003,
+        "candidate_pair_recall": 0.9180528375733855,
+        "candidate_entity_recall": 0.9150021353833013,
+        "all_matches_retrieved_rate": 0.7847533632286996,
+        "blocking_oracle_macro_f0_5": 0.9659949859812076,
+        "candidate_count_quantiles": {
+          "p50": 160.0,
+          "p90": 160.0,
+          "p99": 160.0,
+          "max": 160.0
+        }
+      },
+      "US": {
+        "entities": 1839,
+        "macro_f0_5": 0.9627374651734344,
+        "singleton_count": 102,
+        "singleton_false_positive_rate": 0.058823529411764705,
+        "all_empty_baseline": 0.05546492659053834,
+        "candidate_pair_recall": 0.962281795511222,
+        "candidate_entity_recall": 0.9616317588251959,
+        "all_matches_retrieved_rate": 0.8733448474381117,
+        "blocking_oracle_macro_f0_5": 0.9880690272391889,
+        "candidate_count_quantiles": {
+          "p50": 160.0,
+          "p90": 160.0,
+          "p99": 160.0,
+          "max": 160.0
+        }
+      }
+    }
+  },
+  "new": {
+    "calibrate": {
+      "all": {
+        "entities": 4389,
+        "macro_f0_5": 0.9497257115251583,
+        "singleton_count": 252,
+        "singleton_false_positive_rate": 0.05952380952380952,
+        "all_empty_baseline": 0.05741626794258373,
+        "candidate_pair_recall": 0.944357161560618,
+        "candidate_entity_recall": 0.9443263656280335,
+        "all_matches_retrieved_rate": 0.8438481991781485,
+        "blocking_oracle_macro_f0_5": 0.9804608439335135,
+        "candidate_count_quantiles": {
+          "p50": 160.0,
+          "p90": 160.0,
+          "p99": 160.0,
+          "max": 160.0
+        }
+      },
+      "India": {
+        "entities": 1754,
+        "macro_f0_5": 0.9320708526265576,
+        "singleton_count": 100,
+        "singleton_false_positive_rate": 0.08,
+        "all_empty_baseline": 0.05701254275940707,
+        "candidate_pair_recall": 0.9180596525729269,
+        "candidate_entity_recall": 0.9184581389992514,
+        "all_matches_retrieved_rate": 0.7871825876662636,
+        "blocking_oracle_macro_f0_5": 0.9691962151346861,
+        "candidate_count_quantiles": {
+          "p50": 160.0,
+          "p90": 160.0,
+          "p99": 160.0,
+          "max": 160.0
+        }
+      },
+      "US": {
+        "entities": 2635,
+        "macro_f0_5": 0.9614777504276802,
+        "singleton_count": 152,
+        "singleton_false_positive_rate": 0.046052631578947366,
+        "all_empty_baseline": 0.057685009487666035,
+        "candidate_pair_recall": 0.9618487028558971,
+        "candidate_entity_recall": 0.9615579592019383,
+        "all_matches_retrieved_rate": 0.8815948449456303,
+        "blocking_oracle_macro_f0_5": 0.9879591964622207,
+        "candidate_count_quantiles": {
+          "p50": 160.0,
+          "p90": 160.0,
+          "p99": 160.0,
+          "max": 160.0
+        }
+      }
+    },
+    "holdout": {
+      "all": {
+        "entities": 3051,
+        "macro_f0_5": 0.9437272179291579,
+        "singleton_count": 199,
+        "singleton_false_positive_rate": 0.11055276381909548,
+        "all_empty_baseline": 0.06522451655195018,
+        "candidate_pair_recall": 0.9450685453160701,
+        "candidate_entity_recall": 0.9434017342327299,
+        "all_matches_retrieved_rate": 0.8387096774193549,
+        "blocking_oracle_macro_f0_5": 0.9793001848908854,
+        "candidate_count_quantiles": {
+          "p50": 160.0,
+          "p90": 160.0,
+          "p99": 160.0,
+          "max": 160.0
+        }
+      },
+      "India": {
+        "entities": 1212,
+        "macro_f0_5": 0.9158037570134214,
+        "singleton_count": 97,
+        "singleton_false_positive_rate": 0.16494845360824742,
+        "all_empty_baseline": 0.08003300330033003,
+        "candidate_pair_recall": 0.9180528375733855,
+        "candidate_entity_recall": 0.9150021353833013,
+        "all_matches_retrieved_rate": 0.7847533632286996,
+        "blocking_oracle_macro_f0_5": 0.9659949859812076,
+        "candidate_count_quantiles": {
+          "p50": 160.0,
+          "p90": 160.0,
+          "p99": 160.0,
+          "max": 160.0
+        }
+      },
+      "US": {
+        "entities": 1839,
+        "macro_f0_5": 0.9621302818931996,
+        "singleton_count": 102,
+        "singleton_false_positive_rate": 0.058823529411764705,
+        "all_empty_baseline": 0.05546492659053834,
+        "candidate_pair_recall": 0.962281795511222,
+        "candidate_entity_recall": 0.9616317588251959,
+        "all_matches_retrieved_rate": 0.8733448474381117,
+        "blocking_oracle_macro_f0_5": 0.9880690272391889,
+        "candidate_count_quantiles": {
+          "p50": 160.0,
+          "p90": 160.0,
+          "p99": 160.0,
+          "max": 160.0
+        }
+      }
+    }
+  }
+}
