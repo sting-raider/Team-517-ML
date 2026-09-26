@@ -1,0 +1,30 @@
+{
+  "experiment_id": "I028",
+  "task": "INT003 v3 feature train/inference parity",
+  "status": "FOLLOW-UP",
+  "scope": "current-main source and committed-config integrity audit; no new challenge rows",
+  "features": [
+    "log_lexical_retrieval",
+    "log_character_retrieval",
+    "log_lexical_hits",
+    "log_character_hits"
+  ],
+  "checks": {
+    "structural": {"passed": 13, "total": 13},
+    "reference": {"passed": 8, "total": 8},
+    "total": {"passed": 21, "total": 21}
+  },
+  "findings": {
+    "train_inference_same_candidate_function": true,
+    "train_inference_same_pair_query": true,
+    "saved_schema_matches_v3_names": true,
+    "missing_channel_maps_to_zero": true,
+    "channel_values_target_id_invariant_conditional_on_membership": true,
+    "hard_cap_membership_id_tie_break": "known R026 residual; not a new feature-value defect",
+    "character_index_cache_semantically_versioned": false,
+    "legacy_experiment_helper_uses_id_ordered_ordinal_rrf": true,
+    "current_int003_invalidated": false
+  },
+  "runtime_note": "21 deterministic source/reference checks executed against fetched source/config; Python/container backend returned platform ClientError, so no DuckDB execution is claimed",
+  "recommendation": "FOLLOW-UP"
+}
