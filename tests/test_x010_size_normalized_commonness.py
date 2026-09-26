@@ -12,7 +12,7 @@ SPEC.loader.exec_module(x010)
 class X010CommonnessTests(unittest.TestCase):
     def test_normalizer_semantics(self):
         self.assertEqual(x010.norm_proxy("  Café--12/A  "), "cafe 12 a")
-        self.assertEqual(x010.norm_proxy("Mülller & Söhne".replace("lll", "ll")), "muller sohne")
+        self.assertEqual(x010.norm_proxy("Müller & Söhne"), "muller sohne")
         self.assertEqual(x010.norm_proxy("SHOP # 007"), "shop 007")
 
     def test_transform_empty_stays_zero(self):
