@@ -88,11 +88,14 @@ def retrieval_gate():
 
 @app.function(image=image,volumes={str(VOLUME_ROOT):volume},cpu=8,memory=32768,timeout=3600)
 def make_features(partition:int,partitions:int=8,confirmation:bool=False,
-                  comparison:bool=False):
+                  comparison:bool=False,reason:str=''):
     # Compile before importing ber: forked feature workers inherit ber.__path__.
     _enable_native_features()
     from ber.v2 import V2_NAMES
     from ber.v3 import V3_NAMES
+    if confirmation:
+        from ber.holdout import require_confirmation_reuse
+        require_confirmation_reuse(45000,5000,reason)
     if comparison and not confirmation:
         raise ValueError('The baseline comparison is only for confirmation')
     section='comparison' if comparison else 'confirmation' if confirmation else 'features'
@@ -107,10 +110,11 @@ def make_features(partition:int,partitions:int=8,confirmation:bool=False,
     if comparison:
         from ber.v2 import materialize
         result=materialize(db,out,partition,partitions,confirmation=True,
-                           confirmation_start=45000)
+                           confirmation_start=45000,confirmation_reason=reason)
     else:
         from ber.v3 import materialize
-        result=materialize(db,out,partition,partitions,confirmation)
+        result=materialize(db,out,partition,partitions,confirmation,
+                           confirmation_reason=reason if confirmation else None)
     volume.commit()
     return result
 
@@ -129,7 +133,9 @@ def train_model(depth:int=10):
 
 
 @app.function(image=image,volumes={str(VOLUME_ROOT):volume},cpu=8,memory=16384,timeout=1800)
-def confirm_model(depth:int=10):
+def confirm_model(depth:int=10,reason:str=''):
+    from ber.holdout import require_confirmation_reuse
+    decision=require_confirmation_reuse(45000,5000,reason)
     import numpy as np
     from catboost import CatBoostClassifier
     from ber.v2 import V2_NAMES,load_parts,score_slices
@@ -151,6 +157,7 @@ def confirm_model(depth:int=10):
     bp=old.predict_proba(bx,thread_count=8)[:,1]
     bp_fused=old.predict_proba(x[:,:len(V2_NAMES)],thread_count=8)[:,1]
     report={'protocol':'5000 anchors at hash positions 45001:50000, excluded from v2/v3 fitting and model selection; full-S1 swarm audits may have inspected labels',
+        'holdout_guard':{'action':decision['action'],'reason':decision['reason']},
         'config':config,'model_sha256':sha256(folder/'mixed.cbm'),
         'baseline_v2_original_pool':score_slices(bmeta,bg,bt,bp,'confirmation',.6500000000000002),
         'baseline_v2_fused_pool':score_slices(meta,g,t,bp_fused,'confirmation',.6500000000000002),
@@ -242,7 +249,7 @@ def matching_download_chunk(depth:int,offset:int,length:int):
 
 
 @app.local_entrypoint()
-def main(action:str='prepare',depth:int=10):
+def main(action:str='prepare',depth:int=10,reason:str=''):
     if action=='prepare':
         result=prepare_database.remote()
         Path('reports/int003_database.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
@@ -261,10 +268,12 @@ def main(action:str='prepare',depth:int=10):
         Path(f'reports/int003_depth{depth}.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
         print(f'Trained v3 depth {depth}',flush=True)
     elif action=='confirm':
-        calls=[make_features.spawn(0,1,True,comparison) for comparison in (False,True)]
+        if not reason.strip():
+            raise ValueError('Historical confirmation reuse requires --reason')
+        calls=[make_features.spawn(0,1,True,comparison,reason) for comparison in (False,True)]
         for call in calls:
             print(f'Confirmation features: {call.get()["anchors"]} anchors',flush=True)
-        result=confirm_model.remote(depth)
+        result=confirm_model.remote(depth,reason)
         Path(f'reports/int003_depth{depth}_confirmation.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
         print(json.dumps(result,indent=2),flush=True)
     elif action=='score':
