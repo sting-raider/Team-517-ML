@@ -1,0 +1,129 @@
+{
+  "experiment_id": "D019",
+  "protocol": "Complete train Source-1 + ground truth; no sampling; S2/S3 target prefixes used only for aggregate truth cardinality; no model probabilities",
+  "inputs": {
+    "train_source1": {
+      "rows": 2206821,
+      "sha256": "591af0e1dfeb65cab71ea6ee8cb69df00f92d6ba6fa79e05746c938775d14973"
+    },
+    "train_ground_truth": {
+      "rows": 2206821,
+      "sha256": "70bc1d8a16c667e0155c2105d0ab2ebe41d7e7a85d8a529e3ca81c6c3a5af037"
+    }
+  },
+  "runtime": {
+    "wall_seconds": 14.04,
+    "peak_rss_kib": 630648
+  },
+  "equal_total_budget": {
+    "4": {
+      "global": 0.9806282002104585,
+      "best_source_caps": [
+        2,
+        2
+      ],
+      "source_cap_score": 0.9652546111764436,
+      "gap": -0.015373589034014867,
+      "truncated_share": 0.4108933166758881
+    },
+    "5": {
+      "global": 0.9937661291263773,
+      "best_source_caps": [
+        2,
+        3
+      ],
+      "source_cap_score": 0.9805442661935507,
+      "gap": -0.013221862932826567,
+      "truncated_share": 0.28039111463956523
+    },
+    "6": {
+      "global": 0.9983318239939089,
+      "best_source_caps": [
+        3,
+        3
+      ],
+      "source_cap_score": 0.9926316650309429,
+      "gap": -0.00570015896296594,
+      "truncated_share": 0.14232554430105568
+    },
+    "7": {
+      "global": 0.9996410497486119,
+      "best_source_caps": [
+        3,
+        4
+      ],
+      "source_cap_score": 0.9962549736673102,
+      "gap": -0.0033860760813017032,
+      "truncated_share": 0.08100792950583667
+    },
+    "8": {
+      "global": 0.999940833016186,
+      "best_source_caps": [
+        4,
+        4
+      ],
+      "source_cap_score": 0.9989856051865464,
+      "gap": -0.0009552278296395267,
+      "truncated_share": 0.028064351390529634
+    },
+    "9": {
+      "best_source_caps": [
+        4,
+        5
+      ],
+      "source_cap_score": 0.9995896857869531
+    },
+    "10": {
+      "best_source_caps": [
+        5,
+        5
+      ],
+      "source_cap_score": 0.9999624885889095
+    },
+    "11": {
+      "best_source_caps": [
+        5,
+        6
+      ],
+      "source_cap_score": 1
+    },
+    "12": {
+      "best_source_caps": [
+        6,
+        6
+      ],
+      "source_cap_score": 1
+    }
+  },
+  "country_checks": {
+    "US": {
+      "budget6_best": [
+        3,
+        3
+      ],
+      "budget6_score": 0.9926511098110199,
+      "budget8_best": [
+        4,
+        4
+      ],
+      "budget8_score": 0.9989881320526942
+    },
+    "India": {
+      "budget6_best": [
+        3,
+        3
+      ],
+      "budget6_score": 0.9926025231578786,
+      "budget8_best": [
+        4,
+        4
+      ],
+      "budget8_score": 0.9989818181746994
+    }
+  },
+  "validation": {
+    "focused_tests": "5/5 PASS after correcting one initially invalid synthetic expectation",
+    "dominance_invariant": "For each anchor, min(S2,a)+min(S3,b) <= min(S2+S3,a+b), so source-specific caps cannot exceed the same-budget global perfect-ranking ceiling."
+  },
+  "recommendation": "REJECT independent S2/S3 hard caps as a generic precision policy. At total budget 6, best 3+3 ceiling is only 0.992632; reaching >0.998 on labeled population requires total budget 8 via 4+4. Source-specific score thresholds may still be useful because they do not impose independent hard cardinality ceilings."
+}
