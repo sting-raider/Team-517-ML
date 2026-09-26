@@ -51,7 +51,7 @@ def probe(threshold:float,dense_prior:float):
     local_db=SCRATCH/'artifacts/neural_probe.duckdb'
     local_db.parent.mkdir(parents=True,exist_ok=True)
     shutil.copy2(VOLUME_ROOT/'project/artifacts/data_v3.duckdb',local_db)
-    out=VOLUME_ROOT/'project/experiments/neural_probe_fullensemble'
+    out=VOLUME_ROOT/'project/experiments/neural_probe_exactcandidate'
     result=score_partition(local_db,
         VOLUME_ROOT/'project/experiments/int005_test_retrieval',
         VOLUME_ROOT/'project/experiments/int005/encoder',

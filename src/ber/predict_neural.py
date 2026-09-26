@@ -107,13 +107,6 @@ def score_partition(db, dense_root, encoder_path, cross_path, out,
             SELECT p.* FROM neural_base160 p JOIN test t ON p.rid=t.rowid
             QUALIFY row_number() OVER(PARTITION BY p.anchor
                 ORDER BY p.retrieval DESC,t.entity_id)<=32''')
-        base_probs={}
-        if cat_path is not None:
-            c.execute(pair_query('test','batch_anchors','neural_base32'))
-            while rows:=c.fetchmany(16000):
-                ids,features=score_rows(rows)
-                probabilities=cat.predict_proba(features,thread_count=8)[:,1]
-                base_probs.update((pair,float(p)) for pair,p in zip(ids,probabilities))
         vectors=embed(anchors)
         results=[index.search(vectors,16) for index in indexes]
         selected_anchors=[];selected_rowids=[];selected_scores=[]
@@ -154,6 +147,18 @@ def score_partition(db, dense_root, encoder_path, cross_path, out,
             expected[anchor].append(target)
         if max(map(len,expected.values()))>32:
             raise ValueError('Candidate cap exceeded')
+        # Freeze the exact blocker output before running either pair matcher.
+        write_tsv(shard/'candidate_pairs.tsv',expected,'candidate_entity_ids')
+        base_probs={}
+        if cat_path is not None:
+            c.execute('''CREATE OR REPLACE TEMP TABLE neural_base_scored AS
+                SELECT b.* FROM neural_base32 b
+                JOIN neural_candidates p ON b.anchor=p.anchor AND b.rid=p.rid''')
+            c.execute(pair_query('test','batch_anchors','neural_base_scored'))
+            while rows:=c.fetchmany(16000):
+                ids,features=score_rows(rows)
+                probabilities=cat.predict_proba(features,thread_count=8)[:,1]
+                base_probs.update((pair,float(p)) for pair,p in zip(ids,probabilities))
         with torch.inference_mode():
             for start in range(0,len(records),128):
                 rows=records[start:start+128]
@@ -179,7 +184,6 @@ def score_partition(db, dense_root, encoder_path, cross_path, out,
                     if decision>=logit_gate:
                         matches[row[0]].append(row[1])
         write_tsv(shard/'matching_results.tsv',matches,'matched_entity_ids')
-        write_tsv(shard/'candidate_pairs.tsv',expected,'candidate_entity_ids')
         proof={name:sha256(shard/name) for name in ('matching_results.tsv','candidate_pairs.tsv')}
         done.write_text(json.dumps(proof),encoding='utf-8')
         if checkpoint:
