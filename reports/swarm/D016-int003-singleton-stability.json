@@ -1,0 +1,61 @@
+{
+  "experiment_id": "D016",
+  "recommendation": "FOLLOW-UP",
+  "protocol": "committed INT003 aggregate artifacts only; no new labels/probabilities/tuning",
+  "dependency_correction": {
+    "status": "WITHDRAWN_COMPARISON",
+    "reason": "I028 found baseline_v2_fused_pool used v3 relative_retrieval_score semantics and is not a feature-contract-pure frozen-v2 counterfactual",
+    "invalidated_outputs": [
+      "v2_fused pooled singleton comparison",
+      "same-fused-pool retraining attribution",
+      "derived non-singleton retraining component"
+    ],
+    "unaffected_outputs": [
+      "INT003 singleton counts/rates",
+      "Wilson intervals",
+      "cross-slice descriptive stability",
+      "perfect singleton-fix headroom",
+      "I027 current-v3 actual-vs-oracle error budget"
+    ]
+  },
+  "v3": {
+    "calibrate": {
+      "all": {"entities":4389,"singleton_count":252,"false_positives":16,"false_positive_rate":0.06349206349206349,"wilson95":[0.0394560155353457,0.10063644244979081],"perfect_singleton_fix_macro_headroom":0.003645477329687856,"macro_f0_5":0.9491209587754517,"blocking_oracle_macro_f0_5":0.9804608439335135},
+      "India": {"entities":1754,"singleton_count":100,"false_positives":8,"false_positive_rate":0.08,"wilson95":[0.041093461484380624,0.14998107700948735],"perfect_singleton_fix_macro_headroom":0.004561003420752566,"macro_f0_5":0.9316875652151355,"blocking_oracle_macro_f0_5":0.9691962151346861},
+      "US": {"entities":2635,"singleton_count":152,"false_positives":8,"false_positive_rate":0.05263157894736842,"wilson95":[0.026907491896279292,0.10041073889314774],"perfect_singleton_fix_macro_headroom":0.0030360531309297912,"macro_f0_5":0.9607255782459618,"blocking_oracle_macro_f0_5":0.9879591964622207}
+    },
+    "holdout": {
+      "all": {"entities":3051,"singleton_count":199,"false_positives":21,"false_positive_rate":0.10552763819095477,"wilson95":[0.0700631887478877,0.15593330667870367],"perfect_singleton_fix_macro_headroom":0.00688298918387414,"macro_f0_5":0.9447832214793936,"blocking_oracle_macro_f0_5":0.9793001848908854},
+      "India": {"entities":1212,"singleton_count":97,"false_positives":15,"false_positive_rate":0.15463917525773196,"wilson95":[0.09601122102239842,0.2395795093821221],"perfect_singleton_fix_macro_headroom":0.012376237623762377,"macro_f0_5":0.917540767557495,"blocking_oracle_macro_f0_5":0.9659949859812076},
+      "US": {"entities":1839,"singleton_count":102,"false_positives":6,"false_positive_rate":0.058823529411764705,"wilson95":[0.027235639345374534,0.12243594490150472],"perfect_singleton_fix_macro_headroom":0.0032626427406199023,"macro_f0_5":0.9627374651734344,"blocking_oracle_macro_f0_5":0.9880690272391889}
+    },
+    "confirmation": {
+      "all": {"entities":5000,"singleton_count":262,"false_positives":13,"false_positive_rate":0.04961832061068702,"wilson95":[0.02922338430882089,0.08302945598582148],"perfect_singleton_fix_macro_headroom":0.0026,"macro_f0_5":0.9501984899746141,"blocking_oracle_macro_f0_5":0.9809168628916118},
+      "India": {"entities":2022,"singleton_count":114,"false_positives":8,"false_positive_rate":0.07017543859649122,"wilson95":[0.03598534342897001,0.13238883505845525],"perfect_singleton_fix_macro_headroom":0.003956478733926805,"macro_f0_5":0.9326986145852888,"blocking_oracle_macro_f0_5":0.9709446547885724},
+      "US": {"entities":2978,"singleton_count":148,"false_positives":5,"false_positive_rate":0.033783783783783786,"wilson95":[0.0145150949863528,0.07664221427685157],"perfect_singleton_fix_macro_headroom":0.0016789791806581598,"macro_f0_5":0.9620805410280778,"blocking_oracle_macro_f0_5":0.9876877845787663}
+    }
+  },
+  "pooled_descriptive": {
+    "all": {"false_positives":50,"singleton_count":713,"false_positive_rate":0.07012622720897616,"wilson95":[0.05359503715805745,0.09126469094908643],"split_min_rate":0.04961832061068702,"split_max_rate":0.10552763819095477,"split_range_pp":5.590931758026775,"warning":"descriptive pool only; calibration/holdout are reused development slices, not independent confirmation"},
+    "India": {"false_positives":31,"singleton_count":311,"false_positive_rate":0.09967845659163987,"wilson95":[0.07111396158502425,0.13801179671668534],"split_min_rate":0.07017543859649122,"split_max_rate":0.15463917525773196,"split_range_pp":8.446373666124074,"warning":"descriptive pool only; calibration/holdout are reused development slices, not independent confirmation"},
+    "US": {"false_positives":19,"singleton_count":402,"false_positive_rate":0.0472636815920398,"wilson95":[0.030463711584951876,0.0726343280837361],"split_min_rate":0.033783783783783786,"split_max_rate":0.058823529411764705,"split_range_pp":2.503974562798092,"warning":"descriptive pool only; calibration/holdout are reused development slices, not independent confirmation"}
+  },
+  "native_pipeline_confirmation_context": {
+    "warning": "valid end-to-end comparison, but retrieval/model/feature paths all change; not a retraining attribution",
+    "v2_original_pool": {
+      "all": {"false_positives":12,"singleton_count":262,"false_positive_rate":0.04580152671755725},
+      "India": {"false_positives":6,"singleton_count":114,"false_positive_rate":0.05263157894736842},
+      "US": {"false_positives":6,"singleton_count":148,"false_positive_rate":0.04054054054054054}
+    },
+    "v3": {
+      "all": {"false_positives":13,"singleton_count":262,"false_positive_rate":0.04961832061068702},
+      "India": {"false_positives":8,"singleton_count":114,"false_positive_rate":0.07017543859649122},
+      "US": {"false_positives":5,"singleton_count":148,"false_positive_rate":0.033783783783783786}
+    }
+  },
+  "confirmation_headroom": {
+    "all": {"perfect_fix_macro_headroom":0.0026,"share_of_total_deficit":0.05220725232376832,"share_of_within_candidate_gap":0.08463989961399655,"total_deficit":0.04980151002538591,"within_candidate_gap":0.03071837291699775},
+    "India": {"perfect_fix_macro_headroom":0.003956478733926805,"share_of_total_deficit":0.0587874782895921,"share_of_within_candidate_gap":0.10344806188817225,"total_deficit":0.0673013854147112,"within_candidate_gap":0.03824604020328359},
+    "US": {"perfect_fix_macro_headroom":0.0016789791806581598,"share_of_total_deficit":0.04427750886164742,"share_of_within_candidate_gap":0.0655665721042834,"total_deficit":0.03791945897192217,"within_candidate_gap":0.02560724355068844}
+  }
+}
