@@ -1,0 +1,110 @@
+{
+  "experiment_id": "X011",
+  "protocol": {
+    "train_source1_rows": 2206821,
+    "truth_rows": 2206821,
+    "raw_truth_scan": "Exact full-file regex counts via Files backing-file parser; no sampling",
+    "country_prior_source": "D006a completed full-population Source1+truth audit, PR #68 / branch agent/d/D006a-gt-cardinality-audit",
+    "test_prediction_source": "reports/int003_test_country_drift.json on main",
+    "no_test_labels": true,
+    "no_confirmation_or_frozen_holdout": true,
+    "compute_note": "Container/private Python session returned ClientError before user code; committed helper was not executed in this chat."
+  },
+  "train_truth": {
+    "overall": {
+      "entities": 2206821,
+      "singleton_count": 123247,
+      "singleton_rate": 0.05584820880352326,
+      "mean_true_matches": 3.4612526344456573,
+      "cardinality_counts": {
+        "0": 123247,
+        "1": 119157,
+        "2": 375212,
+        "3": 530841,
+        "4": 484115,
+        "5": 321957,
+        "6": 164868,
+        "7": 63968,
+        "8": 18680,
+        "9": 4205,
+        "10": 534,
+        "11": 37
+      }
+    },
+    "India": {
+      "entities": 883188,
+      "mean_true_matches": 3.4645,
+      "singleton_rate": 0.055878,
+      "values_rounded_from_D006a_report": true
+    },
+    "US": {
+      "entities": 1323633,
+      "mean_true_matches": 3.4591,
+      "singleton_rate": 0.055828,
+      "values_rounded_from_D006a_report": true
+    }
+  },
+  "test_outputs": {
+    "India": {
+      "entities": 809986,
+      "v2_mean_predictions": 2.982621921860378,
+      "v3_mean_predictions": 3.0804729958295574,
+      "v2_empty_rate": 0.07163950981868822,
+      "v3_empty_rate": 0.06851723363119856,
+      "v2_mean_gap_vs_train": -0.48187807813962236,
+      "v3_mean_gap_vs_train": -0.3840270041704428,
+      "mean_abs_gap_reduction_fraction": 0.20306189139574762,
+      "v2_empty_gap_pp_vs_train": 1.5761509818688222,
+      "v3_empty_gap_pp_vs_train": 1.2639233631198565,
+      "empty_abs_gap_reduction_fraction": 0.1980949936526774,
+      "counterfactual_v3_edge_gap_if_train_mean_transported": -311056.497
+    },
+    "US": {
+      "entities": 663106,
+      "v2_mean_predictions": 3.2521120303541213,
+      "v3_mean_predictions": 3.307799959584139,
+      "v2_empty_rate": 0.05969633814201651,
+      "v3_empty_rate": 0.05758506181515474,
+      "v2_mean_gap_vs_train": -0.2069879696458785,
+      "v3_mean_gap_vs_train": -0.15130004041586087,
+      "mean_abs_gap_reduction_fraction": 0.26903944864665463,
+      "v2_empty_gap_pp_vs_train": 0.38683381420165086,
+      "v3_empty_gap_pp_vs_train": 0.17570618151547396,
+      "empty_abs_gap_reduction_fraction": 0.545783809313317,
+      "counterfactual_v3_edge_gap_if_train_mean_transported": -100327.96460000006
+    },
+    "France": {
+      "entities": 259452,
+      "v2_mean_predictions": 4.5741293187179135,
+      "v3_mean_predictions": 4.35870989624285,
+      "v2_empty_rate": 0.03338189722954535,
+      "v3_empty_rate": 0.03436088370873996,
+      "labeled_mean_envelope": [
+        3.4591,
+        3.4645
+      ],
+      "v3_mean_excess_above_labeled_max": 0.8942098962428497,
+      "v3_match_excess_vs_labeled_mean_envelope_if_transported": [
+        232004.54599999997,
+        233405.58680000005
+      ],
+      "labeled_singleton_envelope": [
+        0.055828,
+        0.055878
+      ],
+      "v3_empty_gap_pp_below_labeled_min": -2.1467116291260044,
+      "mean_distance_to_labeled_midpoint_reduction_fraction_vs_v2": 0.19366514830640189
+    }
+  },
+  "overall_test": {
+    "entities": 1732544,
+    "v2_matches": 5759144,
+    "v3_matches": 5819438,
+    "v2_mean_predictions": 3.3240968194747147,
+    "v3_mean_predictions": 3.3588976672453916,
+    "train_overall_mean_true_matches": 3.4612526344456573,
+    "v3_minus_train_overall_mean": -0.10235496720026571
+  },
+  "recommendation": "FOLLOW-UP",
+  "interpretation": "US/India v3 aggregate output cardinality moved toward their nearly identical labeled train priors versus v2. France also moved toward the labeled range but remains outside it on mean predictions and empty rate. These are transport diagnostics only, not accuracy estimates or France labels."
+}
