@@ -114,15 +114,16 @@ def merge_prediction(depth:int,partitions:int=8):
 
 @app.function(image=image,volumes={str(VOLUME_ROOT):volume},cpu=2,memory=4096,timeout=900)
 def package_matching(depth:int):
-    """Compress the validated leaderboard file for a smaller network transfer."""
+    """Transfer a complete matching file while the large candidate audit finishes."""
     import gzip
     from ber.predict import sha256
     folder=VOLUME_ROOT/'project/output'/f'submission_v2_d{depth}'
-    receipt=json.loads((folder/'completion.json').read_text())
-    if receipt['status']!='PASS':
-        raise ValueError('Cannot package an unvalidated export')
     source=folder/'matching_results.tsv'
-    if sha256(source)!=receipt['matching_sha256']:
+    digest=sha256(source)
+    completion=folder/'completion.json'
+    receipt=json.loads(completion.read_text()) if completion.exists() else {
+        'status':'MATCHING_COMPLETE_CANDIDATE_AUDIT_PENDING','matching_sha256':digest}
+    if digest!=receipt['matching_sha256']:
         raise ValueError('Matching file differs from the validation receipt')
     target=folder/'matching_results.tsv.gz'
     with source.open('rb') as src,target.open('wb') as dest:
@@ -133,6 +134,17 @@ def package_matching(depth:int):
     receipt['compressed_sha256']=sha256(target)
     volume.commit()
     return receipt
+
+
+@app.function(image=image,volumes={str(VOLUME_ROOT):volume},cpu=1,memory=1024,timeout=300)
+def matching_download_tail(depth:int,offset:int):
+    source=VOLUME_ROOT/'project/output'/f'submission_v2_d{depth}'/'matching_results.tsv.gz'
+    with source.open('rb') as stream:
+        stream.seek(offset)
+        remaining=stream.read()
+    if len(remaining)>8*1024*1024:
+        raise ValueError('Use the volume CLI for downloads missing more than 8 MiB')
+    return remaining
 
 
 @app.local_entrypoint()
@@ -172,5 +184,30 @@ def main(action:str='train',depth:int=10):
         result=package_matching.remote(depth)
         Path(f'reports/int002_depth{depth}_download.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
         print(json.dumps(result,indent=2))
+    elif action=='resume-download':
+        import gzip
+        import hashlib
+        dest=Path(f'output/submission_v2_d{depth}')
+        zipped=dest/'matching_results.tsv.gz'
+        receipt=json.loads(Path(f'reports/int002_depth{depth}_download.json').read_text())
+        exported=json.loads(Path(f'reports/int002_depth{depth}_export.json').read_text())
+        offset=zipped.stat().st_size
+        if offset>receipt['compressed_bytes']:
+            raise ValueError('Local compressed file is larger than the remote one')
+        if offset<receipt['compressed_bytes']:
+            with zipped.open('ab') as stream:
+                stream.write(matching_download_tail.remote(depth,offset))
+        with zipped.open('rb') as stream:
+            if hashlib.file_digest(stream,'sha256').hexdigest()!=receipt['compressed_sha256']:
+                raise ValueError('Compressed download checksum mismatch')
+        target=dest/'matching_results.tsv'
+        temporary=dest/'matching_results.tsv.tmp'
+        with gzip.open(zipped,'rb') as src,temporary.open('wb') as out:
+            shutil.copyfileobj(src,out,1024*1024)
+        with temporary.open('rb') as stream:
+            if hashlib.file_digest(stream,'sha256').hexdigest()!=exported['matching_sha256']:
+                raise ValueError('Decompressed matching checksum mismatch')
+        temporary.replace(target)
+        print(f'PASS: {target}; {target.stat().st_size:,} bytes; SHA256 {exported["matching_sha256"]}')
     else:
         raise ValueError('Unknown action')

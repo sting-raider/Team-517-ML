@@ -1,7 +1,8 @@
 # Submission 2: INT002 matched-pool CatBoost
 
 Decision: **PROMOTE** the frozen depth-10 matcher, threshold 0.65, cap160.
-The full test export is running; no public score is available for this file yet.
+The full test export completed and passed both the cloud streaming validator and
+the organizer's matching-file validator. No public score is available yet.
 
 | Same 5,000 confirmation anchors | Submitted-v1 model | INT002 |
 |---|---:|---:|
@@ -64,3 +65,22 @@ int002; use new directories for any changed feature/data/blocker configuration.
 The independent retrieval experiment raises the measured cap160 oracle to
 0.981086 but is not enabled here. It needs a matcher trained on its candidate
 pool. See COORDINATOR_PLAN.md for research triage and next priorities.
+
+## Completed export
+
+- 1,732,544 test Source-1 rows, exactly one output row per entity.
+- 5,759,144 predicted matches; 106,273 empty predictions.
+- 256,724,515 candidate pairs, same cap-160 candidate file checksum as
+  submission1. This shows the matcher was compared on the same candidate pool.
+- `matching_results.tsv` SHA256:
+  `16d681298c759f4a72c9ac3559d320ab695cfdcc7ac212a26ea2fafb740ae717`
+- `candidate_pairs.tsv` SHA256:
+  `4bae0e46aaa28addc606c02ee977160735257cb83625bafad8325da54fb8a4a8`
+- Cloud export receipt: `reports/int002_depth10_export.json`; organizer's
+  `validate_submission.py` PASS on the downloaded matching file.
+
+The matching file is at `output/submission_v2_d10/matching_results.tsv` locally,
+excluded from Git. The full candidate file is saved at
+`project/output/submission_v2_d10/candidate_pairs.tsv` on the private Modal Volume.
+An older local candidate download was incomplete (correct byte count but wrong
+SHA256) and was renamed `.incomplete` to prevent its use in the final archive.

@@ -3,7 +3,7 @@
 **Submission 2 selected:** INT002 depth10 CatBoost, 53 features, cap160,
 threshold0.65. Matched 5,000-anchor confirmation macro F0.5 is **0.940478**,
 versus **0.927580** for the uploaded-v1 model on identical anchors.
-India0.913639; US0.958045; singleton FPR5.818%. Full export is underway.
+India0.913639; US0.958045; singleton FPR5.818%. Full export and the organizer's format check passed.
 See [submission-2 evidence](SUBMISSION_2.md) and int002_depth10_confirmation.json.
 Submission1 has public score0.898. No public/private score is known for submission2.
 

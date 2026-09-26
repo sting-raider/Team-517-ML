@@ -12,6 +12,20 @@
       "threshold": 0.5750000000000002,
       "calibration_macro_f0_5": 0.9271965622202124,
       "private_score": null
+    },
+    {
+      "number": 2,
+      "status": "Prepared, not yet uploaded",
+      "file": "output/submission_v2_d10/matching_results.tsv",
+      "sha256": "16d681298c759f4a72c9ac3559d320ab695cfdcc7ac212a26ea2fafb740ae717",
+      "public_score": null,
+      "private_score": null,
+      "candidate_cap": 160,
+      "threshold": 0.6500000000000002,
+      "confirmation_macro_f0_5": 0.9404781798930815,
+      "baseline_on_same_confirmation": 0.9275796443884201,
+      "validation": "Cloud PASS; organizer matching validator PASS",
+      "candidate_remote": "project/output/submission_v2_d10/candidate_pairs.tsv"
     }
   ]
 }

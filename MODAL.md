@@ -115,3 +115,20 @@ python -c "import gzip,shutil; src=gzip.open('output/submission_v2_d10/matching_
 Compare the decompressed SHA256 with the completion receipt before uploading.
 The confirmed checkpoint is also available locally under `artifacts/submission_v2`
 (excluded from Git), for explicit `ber.predict --model artifacts/submission_v2` use.
+
+
+A transfer interrupted near the end can be resumed when at most 8 MiB of the
+compressed file remains. The `resume-download` action appends the exact remote
+tail, checks both the compressed and decompressed SHA256 receipts, and creates
+the final TSV:
+
+```powershell
+modal run -d modal_v2.py --action resume-download --depth 10
+```
+
+The completed INT002 export receipt reports 1,732,544 rows, 5,759,144 matches,
+256,724,515 candidates, and PASS for cloud streaming checks. The organizer's
+matching-file validator also passes on the downloaded file. The old local
+`output/modal_parallel_v1/candidate_pairs.tsv.incomplete` is intentionally
+named incomplete: it had the expected length but failed the cloud checksum.
+Use the valid Modal Volume candidate file for the final archive.
