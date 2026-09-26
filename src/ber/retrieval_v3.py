@@ -55,6 +55,10 @@ def char_index_identity(c,split):
         'split':split,
         'max_frequency':CHAR_INDEX_MAX_FREQ,
         'gram_macro_sql':CHAR_GRAM_MACRO_SQL,
+        # DuckDB implements hash(), list operations, and string semantics used by
+        # the persisted postings. Bind its version so an engine upgrade cannot
+        # silently reuse an index built under different SQL/hash behavior.
+        'duckdb_version':c.execute('SELECT version()').fetchone()[0],
         # Deliberately conservative: any retrieval_v3 implementation change invalidates
         # the persisted char index rather than risking a false experimental gain.
         'implementation_sha256':source_file_sha256(build_char_index),
