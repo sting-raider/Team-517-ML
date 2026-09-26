@@ -1,0 +1,113 @@
+{
+  "experiment_id": "M001a",
+  "issue": 262,
+  "status": "PROMOTE-EMPIRICAL-GATE",
+  "scope": "Complete train Source-1 token-DF census plus complete-population one-token deletion probes; no target records or labels.",
+  "population": {
+    "total_rows": 2206821,
+    "US": {
+      "rows": 1323633,
+      "name_vocab": 70685,
+      "address_vocab": 148006,
+      "name_postings": 4582815,
+      "address_postings": 7785716
+    },
+    "India": {
+      "rows": 883188,
+      "name_vocab": 50639,
+      "address_vocab": 321044,
+      "name_postings": 3265499,
+      "address_postings": 10235906
+    }
+  },
+  "protocol": {
+    "normalization": "Unicode NFD mark removal, lowercase, Unicode letter/number preservation, separator collapse; semantic mirror of repository strip_accents norm",
+    "tokens": "all normalized whitespace-delimited unique tokens, including numeric tokens",
+    "df_scope": "country + field local Source-1 document frequency",
+    "idf_formula": "log((N_country+1)/(df+1))+1",
+    "probe": "For each row/field with >=2 unique tokens, compare original against a variant deleting the rarest token and a variant deleting the commonest token. Token count change is identical; unweighted set Jaccard is therefore matched exactly.",
+    "ids_as_features": false,
+    "labels_used": false
+  },
+  "results": {
+    "US": {
+      "name": {
+        "eligible": 1309023,
+        "eligible_rate": 0.9889621972253638,
+        "nonuniform_rate": 0.9999358300045148,
+        "gap_mean": 0.2186878389395962,
+        "gap_median": 0.21239997110169473,
+        "gap_p90": 0.3728635492892524,
+        "gap_ge_0_10": 0.822774695326209,
+        "rare_df_median": 457,
+        "common_df_median": 55307,
+        "mean_rare_weight_share": 0.4162665195049379,
+        "mean_common_weight_share": 0.19757868056534175,
+        "unweighted_gap_max_abs": 0
+      },
+      "address": {
+        "eligible": 1323633,
+        "eligible_rate": 1,
+        "nonuniform_rate": 1,
+        "gap_mean": 0.19991071891209483,
+        "gap_median": 0.199039128624656,
+        "gap_p90": 0.2594686423981738,
+        "gap_ge_0_10": 0.9925341843245069,
+        "rare_df_median": 66,
+        "common_df_median": 220848,
+        "mean_rare_weight_share": 0.2780763967969057,
+        "mean_common_weight_share": 0.0781656778848109,
+        "unweighted_gap_max_abs": 0
+      }
+    },
+    "India": {
+      "name": {
+        "eligible": 883165,
+        "eligible_rate": 0.9999739579795015,
+        "nonuniform_rate": 0.9999275333601308,
+        "gap_mean": 0.32400244513492454,
+        "gap_median": 0.3247781066428631,
+        "gap_p90": 0.4717317302094039,
+        "gap_ge_0_10": 0.9509955670797643,
+        "rare_df_median": 136,
+        "common_df_median": 521781,
+        "mean_rare_weight_share": 0.4672529856936446,
+        "mean_common_weight_share": 0.14325054055872008,
+        "unweighted_gap_max_abs": 0
+      },
+      "address": {
+        "eligible": 883188,
+        "eligible_rate": 1,
+        "nonuniform_rate": 1,
+        "gap_mean": 0.13730209863889634,
+        "gap_median": 0.13038597341971403,
+        "gap_p90": 0.19249251493841008,
+        "gap_ge_0_10": 0.8193929265343279,
+        "rare_df_median": 18,
+        "common_df_median": 215082,
+        "mean_rare_weight_share": 0.1768923581193206,
+        "mean_common_weight_share": 0.03959025948042426,
+        "unweighted_gap_max_abs": 0
+      }
+    }
+  },
+  "checks": {
+    "authored_semantic_checks": "5/5 PASS in available Python runtime",
+    "randomized_symmetry_bounds": "10,000/10,000 PASS",
+    "unweighted_matched_probe_gap": "exactly 0 for all eligible probes"
+  },
+  "runtime_seconds": {
+    "US_df": 30.051565408706665,
+    "India_df": 32.927494525909424,
+    "US_probe": 45.3737108707428,
+    "India_probe": 44.1214497089386,
+    "total": 152.47422051429749
+  },
+  "risks": [
+    "Source-1 DF is a feasibility proxy, not target-side token commonness.",
+    "The deletion probe is controlled mechanistic evidence, not a natural corruption/positive-pair distribution.",
+    "Numeric tokens are included and may overlap with separate rare-number feature work.",
+    "No official macro F0.5, singleton, candidate-recall, or France-accuracy claim is made."
+  ],
+  "recommendation": "PROMOTE-EMPIRICAL-GATE: build inference-safe train/test target-side token profiles and run an opt-in same-candidate INT003 depth-10 ablation before any production change."
+}
