@@ -1,0 +1,50 @@
+{
+  "protocol": "Complete train Source-1 + ground truth; exact sample517 MD5 order and fold517 SHA256 assignment",
+  "population": {
+    "anchors": 2206821,
+    "india": 883188,
+    "india_share": 0.4002082633797666,
+    "singletons": 123247,
+    "singleton_rate": 0.05584820880352326,
+    "mean_cardinality": 3.4612526344456573
+  },
+  "int002_fit": {
+    "anchors": 108115,
+    "original_dev_fit": 17990,
+    "expanded_fit_50001_200000": 90125,
+    "india": 43160,
+    "india_share": 0.39920455070989225,
+    "singletons": 5970,
+    "singleton_rate": 0.05521897979003838,
+    "mean_cardinality": 3.462664755121861,
+    "us_singleton_rate": 0.05653144484643215,
+    "india_singleton_rate": 0.05324374420759963
+  },
+  "integrity": {
+    "fit_overlap_positions_30001_50000": 0,
+    "fit_overlap_int002_confirmation_40001_45000": 0,
+    "development_fold_counts": {
+      "fit": 17990,
+      "early": 4570,
+      "calibrate": 4389,
+      "holdout": 3051
+    },
+    "exact_training_anchor_count_matches_committed_int002": true
+  },
+  "diagnostics": {
+    "india_share_delta_pp": -0.10037126698743352,
+    "singleton_rate_delta_pp": -0.06292290134848749,
+    "mean_cardinality_delta": 0.0014121206762037,
+    "mean_cardinality_smd": 0.000828066701566044,
+    "india_share_z": -0.6736109181270931,
+    "singleton_rate_z": -0.9010028833946393,
+    "cardinality_delta_pp": {
+      "0": -0.06292290134848749,
+      "1": 0.08356404499087408,
+      "2": -0.05375629020431816,
+      "3": 0.011484484698631725,
+      "4": 0.04308681171415474,
+      "5+": -0.021456149850856976
+    }
+  }
+}
