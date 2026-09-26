@@ -14,7 +14,7 @@ import math
 # digits (General_Category=Nd), not only ASCII 0-9. The production normalizer
 # preserves Unicode numeric characters, so narrowing this feature to ASCII
 # would make commonness disagree with the existing number-overlap features.
-NUMBER_TOKEN_REGEX = r"\\p{Nd}+"
+NUMBER_TOKEN_REGEX = r"\p{Nd}+"
 
 
 NUMBER_COMMONNESS_NAMES = [
