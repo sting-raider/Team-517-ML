@@ -193,7 +193,8 @@ def score_test(run_name: str = "modal_v1", workers: int = 8, candidate_cap: int 
         predict(db, model_dir, out, batch_size=10000, cap=candidate_cap,
                 workers=workers, query_batches=1, partition_index=partition_index,
                 partition_count=partition_count)
-        checked = validate(db, out, check_ids=False) if partition_count == 1 else None
+        checked = validate(db, out, check_ids=False,
+                           max_candidates_per_anchor=candidate_cap) if partition_count == 1 else None
         result = {"status": "PASS", "candidate_cap": candidate_cap,
                   "partition_index": partition_index, "partition_count": partition_count,
                   "validation": checked,
@@ -243,7 +244,8 @@ def merge_score(run_name: str, partition_count: int, candidate_cap: int):
     db = SCRATCH / "artifacts/data.duckdb"
     db.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(VOLUME_ROOT / "project/artifacts/data.duckdb", db)
-    checked = validate(db, out, check_ids=False)
+    checked = validate(db, out, check_ids=False,
+                       max_candidates_per_anchor=candidate_cap)
     result = {"status": "PASS", "candidate_cap": candidate_cap,
               "partition_count": partition_count, "validation": checked,
               "matching_sha256": sha256(out / "matching_results.tsv"),
