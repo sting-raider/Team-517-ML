@@ -53,7 +53,7 @@ class NumberCommonnessTests(unittest.TestCase):
         )
         self.assertEqual(once, repeated)
 
-    def test_df_builder_is_country_side_scoped_and_record_deduplicated(self):
+    def test_df_builder_is_country_source_scoped_and_record_deduplicated(self):
         c = FakeConnection()
         build_number_commonness(c, "train")
         self.assertEqual(len(c.sql), 8)
@@ -61,11 +61,20 @@ class NumberCommonnessTests(unittest.TestCase):
         self.assertIn("s.source=1", joined)
         self.assertIn("s.source>1", joined)
         self.assertIn("GROUP BY country,token", joined)
+        self.assertIn("GROUP BY country,source,token", joined)
+        self.assertIn("USING(country,source,token)", joined)
         self.assertGreaterEqual(
             joined.count("list_distinct(regexp_extract_all"), 8
         )
         self.assertIn("m003_train_left_n_df", joined)
         self.assertIn("m003_train_right_a_profile", joined)
+
+    def test_target_profile_joins_pin_the_actual_source(self):
+        joins = profile_joins("test")
+        self.assertIn("m003_rn.source=r.source", joins)
+        self.assertIn("m003_ra.source=r.source", joins)
+        self.assertNotIn("m003_ln.source", joins)
+        self.assertNotIn("m003_la.source", joins)
 
     def test_query_contract_has_exact_eight_ordered_features(self):
         self.assertEqual(len(NUMBER_COMMONNESS_NAMES), 8)
