@@ -1,0 +1,81 @@
+{
+  "experiment_id": "I032",
+  "reported_public_score": 0.917,
+  "leaderboard_usage": "post-hoc scalar diagnostic only; not labels or tuning target",
+  "test_source1": {
+    "rows": 1732544,
+    "sha256": "3d4a32c54c2ca9c53fd7c2be105bf26f708f94c4d2f88eb370972a195665c2f5",
+    "country_counts": {"France": 259452, "India": 809986, "US": 663106},
+    "country_shares": {
+      "France": 0.14975204092940786,
+      "India": 0.4675125133907133,
+      "US": 0.3827354456798788
+    }
+  },
+  "local_int003": {
+    "slices": {
+      "calibration": 0.9491209587754517,
+      "development_holdout": 0.9447832214793936,
+      "frozen_confirmation": 0.9501984899746141
+    },
+    "confirmation_country_scores": {
+      "India": 0.9326986145852888,
+      "US": 0.9620805410280778
+    },
+    "confirmation_entities": 5000,
+    "paired_v3_minus_v2_bootstrap_95_interval": [
+      0.005891642147687564,
+      0.009955614778634932
+    ],
+    "paired_interval_scope_warning": "This interval is for the paired v3-v2 delta, not an absolute confidence interval for the v3 macro score."
+  },
+  "gap": {
+    "confirmation_minus_reported_public": 0.033198489974614054,
+    "public_minus_local_slices": {
+      "calibration": -0.032120958775451625,
+      "development_holdout": -0.027783221479393605,
+      "frozen_confirmation": -0.033198489974614054
+    },
+    "same_population_sampling_check": {
+      "interpretation": "Conditional only: if confirmation and public rows were independent random samples from the same score distribution. Public split size and composition are not disclosed here.",
+      "minimum_public_entities_for_two_sample_hoeffding_p_le_0_05": 2516,
+      "bound_if_public_entities_equal_confirmation_entities": 0.008086562848454602
+    }
+  },
+  "full_test_mix_counterfactual": {
+    "france_weight": 0.14975204092940786,
+    "non_france_confirmation_score_reweighted_to_test_india_us_mix": 0.9459247618427391,
+    "required_france_score_for_reported_public_if_non_france_unchanged": 0.7527737258820736,
+    "overall_if_france_equals_india_confirmation": 0.943944119297303,
+    "overall_if_france_equals_non_france": 0.9459247618427391,
+    "france_only_explanation_is_arithmetically_possible": true
+  },
+  "public_france_share_sensitivity": [
+    {"public_france_share": 0.01, "required_france_score_if_non_france_unchanged": -1.9465514224311642},
+    {"public_france_share": 0.02, "required_france_score_if_non_france_unchanged": -0.5003133302942109},
+    {"public_france_share": 0.03, "required_france_score_if_non_france_unchanged": -0.018233966248563476},
+    {"public_france_share": 0.05, "required_france_score_if_non_france_unchanged": 0.3674295249879589},
+    {"public_france_share": 0.1, "required_france_score_if_non_france_unchanged": 0.6566771434153484},
+    {"public_france_share": 0.15, "required_france_score_if_non_france_unchanged": 0.7530930162244791},
+    {"public_france_share": 0.2, "required_france_score_if_non_france_unchanged": 0.8013009526290438},
+    {"public_france_share": 0.25, "required_france_score_if_non_france_unchanged": 0.8302257144717826},
+    {"public_france_share": 0.3, "required_france_score_if_non_france_unchanged": 0.8495088890336089}
+  ],
+  "france_score_sensitivity_full_test_mix": [
+    {"assumed_france_score": 0.0, "required_non_france_score_at_full_test_mix": 1.0785089105093233},
+    {"assumed_france_score": 0.5, "required_non_france_score_at_full_test_mix": 0.9904451643210337},
+    {"assumed_france_score": 0.7, "required_non_france_score_at_full_test_mix": 0.9552196658457177},
+    {"assumed_france_score": 0.75, "required_non_france_score_at_full_test_mix": 0.9464132912268888},
+    {"assumed_france_score": 0.8, "required_non_france_score_at_full_test_mix": 0.9376069166080598},
+    {"assumed_france_score": 0.85, "required_non_france_score_at_full_test_mix": 0.9288005419892309},
+    {"assumed_france_score": 0.9, "required_non_france_score_at_full_test_mix": 0.919994167370402},
+    {"assumed_france_score": 0.9326986145852888, "required_non_france_score_at_full_test_mix": 0.9142350423793068},
+    {"assumed_france_score": 0.95, "required_non_france_score_at_full_test_mix": 0.9111877927515729}
+  ],
+  "limitations": [
+    "The public leaderboard country composition and entity count are not established by this analysis.",
+    "France has no supplied labels; every France score shown is a counterfactual algebraic requirement, not an estimate.",
+    "The reported public score is not used to select a threshold, model, retrieval rule, or feature.",
+    "Different test/public distributions, retrieval shift, matcher shift, decision shift, or mixtures of them can produce the same aggregate gap."
+  ]
+}
