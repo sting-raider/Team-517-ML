@@ -19,7 +19,7 @@ def row_score_from_counts(truth_size: int, true_positives: int, false_positives:
     if truth_size == 0:
         return float(predicted_size == 0)
     if not (0 <= true_positives <= truth_size):
-        raise ValueError("true_posititives must be between 0 and truth_size")
+        raise ValueError("true_positives must be between 0 and truth_size")
     if false_positives < 0:
         raise ValueError("false_positives must be non-negative")
     return 1.25 * true_positives / (BETA2 * truth_size + predicted_size)
