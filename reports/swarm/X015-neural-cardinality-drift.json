@@ -1,0 +1,68 @@
+{
+  "experiment": "X015",
+  "population": {
+    "test_source1": {
+      "countries": {"France": 259452, "India": 809986, "US": 663106},
+      "entities": 1732544
+    },
+    "train": {
+      "countries": {
+        "India": {
+          "cardinality_histogram": {"0":49351,"1":47468,"2":149927,"3":211965,"4":193669,"5":129339,"6":66462,"7":25669,"8":7463,"9":1671,"10":187,"11":17},
+          "entities": 883188,
+          "mean_truth_cardinality": 3.4645432229604567,
+          "singleton_rate": 0.05587825015738439,
+          "singletons": 49351,
+          "truth_edges": 3059843
+        },
+        "US": {
+          "cardinality_histogram": {"0":73896,"1":71689,"2":225285,"3":318876,"4":290446,"5":192618,"6":98406,"7":38299,"8":11217,"9":2534,"10":347,"11":20},
+          "entities": 1323633,
+          "mean_truth_cardinality": 3.4590570044717834,
+          "singleton_rate": 0.055828163849042746,
+          "singletons": 73896,
+          "truth_edges": 4578522
+        }
+      },
+      "entities": 2206821,
+      "mean_truth_cardinality": 3.4612526344456573,
+      "singleton_rate": 0.05584820880352326,
+      "singletons": 123247,
+      "truth_edges": 7638365
+    }
+  },
+  "protocol": "Full train Source-1 + truth census; complete test Source-1 country counts; committed unlabeled V3/V5/V6 aggregate outputs only",
+  "runtime_seconds": 12.08428457399998,
+  "transfer": {
+    "artifact_limitations": [
+      "Committed V5 artifacts do not expose India and US test match/empty counts separately; only their exact combined totals are derivable after subtracting France.",
+      "V6 receipt gives added links by country but not changed-row or empty-row reductions by country, so V6 empty rates cannot be reconstructed exactly.",
+      "France has no supplied labels; distance to the US/India truth range is a drift diagnostic, not an accuracy estimate."
+    ],
+    "france_unlabeled": {
+      "labeled_singleton_rate_range": [0.055828163849042746,0.05587825015738439],
+      "labeled_truth_mean_range": [3.4590570044717834,3.4645432229604567],
+      "test_entities": 259452,
+      "v3": {"empty_distance_to_labeled_range":-0.02146728014030279,"empty_predictions":8915,"empty_rate":0.03436088370873996,"entities":259452,"matches":1130876,"mean_distance_to_labeled_range":0.8941666732823932,"mean_matches":4.35870989624285},
+      "v5": {"empty_distance_to_labeled_range":-0.009653919672856011,"empty_predictions":11980,"empty_rate":0.046174244176186735,"entities":259452,"matches":931003,"mean_distance_to_labeled_range":0.12380067109316384,"mean_matches":3.5883438940536205},
+      "v5_minus_v3_edges": -199873,
+      "v6": {"entities":259452,"matches":936801,"mean_distance_to_labeled_range":0.14614777190564565,"mean_matches":3.6106909948661023},
+      "v6_minus_v5_edges": 5798
+    },
+    "overall_descriptive_only": {
+      "v3": {"empty_predictions":102598,"empty_rate":0.059218120867348824,"entities":1732544,"matches":5819438,"mean_matches":3.3588976672453916},
+      "v5": {"empty_predictions":99424,"empty_rate":0.05738613276199623,"entities":1732544,"matches":5743094,"mean_matches":3.31483298548262},
+      "v6": {"entities":1732544,"matches":5768237,"mean_matches":3.3293451710317314}
+    },
+    "seen_countries_US_India": {
+      "test_entities": 1473092,
+      "test_mix_expected_singleton_rate": 0.055855704022058694,
+      "test_mix_expected_truth_mean": 3.4620736254084026,
+      "v3": {"empty_gap_vs_train_test_mix":0.007740459693445834,"empty_predictions":93683,"empty_rate":0.06359616371550453,"entities":1473092,"matches":4688562,"mean_gap_vs_train_test_mix":-0.2792703789037714,"mean_matches":3.182803246504631},
+      "v5": {"empty_gap_vs_train_test_mix":0.0035051505613617542,"empty_predictions":87444,"empty_rate":0.05936085458342045,"entities":1473092,"matches":4812091,"mean_gap_vs_train_test_mix":-0.19541343039003323,"mean_matches":3.2666601950183694},
+      "v5_minus_v3_edges": 123529,
+      "v6": {"entities":1473092,"matches":4831436,"mean_gap_vs_train_test_mix":-0.1822811888192417,"mean_matches":3.279792436589161},
+      "v6_minus_v5_edges": 19345
+    }
+  }
+}
