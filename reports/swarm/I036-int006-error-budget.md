@@ -24,7 +24,7 @@ Inputs:
 
 - INT003 selected holdout: `reports/int003_depth10.json`, `new.holdout`
 - INT006 selected V5 variant: PR #268 `reports/capped_match_evaluation.json`, variant `dense_prior_-2`, `holdout`
-- INT007/V6 overall score: PR #268 `reports/swarm/INT007-blank-address-recovery.md`, reported `0.9720945236`; V6 uses the unchanged V5 candidate file, so its blocking oracle is identical
+- INT007/V6 overall score: PR #268 `experiments/REGISTRY.tsv` exact aggregate `0.9720945236` (the INT007 markdown rounds this to 0.972095); V6 uses the unchanged V5 candidate file, so its blocking oracle is identical
 - target diagnostic: `0.998`
 
 Reproduction after making both upstream JSON files available locally:
