@@ -1,0 +1,488 @@
+{
+  "baseline": {
+    "cal2": 0.978484587945399,
+    "holdout": 0.9707021141747368
+  },
+  "features": [
+    "cross",
+    "cat_logit",
+    "fused",
+    "dense",
+    "name_ratio",
+    "name_sorted_ratio",
+    "name_set_ratio",
+    "name_compact_ratio",
+    "name_jaro_winkler",
+    "name_exact",
+    "name_left_len",
+    "name_right_len",
+    "name_len_ratio",
+    "name_token_jaccard",
+    "name_token_overlap",
+    "name_left_coverage",
+    "name_right_coverage",
+    "name_number_jaccard",
+    "name_number_overlap",
+    "name_left_number_coverage",
+    "name_right_number_coverage",
+    "name_first_number_equal",
+    "name_last_number_equal",
+    "name_number_conflict",
+    "name_left_missing",
+    "name_right_missing",
+    "address_ratio",
+    "address_sorted_ratio",
+    "address_set_ratio",
+    "address_compact_ratio",
+    "address_jaro_winkler",
+    "address_exact",
+    "address_left_len",
+    "address_right_len",
+    "address_len_ratio",
+    "address_token_jaccard",
+    "address_token_overlap",
+    "address_left_coverage",
+    "address_right_coverage",
+    "address_number_jaccard",
+    "address_number_overlap",
+    "address_left_number_coverage",
+    "address_right_number_coverage",
+    "address_first_number_equal",
+    "address_last_number_equal",
+    "address_number_conflict",
+    "address_left_missing",
+    "address_right_missing",
+    "retrieval",
+    "key_hits",
+    "source"
+  ],
+  "training_pairs": 69527,
+  "calibration_pairs": 70513,
+  "v6_baseline": {
+    "cal2": 0.97914139252265,
+    "holdout": 0.9720945236442645
+  },
+  "variants": [
+    {
+      "depth": 4,
+      "iterations": 400,
+      "cal2_threshold": 0.8,
+      "cal2_score": 0.9813476551967588,
+      "holdout_score": 0.9770485551468329,
+      "holdout_delta_vs_v5": 0.0063464409720960235,
+      "calibration_curve": [
+        [
+          0.1,
+          0.949268375537949
+        ],
+        [
+          0.2,
+          0.9657182492306361
+        ],
+        [
+          0.3,
+          0.9697319502113746
+        ],
+        [
+          0.4,
+          0.9730917076218932
+        ],
+        [
+          0.5,
+          0.9776854294165719
+        ],
+        [
+          0.6,
+          0.9794523568372951
+        ],
+        [
+          0.7,
+          0.9809814065504271
+        ],
+        [
+          0.8,
+          0.9813476551967588
+        ],
+        [
+          0.85,
+          0.9812245675908025
+        ],
+        [
+          0.9,
+          0.9801683598070795
+        ],
+        [
+          0.925,
+          0.9796487712034625
+        ],
+        [
+          0.95,
+          0.9779523484812391
+        ],
+        [
+          0.96,
+          0.9769229308005559
+        ],
+        [
+          0.97,
+          0.9750693314441846
+        ],
+        [
+          0.98,
+          0.9723817845166938
+        ],
+        [
+          0.985,
+          0.9709427730100348
+        ],
+        [
+          0.99,
+          0.9663043512179804
+        ],
+        [
+          0.995,
+          0.9564013577882648
+        ],
+        [
+          0.997,
+          0.9438885751663842
+        ],
+        [
+          0.999,
+          0.9044249475788114
+        ]
+      ]
+    },
+    {
+      "depth": 6,
+      "iterations": 600,
+      "cal2_threshold": 0.8,
+      "cal2_score": 0.9816069607181013,
+      "holdout_score": 0.9766751956373187,
+      "holdout_delta_vs_v5": 0.005973081462581908,
+      "calibration_curve": [
+        [
+          0.1,
+          0.9489676111057812
+        ],
+        [
+          0.2,
+          0.9651659878974583
+        ],
+        [
+          0.3,
+          0.9698751770609467
+        ],
+        [
+          0.4,
+          0.9741901444158895
+        ],
+        [
+          0.5,
+          0.977578377066692
+        ],
+        [
+          0.6,
+          0.9792515700888033
+        ],
+        [
+          0.7,
+          0.9815075519212932
+        ],
+        [
+          0.8,
+          0.9816069607181013
+        ],
+        [
+          0.85,
+          0.981048772486729
+        ],
+        [
+          0.9,
+          0.9801889438265774
+        ],
+        [
+          0.925,
+          0.9793484119276255
+        ],
+        [
+          0.95,
+          0.9783398682671378
+        ],
+        [
+          0.96,
+          0.978002140502291
+        ],
+        [
+          0.97,
+          0.976825204985528
+        ],
+        [
+          0.98,
+          0.9733617361148612
+        ],
+        [
+          0.985,
+          0.970524162228646
+        ],
+        [
+          0.99,
+          0.9670688481048071
+        ],
+        [
+          0.995,
+          0.9573639064591705
+        ],
+        [
+          0.997,
+          0.9481316832681431
+        ],
+        [
+          0.999,
+          0.9191567355867245
+        ]
+      ]
+    },
+    {
+      "depth": 8,
+      "iterations": 800,
+      "cal2_threshold": 0.8,
+      "cal2_score": 0.9822868226371478,
+      "holdout_score": 0.9762674553731212,
+      "holdout_delta_vs_v5": 0.005565341198384366,
+      "calibration_curve": [
+        [
+          0.1,
+          0.9524529874508193
+        ],
+        [
+          0.2,
+          0.9667015033634819
+        ],
+        [
+          0.3,
+          0.9706042597207694
+        ],
+        [
+          0.4,
+          0.9742471398470695
+        ],
+        [
+          0.5,
+          0.9772970042809048
+        ],
+        [
+          0.6,
+          0.9794094535388964
+        ],
+        [
+          0.7,
+          0.9812790904657732
+        ],
+        [
+          0.8,
+          0.9822868226371478
+        ],
+        [
+          0.85,
+          0.9820629345740992
+        ],
+        [
+          0.9,
+          0.980813500005941
+        ],
+        [
+          0.925,
+          0.9804789947433302
+        ],
+        [
+          0.95,
+          0.9793578539785917
+        ],
+        [
+          0.96,
+          0.9790481264518794
+        ],
+        [
+          0.97,
+          0.9775617934710047
+        ],
+        [
+          0.98,
+          0.9751449539101875
+        ],
+        [
+          0.985,
+          0.9722054559025042
+        ],
+        [
+          0.99,
+          0.9666470438448136
+        ],
+        [
+          0.995,
+          0.9578195631621828
+        ],
+        [
+          0.997,
+          0.9500537657268351
+        ],
+        [
+          0.999,
+          0.9181672403472607
+        ]
+      ]
+    }
+  ],
+  "production_model": {
+    "path": "artifacts/capped_pairs/stacker_final.cbm",
+    "training_pairs": 140040,
+    "threshold": 0.8,
+    "holdout_score": 0.9773174673720467,
+    "holdout_delta_vs_v5": 0.006615353197309881
+  },
+  "binary_variants": [
+    {
+      "depth": 4,
+      "iterations": 400,
+      "threshold": 0.9,
+      "cal2_score": 0.9803566689169909,
+      "holdout_score": 0.9730053547616366,
+      "holdout_delta_vs_v6": 0.0009108311173721129
+    },
+    {
+      "depth": 6,
+      "iterations": 600,
+      "threshold": 0.9,
+      "cal2_score": 0.980270565943534,
+      "holdout_score": 0.9729395124478332,
+      "holdout_delta_vs_v6": 0.000844988803568647
+    }
+  ],
+  "context_variants": [
+    {
+      "depth": 4,
+      "iterations": 400,
+      "threshold": 0.85,
+      "cal2_score": 0.9816219268923025,
+      "holdout_score": 0.9774105076877976,
+      "holdout_delta_vs_v6": 0.005315984043533062
+    },
+    {
+      "depth": 6,
+      "iterations": 600,
+      "threshold": 0.85,
+      "cal2_score": 0.9811427264679748,
+      "holdout_score": 0.9772105684809265,
+      "holdout_delta_vs_v6": 0.005116044836661948
+    }
+  ],
+  "dual_variants": [
+    {
+      "depth": 4,
+      "iterations": 400,
+      "threshold": 0.8,
+      "cal2_score": 0.9837033837787383,
+      "holdout_score": 0.9792403036411981,
+      "holdout_delta_vs_v6": 0.0071457799969335545
+    },
+    {
+      "depth": 6,
+      "iterations": 600,
+      "threshold": 0.9,
+      "cal2_score": 0.9842798445516779,
+      "holdout_score": 0.9800399788689568,
+      "holdout_delta_vs_v6": 0.007945455224692255
+    }
+  ],
+  "dual_error_pairs": 314,
+  "set_variants": [
+    {
+      "depth": 4,
+      "iterations": 400,
+      "threshold": 0.8,
+      "cal2_score": 0.9838770454952362,
+      "holdout_score": 0.9804130377739505,
+      "holdout_delta_vs_dual_best": 0.0003730589049937283
+    },
+    {
+      "depth": 6,
+      "iterations": 600,
+      "threshold": 0.7,
+      "cal2_score": 0.9842648436854968,
+      "holdout_score": 0.9789905309279314,
+      "holdout_delta_vs_dual_best": -0.0010494479410253499
+    }
+  ],
+  "blank_variants": [
+    {
+      "depth": 4,
+      "iterations": 400,
+      "threshold": 0.85,
+      "cal2_score": 0.9851670824762796,
+      "holdout_score": 0.9806155972082027,
+      "holdout_delta_vs_dual_best": 0.0005756183392459091,
+      "blank_pair_count": 11683
+    },
+    {
+      "depth": 6,
+      "iterations": 600,
+      "threshold": 0.85,
+      "cal2_score": 0.9853748223516998,
+      "holdout_score": 0.9806733078830033,
+      "holdout_delta_vs_dual_best": 0.0006333290140465575,
+      "blank_pair_count": 11683
+    }
+  ],
+  "dual_blank_fuzzy_recovery": [
+    {
+      "name_set_threshold": 0.9,
+      "cal2": 0.9738903794736641,
+      "holdout": 0.9684588015718107,
+      "holdout_true_add": 79,
+      "holdout_false_add": 192
+    },
+    {
+      "name_set_threshold": 0.93,
+      "cal2": 0.9762123032187126,
+      "holdout": 0.9713148499607647,
+      "holdout_true_add": 65,
+      "holdout_false_add": 148
+    },
+    {
+      "name_set_threshold": 0.95,
+      "cal2": 0.9761295614466899,
+      "holdout": 0.9717674506006612,
+      "holdout_true_add": 61,
+      "holdout_false_add": 138
+    },
+    {
+      "name_set_threshold": 0.97,
+      "cal2": 0.9769319476757015,
+      "holdout": 0.9720910570032774,
+      "holdout_true_add": 61,
+      "holdout_false_add": 133
+    },
+    {
+      "name_set_threshold": 0.99,
+      "cal2": 0.9771859396950047,
+      "holdout": 0.9724344354129497,
+      "holdout_true_add": 61,
+      "holdout_false_add": 127
+    },
+    {
+      "name_set_threshold": 1.0,
+      "cal2": 0.9771859396950047,
+      "holdout": 0.9724344354129497,
+      "holdout_true_add": 61,
+      "holdout_false_add": 127
+    }
+  ],
+  "dual_source_calibration": {
+    "cal2_score": 0.9845030745231824,
+    "source2_threshold": 0.85,
+    "source3_threshold": 0.9,
+    "holdout_score": 0.9798074777825512
+  },
+  "seconds": 106.28238344192505
+}

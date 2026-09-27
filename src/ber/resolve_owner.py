@@ -17,7 +17,8 @@ def _iter_rows(path):
             yield anchor, ids
 
 
-def resolve(db_path, matching_path, output_path, min_address=80., min_margin=10.):
+def resolve(db_path, matching_path, output_path, min_address=80., min_margin=10.,
+            country_gates=None):
     """Resolve only conflicts with an unambiguous target-to-owner address margin.
 
     The two scans keep memory proportional to unique target IDs plus the
@@ -74,7 +75,9 @@ def resolve(db_path, matching_path, output_path, min_address=80., min_margin=10.
                 raise ValueError('Cross-country predicted ownership conflict')
             ranked.append((token_sort_ratio(target_address, address), anchor))
         ranked.sort(reverse=True)
-        if ranked[0][0] < min_address or ranked[0][0] - ranked[1][0] < min_margin:
+        gate_address,gate_margin=(country_gates or {}).get(country,
+                                                           (min_address,min_margin))
+        if ranked[0][0] < gate_address or ranked[0][0] - ranked[1][0] < gate_margin:
             continue
         resolved[country] += 1
         winner = ranked[0][1]
@@ -107,6 +110,7 @@ def resolve(db_path, matching_path, output_path, min_address=80., min_margin=10.
     report = {'input_rows':rows,'input_edges':edges,
               'conflicting_targets':len(conflict_ids),
               'min_address':min_address,'min_margin':min_margin,
+              'country_gates':country_gates or {},
               'reviewed_with_address':dict(reviewed),
               'resolved_targets':dict(resolved),
               'removed_edges':dict(removed_edges),

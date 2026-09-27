@@ -15,7 +15,7 @@ from .retrieval_v3 import fused_candidates
 def score_partition(db, dense_root, encoder_path, cross_path, out,
                     country, partition, partitions, threshold,
                     batch_size=5000, checkpoint=None,anchor_limit=None,
-                    cat_path=None,dense_prior=-2.):
+                    cat_path=None,dense_prior=-2.,stacker_path=None):
     import faiss
     import torch
     import torch.nn.functional as F
@@ -26,12 +26,16 @@ def score_partition(db, dense_root, encoder_path, cross_path, out,
         raise ValueError('Invalid country or partition')
     if not .01<=threshold<=.999:
         raise ValueError('Invalid calibrated cross-encoder threshold')
+    if stacker_path is not None and cat_path is None:
+        raise ValueError('Stacker requires the baseline CatBoost pair model')
     started=time.monotonic()
     out=Path(out)
     out.mkdir(parents=True,exist_ok=True)
     config={'country':country,'partition':partition,'partitions':partitions,
             'threshold':threshold,'dense_prior':dense_prior if cat_path is not None else None,
-            'matcher':'catboost_plus_cross' if cat_path is not None else 'cross_only',
+            'matcher':('stacked_catboost' if stacker_path is not None else
+                       'catboost_plus_cross' if cat_path is not None else 'cross_only'),
+            'stacker_sha256':sha256(stacker_path) if stacker_path is not None else None,
             'anchor_limit':anchor_limit,'candidate_cap':32,'dense_slots':16,
             'base_cap':160,'base_scored_cap':32,'nprobe':64}
     config_path=out/'run_config.json'
@@ -47,6 +51,10 @@ def score_partition(db, dense_root, encoder_path, cross_path, out,
         frequency_tables(c,'test')
         cat=CatBoostClassifier()
         cat.load_model(str(cat_path))
+    if stacker_path is not None:
+        from .features import features as pair_features
+        stacker=CatBoostClassifier()
+        stacker.load_model(str(stacker_path))
     c.execute('''CREATE OR REPLACE TABLE neural_anchors AS SELECT *,
         row_number() OVER(ORDER BY entity_id) seq FROM test
         WHERE source=1 AND country=? AND hash(entity_id)%?=?''',
@@ -83,6 +91,7 @@ def score_partition(db, dense_root, encoder_path, cross_path, out,
                 vectors[start:start+len(rows)]=val.cpu().numpy()
         return vectors
     folders=[]
+    total_pairs=0
     for offset in range(0,total,batch_size):
         shard=out/'shards'/f'{offset:08d}'
         shard.mkdir(parents=True,exist_ok=True)
@@ -138,9 +147,10 @@ def score_partition(db, dense_root, encoder_path, cross_path, out,
             QUALIFY row_number() OVER(PARTITION BY d.anchor
                 ORDER BY d.priority,d.ranking DESC,t.entity_id)<=32''')
         records=c.execute('''SELECT p.anchor,t.entity_id,l.business_name,l.business_address,
-            t.business_name,t.business_address FROM neural_candidates p
+            t.business_name,t.business_address,l.n,l.a,t.n,t.a,t.source FROM neural_candidates p
             JOIN batch_anchors l ON p.anchor=l.entity_id
             JOIN test t ON p.rid=t.rowid ORDER BY p.anchor,t.entity_id''').fetchall()
+        total_pairs+=len(records)
         expected={anchor:[] for anchor,_,_ in anchors}
         matches={anchor:[] for anchor,_,_ in anchors}
         for anchor,target,*_ in records:
@@ -168,6 +178,24 @@ def score_partition(db, dense_root, encoder_path, cross_path, out,
                                       return_tensors='pt').to('cuda')
                 with torch.autocast('cuda',dtype=torch.bfloat16):
                     logits=matcher(**inputs).logits.squeeze(-1).float().cpu().numpy()
+                if stacker_path is not None:
+                    stack_features=[]
+                    for row,logit in zip(rows,logits):
+                        probability=base_probs.get((row[0],row[1]))
+                        dense=probability is None
+                        cat_probability=.5 if dense else probability
+                        safe=float(np.clip(cat_probability,1e-7,1-1e-7))
+                        cat_logit=float(np.log(safe/(1-safe)))
+                        fused=float(logit)+cat_logit+(dense_prior if dense else 0.)
+                        stack_features.append([float(logit),cat_logit,fused,float(dense),
+                                               *pair_features(row[6],row[7],row[8],row[9],
+                                                              0,0,row[10])])
+                    stack_probs=stacker.predict_proba(np.asarray(stack_features,np.float32),
+                                                     thread_count=4)[:,1]
+                    for row,probability in zip(rows,stack_probs):
+                        if probability>=threshold:
+                            matches[row[0]].append(row[1])
+                    continue
                 # Compare logits directly to avoid unnecessary sigmoid rounding.
                 logit_gate=float(np.log(threshold/(1-threshold)))
                 for row,logit in zip(rows,logits):
@@ -201,9 +229,11 @@ def score_partition(db, dense_root, encoder_path, cross_path, out,
                     shutil.copyfileobj(source,target,1<<20)
         (out/(filename+'.tmp')).replace(dest)
     report={'country':country,'partition':partition,'partitions':partitions,
-            'anchors':total,'candidate_cap':32,'dense_slots':16,'base_cap':160,
+            'anchors':total,'pairs':total_pairs,'candidate_cap':32,'dense_slots':16,'base_cap':160,
             'nprobe':64,'cross_threshold':threshold,
-            'matcher':'catboost_plus_cross' if cat_path is not None else 'cross_only',
+            'matcher':('stacked_catboost' if stacker_path is not None else
+                       'catboost_plus_cross' if cat_path is not None else 'cross_only'),
+            'stacker_sha256':sha256(stacker_path) if stacker_path is not None else None,
             'dense_prior':dense_prior if cat_path is not None else None,
             'matching_sha256':sha256(out/'matching_results.tsv'),
             'candidate_sha256':sha256(out/'candidate_pairs.tsv'),

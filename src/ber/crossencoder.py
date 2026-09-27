@@ -13,7 +13,8 @@ REVISION = '1427fd652930e4ba29e8149678df786c240d8825'
 
 
 def train(data_root, out, max_seconds=3000, callback=None,
-          positive_limit=2):
+          positive_limit=2, model_name=MODEL, revision=REVISION,
+          batch_size=32, learning_rate=2e-5, checkpoint_steps=2000):
     import torch
     import torch.nn.functional as F
     from huggingface_hub import HfApi
@@ -21,14 +22,15 @@ def train(data_root, out, max_seconds=3000, callback=None,
 
     random.seed(517);np.random.seed(517);torch.manual_seed(517)
     torch.set_num_threads(4)
-    info = HfApi().model_info(MODEL, revision=REVISION)
+    info = HfApi().model_info(model_name, revision=revision)
     license_name = info.card_data.get('license')
     if license_name != 'apache-2.0':
         raise ValueError('Pinned cross-encoder checkpoint license mismatch')
-    if info.sha != REVISION:
+    if info.sha != revision:
         raise ValueError('Pinned cross-encoder checkpoint revision mismatch')
-    tokenizer = AutoTokenizer.from_pretrained(MODEL, revision=REVISION)
-    model = AutoModelForSequenceClassification.from_pretrained(MODEL,revision=REVISION).cuda()
+    tokenizer = AutoTokenizer.from_pretrained(model_name, revision=revision)
+    model = AutoModelForSequenceClassification.from_pretrained(
+        model_name,revision=revision).cuda()
     if model.config.num_labels != 1:
         raise ValueError('Expected pretrained scalar ranking head')
     parameters = sum(p.numel() for p in model.parameters())
@@ -56,8 +58,7 @@ def train(data_root, out, max_seconds=3000, callback=None,
     rng.shuffle(pairs)
     out = Path(out)
     out.mkdir(parents=True,exist_ok=True)
-    optimizer=torch.optim.AdamW(model.parameters(),lr=2e-5,weight_decay=.01)
-    batch_size=32
+    optimizer=torch.optim.AdamW(model.parameters(),lr=learning_rate,weight_decay=.01)
     total_steps=math.ceil(len(pairs)/batch_size)
     losses=[];step=0
     started=time.monotonic()
@@ -79,14 +80,14 @@ def train(data_root, out, max_seconds=3000, callback=None,
         warmup=min(1.,(step+1)/250)
         decay=max(.1,1-step/max(1,total_steps))
         for group in optimizer.param_groups:
-            group['lr']=2e-5*warmup*decay
+            group['lr']=learning_rate*warmup*decay
         optimizer.step()
         step+=1
         losses.append(float(loss.detach()))
         if step%100==0:
             print(f'M017 step {step}/{total_steps}: loss {np.mean(losses[-100:]):.4f}; '
                   f'{time.monotonic()-started:.1f}s',flush=True)
-        if step%2000==0:
+        if step%checkpoint_steps==0:
             model.save_pretrained(out)
             tokenizer.save_pretrained(out)
             if callback:
@@ -95,11 +96,12 @@ def train(data_root, out, max_seconds=3000, callback=None,
             break
     model.save_pretrained(out)
     tokenizer.save_pretrained(out)
-    report={'initialization':MODEL,'revision':REVISION,'license':license_name,
+    report={'initialization':model_name,'revision':revision,'license':license_name,
             'parameters':parameters,'fit_anchors':anchors,'training_pairs':len(pairs),
             'positives':sum(r[2] for r in pairs),'steps':step,'planned_steps':total_steps,
             'seconds':time.monotonic()-started,'stopped_on_time_budget':step<total_steps,
             'batch_size':batch_size,'max_length':160,'seed':517,
+            'learning_rate':learning_rate,'checkpoint_steps':checkpoint_steps,
             'positive_limit_per_anchor':positive_limit,
             'initial_loss_100':float(np.mean(losses[:100])),
             'final_loss_100':float(np.mean(losses[-100:])),

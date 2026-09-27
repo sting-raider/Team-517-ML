@@ -1,0 +1,24 @@
+{
+  "calibrate": {
+    "baseline": 0.977237613625635,
+    "v6": 0.9779415357533748,
+    "expanded": 0.9782887966607712,
+    "added_true": 13,
+    "added_false": 1,
+    "added_country": {
+      "India": 6,
+      "US": 8
+    }
+  },
+  "holdout": {
+    "baseline": 0.9707021141747368,
+    "v6": 0.9720945236442645,
+    "expanded": 0.9726096607763117,
+    "added_true": 14,
+    "added_false": 1,
+    "added_country": {
+      "India": 8,
+      "US": 7
+    }
+  }
+}

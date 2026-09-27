@@ -78,10 +78,10 @@
     {
       "number": null,
       "model_version": "v8-owner80",
-      "status": "Prepared, not yet reported as uploaded",
+      "status": "Evaluated (user-reported)",
       "file": "output/submission_v8_owner80/matching_results.tsv",
       "sha256": "f3892589588bbda2c6dbcf71d3f630ae72a5c9331a608937eb93dbba6303fd82",
-      "public_score": null,
+      "public_score": 0.966,
       "private_score": null,
       "candidate_cap": 32,
       "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
@@ -89,10 +89,10 @@
     {
       "number": null,
       "model_version": "v9-m018-owner80",
-      "status": "Prepared locally; organizer full two-file validator PASS; no public score reported",
+      "status": "Evaluated (user-reported); organizer full two-file validator PASS",
       "file": "output/submission_v9_m018_owner80/matching_results.tsv",
       "sha256": "0744bbf08066b403497c0d88df85fd718ead0b3dbb1b58fae4738f812968f4b9",
-      "public_score": null,
+      "public_score": 0.966,
       "private_score": null,
       "candidate_cap": 32,
       "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
@@ -100,9 +100,42 @@
     {
       "number": null,
       "model_version": "v10-owner70",
-      "status": "Exploratory local variant; organizer full two-file validator PASS; not uploaded",
+      "status": "Evaluated (user-reported); organizer full two-file validator PASS",
       "file": "output/submission_v10_owner70/matching_results.tsv",
       "sha256": "ecc553efb163a543cf5ef26ad00f452a2e544c36659790c2914538a1397f198e",
+      "public_score": 0.967,
+      "private_score": null,
+      "candidate_cap": 32,
+      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
+    },
+    {
+      "number": null,
+      "model_version": "v11-m018-owner70",
+      "status": "Prepared locally; organizer full two-file validator PASS; no public score reported",
+      "file": "output/submission_v11_m018_owner70/matching_results.tsv",
+      "sha256": "0c357184190e51ef0f4dc227f6fec601fea31c9a734160748cbf8e56b2f82dd6",
+      "public_score": null,
+      "private_score": null,
+      "candidate_cap": 32,
+      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
+    },
+    {
+      "number": null,
+      "model_version": "v12-owner50",
+      "status": "Evaluated (user-reported); organizer full two-file validator PASS",
+      "file": "output/submission_v12_owner50/matching_results.tsv",
+      "sha256": "e3c0350b5a94b815985fe321a0ec3b0d7f1b6ecdb87d67ae189c41f514459a62",
+      "public_score": 0.969,
+      "private_score": null,
+      "candidate_cap": 32,
+      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
+    },
+    {
+      "number": null,
+      "model_version": "v13-country-owner",
+      "status": "Prepared locally; organizer and full two-file validators PASS; no public score reported",
+      "file": "output/submission_v13_owner_country/matching_results.tsv",
+      "sha256": "2d4ca5400f2e87daf886c5f4c8e1c0769720a2dd889dfd9e2de149f848199e3a",
       "public_score": null,
       "private_score": null,
       "candidate_cap": 32,
