@@ -24,7 +24,7 @@ Inputs:
 
 - INT003 selected holdout: `reports/int003_depth10.json`, `new.holdout`
 - INT006 selected V5 variant: PR #268 `reports/capped_match_evaluation.json`, variant `dense_prior_-2`, `holdout`
-- INT007/V6 overall score: PR #268 `reports/swarm/INT007-blank-address-recovery.md`, reported `0.972095`; V6 uses the unchanged V5 candidate file, so its blocking oracle is identical
+- INT007/V6 overall score: PR #268 `reports/swarm/INT007-blank-address-recovery.md`, reported `0.9720945236`; V6 uses the unchanged V5 candidate file, so its blocking oracle is identical
 - target diagnostic: `0.998`
 
 Reproduction after making both upstream JSON files available locally:
@@ -34,7 +34,7 @@ python tools/experiments/i036_int006_error_budget.py \
   --v3-json /path/to/int003_depth10.json \
   --v5-json /path/to/capped_match_evaluation.json \
   --v5-variant dense_prior_-2 \
-  --v6-score 0.972095 \
+  --v6-score 0.9720945236 \
   --output reports/swarm/I036-int006-error-budget.json
 python -m unittest tests.test_i036_int006_error_budget -v
 ```
@@ -50,9 +50,9 @@ No challenge rows, labels, candidate probabilities, confirmation/frozen windows,
 | V5 all | 0.970702 | 0.992823 | 0.029298 | 0.007177 | 0.022121 | **75.50%** |
 | V5 India | 0.968360 | 0.991419 | 0.031640 | 0.008581 | 0.023060 | **72.88%** |
 | V5 US | 0.972246 | 0.993748 | 0.027754 | 0.006252 | 0.021502 | **77.47%** |
-| V6 all | 0.972095 | 0.992823 | 0.027905 | 0.007177 | 0.020728 | **74.28%** |
+| V6 all | 0.9720945236 | 0.992823 | 0.027905 | 0.007177 | 0.020728 | **74.28%** |
 
-The same-candidate V6 rule gains +0.001393 over V5 and closes about **6.30%** of V5's measured oracle-to-score gap. Even after that recovery, about three quarters of the remaining measured deficit is inside the candidate set rather than imposed by retrieval.
+The same-candidate V6 rule gains +0.001393 over V5 and closes about **6.29%** of V5's measured oracle-to-score gap. Even after that recovery, about three quarters of the remaining measured deficit is inside the candidate set rather than imposed by retrieval.
 
 ### What changed from INT003 v3 to neural32 V5
 
@@ -86,7 +86,7 @@ Retrieval is still structurally mandatory for the 0.998 aspiration because the o
 ## Risks
 
 - The 3,051-anchor development holdout has been reused across experiments. Treat magnitudes as planning evidence, not a fresh generalization estimate.
-- V6's committed report rounds its overall score to six decimals; its decomposition therefore has corresponding rounding error. V5/v3 values come from exact JSON.
+- V6's exact aggregate score (0.9720945236) is taken from PR #268's committed integration registry; V5/v3 values come from exact JSON.
 - The additive identity is a loss accounting device, not proof that independent stage improvements will add linearly after retraining.
 - France has no labels. Nothing here establishes the same error proportions on France or the leaderboard.
 - PR #268 is still draft and under independent I035 red-team. If its reported candidate or evaluation semantics are invalidated, this prioritization analysis must be revisited.
