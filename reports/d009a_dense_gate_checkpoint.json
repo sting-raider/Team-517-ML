@@ -1,0 +1,130 @@
+{
+  "experiment_id": "D009a",
+  "base_pr": 268,
+  "base_head": "fdff7866c4419f4fb645aa8d45a2a15696b8b729",
+  "protocol": "Existing INT006 exact cap32 scored candidate pool; penalty selected by calibration macro F0.5 only; holdout untouched for selection",
+  "baseline": {
+    "dense_prior": -2,
+    "threshold": 0.9500000000000004,
+    "calibration_macro_f0_5": 0.9772376136256352,
+    "holdout_macro_f0_5": 0.9707021141747368,
+    "calibration_singleton_fpr": 0.015873015873015872,
+    "holdout_singleton_fpr": 0.06030150753768844
+  },
+  "selected_gate": {
+    "extra_dense_logit_penalty": 0.5,
+    "equivalent_dense_prior": -2.5,
+    "calibration_macro_f0_5": 0.977844004349562,
+    "holdout_macro_f0_5": 0.9714486711616093,
+    "calibration_delta": 0.0006063907239267641,
+    "holdout_delta": 0.0007465569868724264,
+    "calibration_singleton_fpr": 0.011904761904761904,
+    "holdout_singleton_fpr": 0.05025125628140704
+  },
+  "slices": {
+    "calibration": {
+      "India": {
+        "baseline": 0.9760228155630637,
+        "gate": 0.977392680518757,
+        "delta": 0.0013698649556933562,
+        "singleton_fpr_before": 0.02,
+        "singleton_fpr_after": 0.01
+      },
+      "US": {
+        "baseline": 0.9780462496035287,
+        "gate": 0.9781444301557221,
+        "delta": 0.00009818055219334987,
+        "singleton_fpr_before": 0.013157894736842105,
+        "singleton_fpr_after": 0.013157894736842105
+      }
+    },
+    "holdout": {
+      "India": {
+        "baseline": 0.9683596536164192,
+        "gate": 0.9686828099184862,
+        "delta": 0.00032315630206702917,
+        "singleton_fpr_before": 0.08247422680412371,
+        "singleton_fpr_after": 0.08247422680412371
+      },
+      "US": {
+        "baseline": 0.9722459217857651,
+        "gate": 0.9732715226171098,
+        "delta": 0.0010256008313447307,
+        "singleton_fpr_before": 0.0392156862745098,
+        "singleton_fpr_after": 0.0196078431372549
+      }
+    }
+  },
+  "provenance": {
+    "calibration": {
+      "dense_selected": 551,
+      "lexical_selected": 13891,
+      "dense_selected_share": 0.03815261044176707,
+      "dense_false_positives": 50,
+      "lexical_false_positives": 29,
+      "dense_false_positive_share": 0.6329113924050633,
+      "dense_fp_rate": 0.09074410163339383,
+      "lexical_fp_rate": 0.0020876826722338203,
+      "fp_rate_ratio": 43.46642468239565
+    },
+    "holdout": {
+      "dense_selected": 378,
+      "lexical_selected": 9536,
+      "dense_selected_share": 0.03812789993947952,
+      "dense_false_positives": 43,
+      "lexical_false_positives": 30,
+      "dense_false_positive_share": 0.589041095890411,
+      "dense_fp_rate": 0.11375661375661375,
+      "lexical_fp_rate": 0.003145973154362416,
+      "fp_rate_ratio": 36.159435626102294
+    }
+  },
+  "sweep": [
+    {
+      "extra_penalty": -1,
+      "calibration_delta": -0.001819825383939598,
+      "holdout_delta": -0.0009428103125152204
+    },
+    {
+      "extra_penalty": 0,
+      "calibration_delta": 0,
+      "holdout_delta": 0
+    },
+    {
+      "extra_penalty": 0.5,
+      "calibration_delta": 0.0006063907239267641,
+      "holdout_delta": 0.0007465569868724264
+    },
+    {
+      "extra_penalty": 1,
+      "calibration_delta": 0.00021251497971791266,
+      "holdout_delta": 0.0016431624616461793
+    },
+    {
+      "extra_penalty": 1.5,
+      "calibration_delta": 0.0005337491745067685,
+      "holdout_delta": 0.001597408793475421
+    },
+    {
+      "extra_penalty": 2,
+      "calibration_delta": -0.0000881810059190784,
+      "holdout_delta": 0.001907756248796642
+    },
+    {
+      "extra_penalty": 3,
+      "calibration_delta": -0.0008526984652539047,
+      "holdout_delta": 0.0000615973502628726
+    }
+  ],
+  "parity": {
+    "candidate_pair_recall_unchanged": true,
+    "blocking_oracle_unchanged": true,
+    "candidate_pool": "exact same cap32"
+  },
+  "validation": {
+    "focused_tests": "5/5 PASS",
+    "helper_py_compile": "PASS"
+  },
+  "recommendation": "REPLICATE",
+  "note": "Holdout-optimal penalty differs from calibration-selected penalty; do not tune on holdout. V6 combination is unmeasured and must not be assumed additive."
+}
