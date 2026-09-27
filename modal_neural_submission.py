@@ -15,8 +15,8 @@ gpu_image=(modal.Image.debian_slim(python_version='3.12')
     .env({'PYTHONPATH':'/app/src'})
     .add_local_dir(str(Path(__file__).parent/'src'),'/app/src')
     .add_local_python_source('modal_app'))
-app=modal.App('team517-neural32-test-submission')
-RUN='submission_v5_neural32'
+app=modal.App('team517-d009a-dense-gate')
+RUN='submission_d009a_dense_gate'
 COUNTRIES=('France','India','US')
 
 
@@ -94,7 +94,7 @@ def compress_matching():
 
 
 @app.local_entrypoint()
-def main(threshold:float,dense_prior:float=-2.,parts_per_country:int=4,action:str='run'):
+def main(threshold:float,dense_prior:float=-2.5,parts_per_country:int=4,action:str='run'):
     if parts_per_country not in (2,4,8):
         raise ValueError('Choose 2, 4, or 8 partitions per country')
     if action=='probe':
