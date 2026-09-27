@@ -14,7 +14,7 @@ def pair_query(split, anchors, pairs):
                max(retrieval) OVER(PARTITION BY anchor) AS top_retrieval
         FROM {pairs} p),
     joined AS (
-        SELECT p.anchor,p.rid,r.entity_id,l.country,l.n AS ln,l.a AS la,r.n AS rn,r.a AS ra,
+        SELECT p.anchor,p.rid,r.entity_id,l.country,r.country AS right_country,l.n AS ln,l.a AS la,r.n AS rn,r.a AS ra,
           p.retrieval,p.hits,r.source AS right_source,
           ln(1+coalesce(lnf.freq,0)) AS log_lnf,ln(1+coalesce(laf.freq,0)) AS log_laf,
           ln(1+coalesce(rnf.freq,0)) AS log_rnf,ln(1+coalesce(raf.freq,0)) AS log_raf,
@@ -49,10 +49,10 @@ def pair_query(split, anchors, pairs):
                coalesce(rdf.idf,ln(rp.nrows+1.0)+1.0)) AS w
         FROM tokens t JOIN joined j USING(anchor,rid)
         JOIN {profile} lp ON lp.source=1 AND lp.country=j.country
-        JOIN {profile} rp ON rp.source=j.right_source AND rp.country=j.country
+        JOIN {profile} rp ON rp.source=j.right_source AND rp.country=j.right_country
         LEFT JOIN {token_table} ldf ON ldf.source=1 AND ldf.country=j.country
           AND ldf.field=t.field AND ldf.token=t.token
-        LEFT JOIN {token_table} rdf ON rdf.source=j.right_source AND rdf.country=j.country
+        LEFT JOIN {token_table} rdf ON rdf.source=j.right_source AND rdf.country=j.right_country
           AND rdf.field=t.field AND rdf.token=t.token),
     aggregate AS (
         SELECT anchor,rid,field,
