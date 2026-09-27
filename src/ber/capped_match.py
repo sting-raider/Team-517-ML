@@ -8,6 +8,39 @@ import numpy as np
 from .dense_training import serialize
 
 
+def compose_dense_gate_blank_recovery(chosen_logits, dense, threshold,
+                                      extra_dense_logit_penalty,
+                                      recovery_eligible):
+    """Compose a fixed dense-only penalty with post-gate blank-name recovery.
+
+    Recovery is applied to the *gated* decision set. This is intentionally not
+    equivalent to adding the independently measured macro deltas: an eligible
+    pair removed by the dense gate is re-added by recovery.
+    """
+    chosen_logits=np.asarray(chosen_logits,dtype=np.float64)
+    dense=np.asarray(dense,dtype=bool)
+    recovery_eligible=np.asarray(recovery_eligible,dtype=bool)
+    if chosen_logits.shape!=dense.shape or chosen_logits.shape!=recovery_eligible.shape:
+        raise ValueError('Dense-gate composition arrays must have identical shapes')
+    if not 0.<threshold<1.:
+        raise ValueError('threshold must be strictly between zero and one')
+    cutoff=np.log(threshold/(1.-threshold))
+    base_selected=chosen_logits>=cutoff
+    gated_logits=chosen_logits-np.where(dense,extra_dense_logit_penalty,0.)
+    gated_selected=gated_logits>=cutoff
+    recovered=recovery_eligible&~gated_selected
+    final_selected=gated_selected|recovered
+    readded_gate_removed=recovered&base_selected&~gated_selected
+    return {
+        'gated_logits':gated_logits,
+        'base_selected':base_selected,
+        'gated_selected':gated_selected,
+        'recovered':recovered,
+        'readded_gate_removed':readded_gate_removed,
+        'final_selected':final_selected,
+    }
+
+
 def score_dense_only(db, pair_path, model_path, out):
     import duckdb
     import torch
@@ -327,6 +360,42 @@ def evaluate_capped_match(baseline, retrieval_root, cross_root, dense_score_root
                 'calibration':score_slices(meta,groups,targets,adjusted,'calibrate',best['threshold']),
                 'holdout':score_slices(meta,groups,targets,adjusted,'holdout',best['threshold'])})
         report['blank_address_unique_name_recovery']=unique_recovery
+
+        # D021: direct composition of the calibration-selected dense gate with
+        # the already-fixed INT007 max-count=1 recovery rule. Evaluate recovery
+        # after gating because qualifying gate removals can be re-added.
+        selected_dense_penalty=report['dense_gate_selected']['extra_dense_logit_penalty']
+        unique_recovery_eligible=np.array([bool(blank_exact[i] and
+            name_counts.get((meta[int(groups[i])]['country'],records[a][0]),999999)<=1)
+            for i,(a,_) in enumerate(keys)],bool)
+        composed=compose_dense_gate_blank_recovery(
+            chosen_logits,dense,best['threshold'],selected_dense_penalty,
+            unique_recovery_eligible)
+        composed_probability=1/(1+np.exp(-np.clip(composed['gated_logits'],-30,30)))
+        composed_probability[composed['recovered']]=1.
+        composed_counts={}
+        for fold_name in ('calibrate','holdout'):
+            fold_mask=np.array([m['fold']==fold_name for m in meta],bool)[groups]
+            gate_removed=composed['base_selected']&~composed['gated_selected']&fold_mask
+            recovered=composed['recovered']&fold_mask
+            readded=composed['readded_gate_removed']&fold_mask
+            composed_counts[fold_name]={
+                'gate_removed_true_edges':int(np.count_nonzero(gate_removed&truth)),
+                'gate_removed_false_edges':int(np.count_nonzero(gate_removed&~truth)),
+                'recovered_true_edges':int(np.count_nonzero(recovered&truth)),
+                'recovered_false_edges':int(np.count_nonzero(recovered&~truth)),
+                'readded_gate_removed_true_edges':int(np.count_nonzero(readded&truth)),
+                'readded_gate_removed_false_edges':int(np.count_nonzero(readded&~truth)),
+            }
+        report['dense_gate_plus_blank_unique_recovery']={
+            'protocol':'Fixed calibration-selected dense-only penalty, then INT007 exact-name blank-address recovery for Source-1 names unique within country; same frozen cap32 pool and threshold',
+            'extra_dense_logit_penalty':float(selected_dense_penalty),
+            'max_same_name_s1_anchors':1,
+            'counts':composed_counts,
+            'calibration':score_slices(meta,groups,targets,composed_probability,
+                                       'calibrate',best['threshold']),
+            'holdout':score_slices(meta,groups,targets,composed_probability,
+                                   'holdout',best['threshold'])}
         from rapidfuzz import fuzz
         nonblank_exact_unique=np.array([bool(not chosen[i] and records[t][1] and
             records[a][0] and records[a][0]==records[t][0] and
