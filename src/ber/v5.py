@@ -54,7 +54,7 @@ def pair_query(split, anchors, pairs):
           AND ldf.field=t.field AND ldf.token=t.token
         LEFT JOIN {token_table} rdf ON rdf.source=j.right_source AND rdf.country=j.right_country
           AND rdf.field=t.field AND rdf.token=t.token),
-    aggregate AS (
+    agg AS (
         SELECT anchor,rid,field,
           sum(w) AS union_mass,
           coalesce(sum(w) FILTER (WHERE in_left=1 AND in_right=1),0.0) AS shared_mass,
@@ -71,7 +71,7 @@ def pair_query(split, anchors, pairs):
           max(shared_mass) FILTER (WHERE field='address') AS address_shared,
           max(left_mass) FILTER (WHERE field='address') AS address_left,
           max(right_mass) FILTER (WHERE field='address') AS address_right
-        FROM aggregate GROUP BY anchor,rid)
+        FROM agg GROUP BY anchor,rid)
     SELECT j.anchor,j.entity_id,j.ln,j.la,j.rn,j.ra,j.retrieval,j.hits,j.right_source,
       j.log_lnf,j.log_laf,j.log_rnf,j.log_raf,j.log_rank,j.relative_retrieval,
       j.log_lexical_retrieval,j.log_character_retrieval,j.log_lexical_hits,j.log_character_hits,
