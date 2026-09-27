@@ -2,6 +2,7 @@
 import argparse
 from pathlib import Path
 from .data import connect
+from .output_receipt import add_country_row, new_country_counts, ordered_country_counts
 
 
 def parse(line,expected):
@@ -18,15 +19,16 @@ def parse(line,expected):
 
 def validate(db,output,check_ids=True):
     c=connect(db)
-    c.execute('SELECT entity_id FROM test WHERE source=1 ORDER BY entity_id')
+    c.execute('SELECT entity_id,country FROM test WHERE source=1 ORDER BY entity_id')
     count=pairs=matches=empty=0
+    countries=new_country_counts()
     with (output/'matching_results.tsv').open(encoding='utf-8') as mf, (output/'candidate_pairs.tsv').open(encoding='utf-8') as cf:
         if mf.readline().rstrip('\r\n')!='source1_entity_id\tmatched_entity_ids':
             raise ValueError('Wrong matching header')
         if cf.readline().rstrip('\r\n')!='source1_entity_id\tcandidate_entity_ids':
             raise ValueError('Wrong candidate header')
         while rows:=c.fetchmany(10000):
-            for (anchor,) in rows:
+            for anchor,country in rows:
                 predicted=parse(mf.readline(),anchor)
                 candidates=parse(cf.readline(),anchor)
                 if not predicted<=candidates:
@@ -35,6 +37,7 @@ def validate(db,output,check_ids=True):
                 pairs+=len(candidates)
                 matches+=len(predicted)
                 empty+=not predicted
+                add_country_row(countries,country,candidates,predicted)
         if mf.readline() or cf.readline():
             raise ValueError('Extra rows in output')
     if check_ids:
@@ -47,7 +50,9 @@ def validate(db,output,check_ids=True):
         if unknown:
             raise ValueError(f'{unknown} nonexistent target IDs')
     c.close()
-    return {'anchors':count,'candidates':pairs,'matches':matches,'empty_predictions':empty,'target_ids_checked':check_ids,'status':'PASS'}
+    return {'anchors':count,'candidates':pairs,'matches':matches,
+            'empty_predictions':empty,'target_ids_checked':check_ids,
+            'status':'PASS','countries':ordered_country_counts(countries)}
 
 
 def main():
