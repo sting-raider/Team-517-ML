@@ -1,0 +1,128 @@
+{
+  "protocol": "Original v3 predictions only; top3 E5 reverse owners plus original owner, ranked by frozen M017 cross-encoder; margin selected on calibration and checked on holdout",
+  "folds": {
+    "calibrate": {
+      "baseline": 0.9491209587754517,
+      "variants": {
+        "0.0": {
+          "macro_f0_5": 0.95403753370963,
+          "India": 0.939982488914775,
+          "US": 0.963393339618615,
+          "removed_true": 19,
+          "removed_false": 92,
+          "original_unscored": 0
+        },
+        "0.5": {
+          "macro_f0_5": 0.9533750112662847,
+          "India": 0.93953455695316,
+          "US": 0.9625879740234841,
+          "removed_true": 11,
+          "removed_false": 79,
+          "original_unscored": 0
+        },
+        "1.0": {
+          "macro_f0_5": 0.9529513236888576,
+          "India": 0.938569392693946,
+          "US": 0.9625247229165897,
+          "removed_true": 8,
+          "removed_false": 73,
+          "original_unscored": 0
+        },
+        "2.0": {
+          "macro_f0_5": 0.9525510490896647,
+          "India": 0.9383525424790617,
+          "US": 0.9620023510232502,
+          "removed_true": 3,
+          "removed_false": 67,
+          "original_unscored": 0
+        },
+        "3.0": {
+          "macro_f0_5": 0.9524562900134569,
+          "India": 0.9381423913507086,
+          "US": 0.9619844032030057,
+          "removed_true": 0,
+          "removed_false": 63,
+          "original_unscored": 0
+        },
+        "4.0": {
+          "macro_f0_5": 0.952329410505523,
+          "India": 0.9379199241365378,
+          "US": 0.9619211520961112,
+          "removed_true": 0,
+          "removed_false": 60,
+          "original_unscored": 0
+        },
+        "6.0": {
+          "macro_f0_5": 0.9522500171698492,
+          "India": 0.9377998977307285,
+          "US": 0.9618688063524745,
+          "removed_true": 0,
+          "removed_false": 58,
+          "original_unscored": 0
+        }
+      }
+    },
+    "holdout": {
+      "baseline": 0.9447832214793936,
+      "variants": {
+        "0.0": {
+          "macro_f0_5": 0.9494086885860196,
+          "India": 0.9275599421026491,
+          "US": 0.9638081887153537,
+          "removed_true": 12,
+          "removed_false": 63,
+          "original_unscored": 0
+        },
+        "0.5": {
+          "macro_f0_5": 0.9491295079356491,
+          "India": 0.9268465122431797,
+          "US": 0.9638152016709799,
+          "removed_true": 6,
+          "removed_false": 59,
+          "original_unscored": 0
+        },
+        "1.0": {
+          "macro_f0_5": 0.9490723979965334,
+          "India": 0.9266746200539608,
+          "US": 0.9638337394138243,
+          "removed_true": 5,
+          "removed_false": 58,
+          "original_unscored": 0
+        },
+        "2.0": {
+          "macro_f0_5": 0.9485667103807002,
+          "India": 0.9257357330618133,
+          "US": 0.9636135535076664,
+          "removed_true": 2,
+          "removed_false": 53,
+          "original_unscored": 0
+        },
+        "3.0": {
+          "macro_f0_5": 0.9483481977611629,
+          "India": 0.9255620314811288,
+          "US": 0.9633655080011853,
+          "removed_true": 0,
+          "removed_false": 48,
+          "original_unscored": 0
+        },
+        "4.0": {
+          "macro_f0_5": 0.9482389439645936,
+          "India": 0.9255620314811288,
+          "US": 0.9631842500711508,
+          "removed_true": 0,
+          "removed_false": 46,
+          "original_unscored": 0
+        },
+        "6.0": {
+          "macro_f0_5": 0.94816994156676,
+          "India": 0.9253883299004445,
+          "US": 0.9631842500711508,
+          "removed_true": 0,
+          "removed_false": 45,
+          "original_unscored": 0
+        }
+      }
+    }
+  },
+  "selected_margin": "0.0"
+}

@@ -1,0 +1,26 @@
+{
+  "threshold": 0.95,
+  "dense_prior": -2.0,
+  "parts_per_country": 4,
+  "completion": {
+    "status": "PASS",
+    "candidate_cap": 32,
+    "partition_count": 12,
+    "validation": {
+      "anchors": 1732544,
+      "candidates": 55384406,
+      "matches": 5743094,
+      "empty_predictions": 99424,
+      "target_ids_checked": false,
+      "status": "PASS"
+    },
+    "matching_sha256": "5a4aff5fcc37c74769ff3db1ebf2d35f85ab2258d80e5425e90ae616f1d7b33d",
+    "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
+  },
+  "package": {
+    "matching_sha256": "5a4aff5fcc37c74769ff3db1ebf2d35f85ab2258d80e5425e90ae616f1d7b33d",
+    "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec",
+    "compressed_sha256": "d22dd4c377f20a93496cfa4bb9f60efb8287dd79bbd1720d9eb47246a6c1d62a",
+    "compressed_bytes": 41382133
+  }
+}

@@ -42,7 +42,10 @@ def evaluate(scheme:str='capped'):
     from ber.capped_match import evaluate_capped_match
     score_root=ROOT if scheme=='capped' else ROOT/scheme
     result=evaluate_capped_match(BASE,RETRIEVAL,CROSS/'scores',score_root,
-                                 score_root/'evaluation.json',scheme)
+                                 score_root/'evaluation.json',scheme,
+                                 VOLUME_ROOT/'project/experiments/d017',
+                                 VOLUME_ROOT/'project/experiments/owner_cross',
+                                 record_db=VOLUME_ROOT/'project/artifacts/data_v3.duckdb')
     volume.commit()
     return result
 
