@@ -39,6 +39,24 @@ Because exact subword boundaries are the quantity under test, replacing the pinn
 5. Direct pinned-tokenizer artifact path: **BLOCKED by inaccessible Hugging Face Xet redirect/artifact transfer**.
 6. Search for preinstalled SentencePiece binaries/libraries/wheels: **none found**.
 
+## Recovery checkpoint — 2026-09-27
+
+A second agent recovered the released lease and tightened the capability diagnosis without changing the scientific scope.
+
+New findings:
+
+- this runtime **does** provide Python `sentencepiece==0.2.1`; the earlier package probe was runtime-specific;
+- inspection of the exact pinned INT005/M017 revisions shows that both neural tokenizers are XLM-R-family tokenizers and reference the same 5,069,051-byte `sentencepiece.bpe.model`;
+- the exact expected SHA-256 is `cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865`;
+- an independent GitHub Release asset was located whose API metadata reports the same byte size and SHA-256, so artifact identity/provenance is no longer ambiguous;
+- direct compute-network access is unavailable in this runtime, while the available web/download bridge refuses the binary release redirect. The exact model bytes therefore still cannot be placed in the compute filesystem.
+
+I explicitly did **not** substitute a different SentencePiece model, whitespace tokenization, character counts, a generic XLM-R vocabulary, or an approximate reimplementation. The binary model is the object that fixes the subword boundaries under test.
+
+The blocker is therefore narrower than the original report: **SentencePiece execution support is present; exact tokenizer binary transport is not.** No tokenizer-truncation statistic is claimed from this recovery attempt.
+
+Lease released again after this checkpoint.
+
 ## Risks / interpretation
 
 This is an execution blocker only. It provides no evidence for or against France tokenizer truncation. Character-length or whitespace-token distributions would not be a valid substitute because the hypothesis specifically concerns the pinned multilingual subword tokenizers.
