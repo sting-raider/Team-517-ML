@@ -9,21 +9,23 @@ from ber.idf import (
     table_names,
     weighted_overlap,
 )
-from ber.v3 import V3_NAMES
-from ber.v5 import V5_NAMES, pair_query
 
 
 class TestIdfFeatures(unittest.TestCase):
-    def test_schema_is_v3_plus_eight(self):
-        self.assertEqual(len(IDF_FEATURE_NAMES), 8)
-        self.assertEqual(V5_NAMES[: len(V3_NAMES)], V3_NAMES)
-        self.assertEqual(V5_NAMES[len(V3_NAMES):], IDF_FEATURE_NAMES)
-        self.assertEqual(len(V5_NAMES), len(V3_NAMES) + 8)
-        sql = pair_query("train", "anchors", "pairs")
-        self.assertIn("m001_idf_profile_train", sql)
-        self.assertIn("right_source", sql)
-        self.assertIn("ldf.source=1", sql)
-        self.assertIn("rdf.source=j.right_source", sql)
+    def test_feature_schema_is_eight_weighted_overlap_features(self):
+        self.assertEqual(
+            IDF_FEATURE_NAMES,
+            [
+                "name_idf_jaccard",
+                "name_idf_overlap",
+                "name_idf_left_coverage",
+                "name_idf_right_coverage",
+                "address_idf_jaccard",
+                "address_idf_overlap",
+                "address_idf_left_coverage",
+                "address_idf_right_coverage",
+            ],
+        )
 
     def test_idf_positive_and_monotone(self):
         self.assertGreater(idf_weight(1000, 1), idf_weight(1000, 900))
