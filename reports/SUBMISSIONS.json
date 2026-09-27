@@ -100,7 +100,7 @@
     {
       "number": null,
       "model_version": "v10-owner70",
-      "status": "Exploratory local variant; not organizer validated or uploaded",
+      "status": "Exploratory local variant; organizer full two-file validator PASS; not uploaded",
       "file": "output/submission_v10_owner70/matching_results.tsv",
       "sha256": "ecc553efb163a543cf5ef26ad00f452a2e544c36659790c2914538a1397f198e",
       "public_score": null,

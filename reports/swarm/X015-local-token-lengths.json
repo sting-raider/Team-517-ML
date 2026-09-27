@@ -1,0 +1,35 @@
+{
+  "model": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+  "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+  "max_length": 160,
+  "sample_rule": "hash(Source1 ID)%100<2; first V6 predicted target; max N per country",
+  "countries": {
+    "US": {
+      "pairs": 5000,
+      "p50": 59.0,
+      "p90": 68.0,
+      "p99": 80.0,
+      "max": 113,
+      "over_160": 0,
+      "over_160_rate": 0.0
+    },
+    "India": {
+      "pairs": 5000,
+      "p50": 86.0,
+      "p90": 109.0,
+      "p99": 130.0,
+      "max": 162,
+      "over_160": 1,
+      "over_160_rate": 0.0002
+    },
+    "France": {
+      "pairs": 5000,
+      "p50": 67.0,
+      "p90": 79.0,
+      "p99": 90.0,
+      "max": 107,
+      "over_160": 0,
+      "over_160_rate": 0.0
+    }
+  }
+}
