@@ -23,8 +23,10 @@ competitors. It considers only target groups where the true owner is in the
 competitor set. This is a **proxy for ambiguous ownership**, not a full replay
 of V5 model predictions. At the 80/10 gate, the address winner is the true
 owner in **337,356 / 337,356** eligible US/India groups: 242,093 US and 95,263
-India. The looser 70/10 gate errs in 5 of 399,274 groups. Detailed counts and
-runtime are in `reports/m020_owner_label_gate.json`.
+India. The looser 70/10 gate errs in 5 of 399,274 groups; 50/5 errs in 207 of
+437,327. These figures are training-structural diagnostics rather than a
+French accuracy estimate or an actual V5 replay. Detailed counts and runtime
+are in `reports/m020_owner_label_gate.json`.
 
 The frozen 3,051-anchor INT006 development holdout contains zero predicted
 target conflicts passing this margin. It therefore cannot give a meaningful

@@ -4,27 +4,39 @@
     "US": {
       "eligible_with_true_owner": 336248,
       "best_correct": 324298,
-      "gate_70": 291446,
-      "gate_70_correct": 291445,
-      "gate_80": 242093,
-      "gate_80_correct": 242093,
-      "gate_85": 190462,
-      "gate_85_correct": 190462,
-      "gate_90": 129223,
-      "gate_90_correct": 129223
+      "gate_20_2": 317880,
+      "gate_20_2_correct": 317823,
+      "gate_30_3": 317809,
+      "gate_30_3_correct": 317764,
+      "gate_50_5": 316791,
+      "gate_50_5_correct": 316770,
+      "gate_70_10": 291446,
+      "gate_70_10_correct": 291445,
+      "gate_80_10": 242093,
+      "gate_80_10_correct": 242093,
+      "gate_85_10": 190462,
+      "gate_85_10_correct": 190462,
+      "gate_90_10": 129223,
+      "gate_90_10_correct": 129223
     },
     "India": {
       "eligible_with_true_owner": 140069,
       "best_correct": 132717,
-      "gate_70": 107828,
-      "gate_70_correct": 107824,
-      "gate_80": 95263,
-      "gate_80_correct": 95263,
-      "gate_85": 79971,
-      "gate_85_correct": 79971,
-      "gate_90": 56205,
-      "gate_90_correct": 56205
+      "gate_20_2": 130580,
+      "gate_20_2_correct": 129404,
+      "gate_30_3": 129273,
+      "gate_30_3_correct": 128447,
+      "gate_50_5": 120536,
+      "gate_50_5_correct": 120350,
+      "gate_70_10": 107828,
+      "gate_70_10_correct": 107824,
+      "gate_80_10": 95263,
+      "gate_80_10_correct": 95263,
+      "gate_85_10": 79971,
+      "gate_85_10_correct": 79971,
+      "gate_90_10": 56205,
+      "gate_90_10_correct": 56205
     }
   },
-  "seconds": 18.890999999945052
+  "seconds": 19.17200000002049
 }

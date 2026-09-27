@@ -28,3 +28,12 @@ to the unlabeled country without paying to rescore all 55.38 million test
 candidates. It must preserve the frozen V5 candidate SHA per partition and
 replace only French rows in V6. The public score, not a fabricated French
 validation score, will determine whether that variant is kept.
+
+The France rescore completed for all 259,452 French Source 1 records across
+four resumable GPU partitions. Its merged V7 output re-applies the selected
+blank-address rule, preserves the frozen candidate SHA-256
+`fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec`,
+and has matching SHA-256
+`aafbc73e655ce51222f81b57ed5ce92198ac01dad02c17d941a342dabbfb2f0b`.
+The remote completion receipt is copied to `reports/m018_france_submission.json`.
+No public score has been reported for V7.

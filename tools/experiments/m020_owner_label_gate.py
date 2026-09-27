@@ -36,10 +36,12 @@ def run(db_path):
             return
         counts[country]['eligible_with_true_owner'] += 1
         counts[country]['best_correct'] += ranked[0][2]
-        for minimum in (70,80,85,90):
-            if ranked[0][0] >= minimum and ranked[0][0]-ranked[1][0] >= 10:
-                counts[country][f'gate_{minimum}'] += 1
-                counts[country][f'gate_{minimum}_correct'] += ranked[0][2]
+        for minimum, margin in ((20,2),(30,3),(50,5),
+                                (70,10),(80,10),(85,10),(90,10)):
+            if ranked[0][0] >= minimum and ranked[0][0]-ranked[1][0] >= margin:
+                key = f'gate_{minimum}_{margin}'
+                counts[country][key] += 1
+                counts[country][key + '_correct'] += ranked[0][2]
 
     cursor = con.execute(query)
     while chunk := cursor.fetchmany(100000):
