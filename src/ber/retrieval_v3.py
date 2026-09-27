@@ -103,6 +103,97 @@ def char_candidates(c,split,anchors,result,cap=64):
         QUALIFY row_number() OVER(PARTITION BY anchor ORDER BY retrieval DESC,r.entity_id)<={int(cap)}''')
 
 
+
+def build_source_char_index(c,split):
+    """Build an opt-in character index with S2/S3-local posting frequencies.
+
+    The selected INT003 index remains unchanged. Keys include the concrete target
+    source so a gram common in S2 cannot make the same gram ineligible or less
+    informative in S3 (and vice versa).
+    """
+    c.execute('''CREATE OR REPLACE MACRO name_grams(n) AS list_distinct(list_concat(
+        list_transform(range(1,greatest(1,length(replace(n,' ',''))-1)),i->'c3:'||substr(replace(n,' ',''),i,3)),
+        list_transform(range(1,greatest(1,length(replace(n,' ',''))-2)),i->'c4:'||substr(replace(n,' ',''),i,4))))''')
+    c.execute(f'''CREATE OR REPLACE TABLE {split}_source_char_raw AS
+        SELECT rowid rid,source,hash(country,source,k) AS key
+        FROM {split},unnest(name_grams(n)) u(k) WHERE source>1''')
+    c.execute(f'''CREATE OR REPLACE TABLE {split}_source_char_freq AS
+        SELECT key,count(*)::INTEGER freq FROM {split}_source_char_raw GROUP BY key''')
+    c.execute(f'''CREATE OR REPLACE TABLE {split}_source_char_index AS
+        SELECT r.rid,r.key,f.freq FROM {split}_source_char_raw r
+        JOIN {split}_source_char_freq f USING(key) WHERE f.freq<=2000''')
+    c.execute(f'DROP TABLE {split}_source_char_raw')
+
+
+def source_char_candidates(c,split,anchors,result,cap=64):
+    """Retrieve with source-local character DF without increasing query-gram count.
+
+    Up to six unique grams per 3/4-gram family are selected globally per anchor,
+    exactly matching the baseline query-gram budget. Selection uses the best
+    eligible source-local frequency, then each selected gram probes whichever
+    concrete target sources contain it with DF<=2000.
+    """
+    c.execute(f'''CREATE OR REPLACE TEMP TABLE source_char_query AS
+        WITH eligible AS (
+          SELECT entity_id anchor,s.source,k,hash(country,s.source,k) AS key,
+            f.freq,left(k,3) kind
+          FROM {anchors} CROSS JOIN (VALUES(2),(3)) s(source),unnest(name_grams(n)) u(k)
+          JOIN {split}_source_char_freq f ON f.key=hash(country,s.source,k)
+          WHERE f.freq<=2000
+        ), selected_grams AS (
+          SELECT anchor,k,kind,min(freq) AS best_freq
+          FROM eligible GROUP BY anchor,k,kind
+          QUALIFY row_number() OVER(
+            PARTITION BY anchor,kind ORDER BY best_freq,k)<=6
+        )
+        SELECT e.anchor,e.source,e.key,e.freq,e.kind,e.k
+        FROM eligible e JOIN selected_grams s USING(anchor,k,kind)''')
+    c.execute(f'''CREATE OR REPLACE TABLE {result} AS
+        WITH hits AS (SELECT q.anchor,r.rid,sum(ln(10000001.0/r.freq))::FLOAT retrieval,
+          count(*)::SMALLINT hits FROM source_char_query q
+          JOIN {split}_source_char_index r USING(key)
+          GROUP BY q.anchor,r.rid HAVING count(*)>=2)
+        SELECT h.* FROM hits h JOIN {split} r ON h.rid=r.rowid
+        QUALIFY row_number() OVER(
+          PARTITION BY anchor ORDER BY retrieval DESC,r.entity_id)<={int(cap)}''')
+
+
+def source_char_fused_candidates(c,split,anchors,result,cap=160):
+    """Opt-in INT003 fusion using source-local character retrieval.
+
+    This deliberately duplicates the selected fusion SQL instead of refactoring
+    the production function, so current INT003 behavior is untouched.
+    """
+    lexical_candidates(c,split,anchors,'source_char_fusion_lexical',cap)
+    source_char_candidates(c,split,anchors,'source_char_fusion_character',64)
+    c.execute(f'''CREATE OR REPLACE TABLE {result} AS
+        WITH ranked AS (
+          SELECT p.anchor,p.rid,1.0/(60+rank() OVER(
+            PARTITION BY p.anchor ORDER BY p.retrieval DESC)
+            +(count(*) OVER(PARTITION BY p.anchor,p.retrieval)-1.0)/2.0) AS weight,
+            p.retrieval AS base_retrieval,0.0::FLOAT AS char_retrieval,
+            p.hits AS base_hits,0::SMALLINT AS char_hits
+          FROM source_char_fusion_lexical p
+          UNION ALL
+          SELECT p.anchor,p.rid,0.5/(60+rank() OVER(
+            PARTITION BY p.anchor ORDER BY p.retrieval DESC)
+            +(count(*) OVER(PARTITION BY p.anchor,p.retrieval)-1.0)/2.0) AS weight,
+            0.0::FLOAT AS base_retrieval,p.retrieval AS char_retrieval,
+            0::SMALLINT AS base_hits,p.hits AS char_hits
+          FROM source_char_fusion_character p), fused AS (
+          SELECT anchor,rid,sum(weight)::FLOAT AS retrieval,
+            max(base_retrieval)::FLOAT AS base_retrieval,
+            max(char_retrieval)::FLOAT AS char_retrieval,
+            max(base_hits)::SMALLINT AS base_hits,
+            max(char_hits)::SMALLINT AS char_hits
+          FROM ranked GROUP BY anchor,rid)
+        SELECT p.anchor,p.rid,p.retrieval,
+          (p.base_hits+p.char_hits)::SMALLINT AS hits,
+          p.base_retrieval,p.char_retrieval,p.base_hits,p.char_hits
+        FROM fused p JOIN {split} r ON p.rid=r.rowid
+        QUALIFY row_number() OVER(PARTITION BY p.anchor
+          ORDER BY p.retrieval DESC,r.entity_id)<={int(cap)}''')
+
 def evaluate_table(c,table,meta):
     truth={m['id']:m['truth'] for m in meta}; cand={k:set() for k in truth}
     for anchor,target in c.execute(f'SELECT p.anchor,r.entity_id FROM {table} p JOIN train r ON p.rid=r.rowid').fetchall():
