@@ -170,6 +170,22 @@ def evaluate_capped_match(baseline, retrieval_root, cross_root, dense_score_root
             'predicted_false_links':int(np.count_nonzero(fold_pairs&~truth&chosen)),
             'missed_true_inside_candidates':int(np.count_nonzero(fold_pairs&truth&~chosen))}
     report['error_budget']=budget
+    cat_rescue=[]
+    for minimum in (.9,.95,.98,.99,.995,.999):
+        added=(~chosen)&(~dense)&(cat>=minimum)
+        adjusted=1/(1+np.exp(-np.clip(chosen_logits,-30,30)))
+        adjusted[added]=1.
+        counts={}
+        for fold_name in ('calibrate','holdout'):
+            fold_mask=np.array([m['fold']==fold_name for m in meta],bool)[groups]
+            counts[fold_name]={
+                'added_true_edges':int(np.count_nonzero(added&truth&fold_mask)),
+                'added_false_edges':int(np.count_nonzero(added&~truth&fold_mask))}
+        cat_rescue.append({
+            'minimum_cat_probability':minimum,'counts':counts,
+            'calibration':score_slices(meta,groups,targets,adjusted,'calibrate',best['threshold']),
+            'holdout':score_slices(meta,groups,targets,adjusted,'holdout',best['threshold'])})
+    report['catboost_veto_rescue']=cat_rescue
     if ownership_root is not None:
         owner_scores={}
         best_owner={}
@@ -269,8 +285,8 @@ def evaluate_capped_match(baseline, retrieval_root, cross_root, dense_score_root
         blank_exact=np.array([bool(records[a][0] and
             records[a][0]==records[t][0] and not records[t][1])
             for a,t in keys],bool)
-        exact_names=sorted({records[keys[i][0]][0]
-                            for i in np.flatnonzero(blank_exact)})
+        exact_names=sorted({records[a][0] for a,t in keys
+                            if records[a][0] and records[a][0]==records[t][0]})
         c.execute('CREATE TEMP TABLE needed_names AS SELECT unnest(?) n',[exact_names])
         name_counts={(country,name):count for country,name,count in
             c.execute('''SELECT t.country,t.n,count(*) FROM train t
@@ -312,6 +328,66 @@ def evaluate_capped_match(baseline, retrieval_root, cross_root, dense_score_root
                 'holdout':score_slices(meta,groups,targets,adjusted,'holdout',best['threshold'])})
         report['blank_address_unique_name_recovery']=unique_recovery
         from rapidfuzz import fuzz
+        nonblank_exact_unique=np.array([bool(not chosen[i] and records[t][1] and
+            records[a][0] and records[a][0]==records[t][0] and
+            name_counts.get((meta[int(groups[i])]['country'],records[a][0]),999999)==1)
+            for i,(a,t) in enumerate(keys)],bool)
+        address_ratios=np.zeros(len(keys),np.float32)
+        for i in np.flatnonzero(nonblank_exact_unique):
+            a,t=keys[i]
+            address_ratios[i]=fuzz.ratio(records[a][1],records[t][1])
+        nonblank_recovery=[]
+        for minimum in (0.,40.,60.,75.,85.,95.):
+            added=nonblank_exact_unique&(address_ratios>=minimum)
+            adjusted=1/(1+np.exp(-np.clip(chosen_logits,-30,30)))
+            adjusted[added]=1.
+            counts={}
+            for fold_name in ('calibrate','holdout'):
+                fold_mask=np.array([m['fold']==fold_name for m in meta],bool)[groups]
+                counts[fold_name]={
+                    'added_true_edges':int(np.count_nonzero(added&truth&fold_mask)),
+                    'added_false_edges':int(np.count_nonzero(added&~truth&fold_mask))}
+            nonblank_recovery.append({
+                'minimum_address_ratio':minimum,'counts':counts,
+                'calibration':score_slices(meta,groups,targets,adjusted,'calibrate',best['threshold']),
+                'holdout':score_slices(meta,groups,targets,adjusted,'holdout',best['threshold'])})
+        report['nonblank_exact_unique_name_recovery']=nonblank_recovery
+        selected_indices=np.flatnonzero(chosen)
+        selected_name_ratio=np.zeros(len(keys),np.float32)
+        selected_address_ratio=np.zeros(len(keys),np.float32)
+        selected_name_token=np.zeros(len(keys),np.float32)
+        selected_address_token=np.zeros(len(keys),np.float32)
+        for i in selected_indices:
+            a,t=keys[i]
+            an,aa=records[a];tn,ta=records[t]
+            selected_name_ratio[i]=fuzz.ratio(an,tn)
+            selected_address_ratio[i]=fuzz.ratio(aa,ta)
+            selected_name_token[i]=fuzz.token_set_ratio(an,tn)
+            selected_address_token[i]=fuzz.token_set_ratio(aa,ta)
+        removal_rules=[
+            ('dense_ratio_40_50',dense,selected_name_ratio,selected_address_ratio,40.,50.),
+            ('dense_ratio_50_50',dense,selected_name_ratio,selected_address_ratio,50.,50.),
+            ('dense_ratio_50_60',dense,selected_name_ratio,selected_address_ratio,50.,60.),
+            ('all_ratio_40_50',np.ones(len(keys),bool),selected_name_ratio,selected_address_ratio,40.,50.),
+            ('all_ratio_50_50',np.ones(len(keys),bool),selected_name_ratio,selected_address_ratio,50.,50.),
+            ('dense_token_50_50',dense,selected_name_token,selected_address_token,50.,50.),
+            ('all_token_50_50',np.ones(len(keys),bool),selected_name_token,selected_address_token,50.,50.)]
+        low_evidence_removal=[]
+        for name,channel,name_sim,address_sim,ncut,acut in removal_rules:
+            removed=chosen&channel&(name_sim<ncut)&(address_sim<acut)
+            adjusted=1/(1+np.exp(-np.clip(chosen_logits,-30,30)))
+            adjusted[removed]=0.
+            counts={}
+            for fold_name in ('calibrate','holdout'):
+                fold_mask=np.array([m['fold']==fold_name for m in meta],bool)[groups]
+                counts[fold_name]={
+                    'removed_true_edges':int(np.count_nonzero(removed&truth&fold_mask)),
+                    'removed_false_edges':int(np.count_nonzero(removed&~truth&fold_mask))}
+            low_evidence_removal.append({
+                'name':name,'counts':counts,
+                'calibration':score_slices(meta,groups,targets,adjusted,'calibrate',best['threshold']),
+                'holdout':score_slices(meta,groups,targets,adjusted,'holdout',best['threshold'])})
+        report['low_evidence_removal']=low_evidence_removal
         blank_unique=np.array([bool(not chosen[i] and not records[t][1] and
             records[a][0] and records[t][0] and
             name_counts.get((meta[int(groups[i])]['country'],records[a][0]),999999)==1)
@@ -340,6 +416,46 @@ def evaluate_capped_match(baseline, retrieval_root, cross_root, dense_score_root
                     'calibration':score_slices(meta,groups,targets,adjusted,'calibrate',best['threshold']),
                     'holdout':score_slices(meta,groups,targets,adjusted,'holdout',best['threshold'])})
         report['blank_address_fuzzy_unique_recovery']=fuzzy_recovery
+        selected_by_anchor={}
+        for i,(anchor,target) in enumerate(keys):
+            if chosen[i]:
+                selected_by_anchor.setdefault(anchor,[]).append(target)
+        neighbor_strength=np.zeros(len(keys),np.float32)
+        cross_source_strength=np.zeros(len(keys),np.float32)
+        for i,(anchor,target) in enumerate(keys):
+            if chosen[i]:
+                continue
+            name,address=records[target]
+            if not name or not address:
+                continue
+            for neighbor in selected_by_anchor.get(anchor,[]):
+                other_name,other_address=records[neighbor]
+                if not other_name or not other_address:
+                    continue
+                strength=min(fuzz.ratio(name,other_name),
+                             fuzz.ratio(address,other_address))
+                if strength>neighbor_strength[i]:
+                    neighbor_strength[i]=strength
+                if target[:2]!=neighbor[:2] and strength>cross_source_strength[i]:
+                    cross_source_strength[i]=strength
+        neighbor_recovery=[]
+        for minimum in (80.,85.,90.,95.):
+            for cross_only in (False,True):
+                added=(cross_source_strength if cross_only else neighbor_strength)>=minimum
+                adjusted=1/(1+np.exp(-np.clip(chosen_logits,-30,30)))
+                adjusted[added]=1.
+                counts={}
+                for fold_name in ('calibrate','holdout'):
+                    fold_mask=np.array([m['fold']==fold_name for m in meta],bool)[groups]
+                    counts[fold_name]={
+                        'added_true_edges':int(np.count_nonzero(added&truth&fold_mask)),
+                        'added_false_edges':int(np.count_nonzero(added&~truth&fold_mask))}
+                neighbor_recovery.append({
+                    'minimum_name_and_address_ratio':minimum,
+                    'cross_source_only':cross_only,'counts':counts,
+                    'calibration':score_slices(meta,groups,targets,adjusted,'calibrate',best['threshold']),
+                    'holdout':score_slices(meta,groups,targets,adjusted,'holdout',best['threshold'])})
+        report['selected_neighbor_recovery']=neighbor_recovery
         private_errors=[{
             'fold':meta[int(groups[i])]['fold'],
             'country':meta[int(groups[i])]['country'],

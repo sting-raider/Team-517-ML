@@ -1,5 +1,7 @@
 """CPU-only exact-name/blank-address recovery on the frozen v5 candidates."""
 import json
+import gzip
+import shutil
 from pathlib import Path
 
 import modal
@@ -39,9 +41,34 @@ def run():
     return result
 
 
+@app.function(image=cpu_image,volumes={str(VOLUME_ROOT):volume},
+              cpu=2,memory=4096,timeout=900)
+def compress():
+    from ber.predict import sha256
+    dest=VOLUME_ROOT/'project/output/submission_v6_blank_recovery'
+    receipt=json.loads((dest/'completion.json').read_text())
+    source=dest/'matching_results.tsv'
+    if sha256(source)!=receipt['matching_sha256']:
+        raise ValueError('Recovery output checksum changed')
+    target=dest/'matching_results.tsv.gz'
+    with source.open('rb') as src,target.open('wb') as dst:
+        with gzip.GzipFile(filename='',mode='wb',fileobj=dst,
+                           compresslevel=3,mtime=0) as gz:
+            shutil.copyfileobj(src,gz,1<<20)
+    volume.commit()
+    return {'compressed_bytes':target.stat().st_size,
+            'compressed_sha256':sha256(target),
+            'matching_sha256':receipt['matching_sha256']}
+
+
 @app.local_entrypoint()
-def main():
-    result=run.remote()
-    Path('reports/blank_recovery_submission.json').write_text(
-        json.dumps(result,indent=2),encoding='utf-8')
+def main(action:str='run'):
+    if action=='run':
+        result=run.remote()
+        Path('reports/blank_recovery_submission.json').write_text(
+            json.dumps(result,indent=2),encoding='utf-8')
+    elif action=='compress':
+        result=compress.remote()
+    else:
+        raise ValueError('Expected run or compress')
     print(json.dumps(result,indent=2),flush=True)

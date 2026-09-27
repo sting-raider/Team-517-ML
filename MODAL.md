@@ -38,12 +38,34 @@ final archive, download its **same-run** `candidate_pairs.tsv` from
 `project/output/submission_v5_neural32/`; do not pair it with an older run's
 candidate file. That file has at most 32 pairs per Source 1 entity.
 
+## V6 exact-name / blank-address recovery (INT007)
+
+With the v5 output already on the private Volume, this CPU-only pass restores
+candidate matches that have an exact normalized business name, an empty
+provider address, and a country-unique Source-1 name. It raised the development
+holdout macro F0.5 from 0.970702 to 0.972095. It uses the **unchanged v5
+candidate file**; the public score remains unknown until submission.
+
+```powershell
+modal run modal_recover_blank.py
+modal run modal_recover_blank.py --action compress
+New-Item -ItemType Directory -Force output/submission_v6_blank_recovery | Out-Null
+modal volume get team517-business-er project/output/submission_v6_blank_recovery/matching_results.tsv.gz output/submission_v6_blank_recovery/matching_results.tsv.gz
+python -c "import gzip,shutil; shutil.copyfileobj(gzip.open('output/submission_v6_blank_recovery/matching_results.tsv.gz','rb'),open('output/submission_v6_blank_recovery/matching_results.tsv','wb'))"
+python ../student_resource/utils/validate_submission.py --matching output/submission_v6_blank_recovery/matching_results.tsv --test-dir ../student_resource/dataset/test
+```
+
+Verify the decompressed SHA-256 against
+`reports/blank_recovery_submission.json` before uploading. The local copy in
+`output/submission_v6_blank_recovery/` already passed that checksum and the
+organizer's matching TSV validator. For the final archive, use v5's exact
+same-run candidate file from `project/output/submission_v5_neural32/`.
+
 `modal_neural_conflict.py` is a separate optional owner-ambiguity variant.
 It removes only v5-predicted links to targets claimed by multiple Source 1
 businesses, keeps the exact v5 candidate set, and writes
-`submission_v6_neural32_owner`. Its accuracy is unknown without a separate
-evaluation, so do not replace the selected v5 output based on its unlabeled
-conflict counts alone.
+`submission_v6_neural32_owner`. Its full-inventory development filter reduced
+v5's holdout score slightly, so it was not promoted for submission.
 
 The Modal app uses a private Volume named `team517-business-er`. It mounts the
 project code from this repository; datasets, models, and predictions stay outside
