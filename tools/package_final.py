@@ -13,13 +13,21 @@ CAND_SHA='fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec'
 CORE_MODAL=(
     'modal_app.py','modal_v2.py','modal_v3.py','modal_dense.py',
     'modal_crossencoder.py','modal_dense_test.py',
-    'modal_neural_submission.py','modal_recover_blank.py')
+    'modal_neural_submission.py','modal_recover_blank.py',
+    'modal_crossencoder_all.py','modal_capped_all.py',
+    'modal_neural_m018_france.py')
 REPORTS=(
     'reports/swarm/INT005-D017-learned-owner-competition.md',
     'reports/swarm/M017-multilingual-crossencoder.md',
     'reports/swarm/INT006-neural32-integration.md',
     'reports/swarm/INT007-blank-address-recovery.md',
+    'reports/swarm/M018-all-positive-crossencoder.md',
+    'reports/swarm/M020-global-owner-resolution.md',
     'reports/capped_match_evaluation.json',
+    'reports/m018_capped_evaluation.json',
+    'reports/m018_training.json',
+    'reports/m018_france_submission.json',
+    'reports/m020_owner_label_gate.json',
     'reports/neural32_submission.json',
     'reports/blank_recovery_submission.json')
 
@@ -32,11 +40,11 @@ def digest(path):
     return value.hexdigest()
 
 
-def package(matching,candidate,output):
+def package(matching,candidate,output,matching_sha=MATCH_SHA):
     matching=Path(matching)
     candidate=Path(candidate)
     output=Path(output)
-    for path,expected in ((matching,MATCH_SHA),(candidate,CAND_SHA)):
+    for path,expected in ((matching,matching_sha),(candidate,CAND_SHA)):
         actual=digest(path)
         if actual!=expected:
             raise ValueError(f'{path}: SHA-256 {actual} does not match expected {expected}')
@@ -66,7 +74,7 @@ def package(matching,candidate,output):
             archive.write(path,arcname)
     temporary.replace(output)
     receipt={'archive':str(output.resolve()),'archive_bytes':output.stat().st_size,
-             'archive_sha256':digest(output),'matching_sha256':MATCH_SHA,
+             'archive_sha256':digest(output),'matching_sha256':matching_sha,
              'candidate_sha256':CAND_SHA,'entries':len(mappings)}
     (output.parent/'final_package_receipt.json').write_text(
         json.dumps(receipt,indent=2),encoding='utf-8')
@@ -79,10 +87,13 @@ def main():
         default=ROOT/'output/submission_v6_blank_recovery/matching_results.tsv')
     parser.add_argument('--candidate',type=Path,
         default=ROOT/'output/submission_v5_neural32/candidate_pairs.tsv')
+    parser.add_argument('--matching-sha',default=MATCH_SHA,
+        help='Expected SHA-256 for the selected, validated matching file')
     parser.add_argument('--output',type=Path,
         default=ROOT/'output/Team_517_submission.zip')
     args=parser.parse_args()
-    print(json.dumps(package(args.matching,args.candidate,args.output),indent=2))
+    print(json.dumps(package(args.matching,args.candidate,args.output,
+                             args.matching_sha),indent=2))
 
 
 if __name__=='__main__':

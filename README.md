@@ -29,7 +29,10 @@ only selects from those candidates. V6 remains the best measured public file:
 experimental V8 global-owner postprocessor removes duplicate target
 assignments with decisive address evidence; its fully validated file is
 `output/submission_v8_owner80/matching_results.tsv`, but it has no public
-score yet. See
+score yet. M018's France-only rescore is downloaded and fully validated as
+`output/submission_v7_m018_france/matching_results.tsv`; it also has no public
+score. A combined V9 file, `output/submission_v9_m018_owner80/matching_results.tsv`,
+passes the same two-file validator but has no public score. See
 [INT006/INT007 methodology](Documentation_template.md) and
 [measured integration results](reports/swarm/INT006-neural32-integration.md).
 See [the integration decision](reports/COORDINATOR_PLAN.md),

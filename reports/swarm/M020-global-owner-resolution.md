@@ -49,3 +49,11 @@ This is promising because it attacks a global constraint absent from the pair
 model, especially in France. The proxy benchmark may overstate its precision
 on actual neural conflicts or the unlabeled French slice, so V8 remains an
 experimental submission until its public result is observed.
+
+For a joint M018/M020 experiment, the same 80/10 resolver applied to V7
+removes 42,420 conflicting assignments, creating V9 at
+`output/submission_v9_m018_owner80/matching_results.tsv` (SHA-256
+`0744bbf08066b403497c0d88df85fd718ead0b3dbb1b58fae4738f812968f4b9`).
+V9 also passes the organizer's full two-file validator and has no reported
+public score. A separate 70/10 V6 variant removes 62,346 edges; it is a
+research variant pending a public signal from V8, not a selected final output.
