@@ -2,12 +2,12 @@
 
 **Team Name:** Team 517
 
-**Team Members:** Complete before final submission
+**Team Members:**
 **Submission Date:** 27 September 2026
 
 ## 1. Executive Summary
 
-We combine lexical/character blocking with learned multilingual nearest-neighbor retrieval, then score the resulting business pairs using CatBoost and a fine-tuned multilingual cross-encoder. Both required TSVs come from the same run. The candidate file contains at most 32 Source 2/3 records per Source 1 business. On 3,051 labeled US/India development holdout businesses, the combined system scored 0.970702 macro F0.5, versus 0.944783 for the previous 160-candidate system. This is a development measurement, not a French or private-leaderboard score.
+We combine lexical/character blocking with learned multilingual nearest-neighbor retrieval, then score the resulting business pairs using CatBoost and a fine-tuned multilingual cross-encoder. An exact-name recovery rule repairs links whose provider address is missing. The candidate file contains at most 32 Source 2/3 records per Source 1 business. On 3,051 labeled US/India development holdout businesses, the complete system scored 0.972095 macro F0.5, versus 0.944783 for the previous 160-candidate system. This is a development measurement, not a French or private-leaderboard score.
 
 ## 2. Methodology
 
@@ -31,33 +31,36 @@ The INT003 CatBoost depth-10 model scores retained lexical/character pairs with 
 
 The pretrained encoder revisions and licenses are recorded in `reports/swarm/INT005-D017-learned-owner-competition.md` and `reports/swarm/M017-multilingual-crossencoder.md`. Each checkpoint is below the challenge's 8-billion-parameter limit. The saved fine-tuned weights are excluded from Git and recreated by the provided training pipeline. No pretrained model receives external business identity data during challenge training or inference.
 
+After pair scoring, a CPU rule restores a candidate only when its normalized name exactly equals the Source 1 business name, its normalized provider address is empty, and that name occurs once among same-country Source 1 records. This rule was selected on calibration anchors and applied to the unchanged 32-candidate file. On holdout it restored 44 true and 3 false links; broad fuzzy-name, nonempty-address, and target-to-target propagation variants were rejected because they created too many false merges. The rule uses no hidden labels or external data.
+
 ## 5. Results and Error Analysis
 
-| Development slice | Previous INT003 | Selected integrated system |
-|---|---:|---:|
-| Calibration, 4,389 businesses | 0.949121 | 0.977238 |
-| Holdout, 3,051 businesses | 0.944783 | 0.970702 |
-| India holdout, 1,212 businesses | 0.917541 | 0.968360 |
-| US holdout, 1,839 businesses | 0.962737 | 0.972246 |
+| Development slice | Previous INT003 | Neural32 | Neural32 plus recovery |
+|---|---:|---:|---:|
+| Calibration, 4,389 businesses | 0.949121 | 0.977238 | 0.977942 |
+| Holdout, 3,051 businesses | 0.944783 | 0.970702 | 0.972095 |
+| India holdout, 1,212 businesses | 0.917541 | 0.968360 | 0.968947 |
+| US holdout, 1,839 businesses | 0.962737 | 0.972246 | 0.974169 |
 
-The holdout blocker oracle of 0.992823 leaves 0.022121 macro points for better classification and decision rules. A more compact internal lexical budget of 32 scored 0.969242 on holdout, so the selected implementation retains 160 only for internal ranking while writing 32 final candidates. The labeled development folds have been inspected repeatedly; their scores do not establish a private-test result. France has no labels, and address ambiguity is higher there, so geographic transfer remains the principal uncertainty. The full test export and exact format validation status should be taken from the run's `completion.json` and organizer validator before the final archive is submitted.
+The holdout blocker oracle of 0.992823 leaves 0.020728 macro points after the recovery rule for better classification and decision rules. A more compact internal lexical budget of 32 scored 0.969242 before recovery, so the selected implementation retains 160 only for internal ranking while writing 32 final candidates. The labeled development folds have been inspected repeatedly; their scores do not establish a private-test result. France has no labels, and address ambiguity is higher there, so geographic transfer remains the principal uncertainty. The full test export contains 1,732,544 Source 1 rows and 55,384,406 candidate pairs; the final matching file passes the organizer's formatting validator.
 
 ## 6. Conclusion
 
-The learned retriever recovers more true links while reducing the final candidate set by fivefold. The multilingual pair model improves decisions on that harder pool. The final archive must pair the exact `matching_results.tsv` with its same-run `candidate_pairs.tsv`, plus the runnable pipeline and this methodology. Leaderboard scores should be reported only after organizer evaluation.
+The learned retriever recovers more true links while reducing the final candidate set by fivefold. The multilingual pair model improves decisions on that harder pool, and the missing-address rule repairs a measured residual error. The final archive pairs the recovery output with the unchanged 32-candidate file used by the neural model. Leaderboard scores should be reported only after organizer evaluation.
 
 ## Appendix
 
 ### A. Code Artifacts
 
-`modal_dense.py` trains the encoder; `modal_dense_retrieval.py` and `modal_dense_test.py` build complete target indexes; `modal_crossencoder.py` trains the reranker; `modal_neural_submission.py` scores the test split, emits both TSVs, merges partitioned output, and verifies that every predicted match is a candidate. Core implementation is under `src/ber/`. The repository `requirements.txt` and Modal images pin direct dependencies. The exact production command is:
+`modal_dense.py` trains the encoder; `modal_dense_retrieval.py` and `modal_dense_test.py` build complete target indexes; `modal_crossencoder.py` trains the reranker; `modal_neural_submission.py` scores the test split and emits both TSVs; `modal_recover_blank.py` produces the final matching file from the unchanged candidate file. Core implementation is under `src/ber/`. The repository `requirements.txt` and Modal images pin direct dependencies. The final production commands are:
 
 ```bash
 modal run modal_neural_submission.py --threshold 0.95 --dense-prior -2 --parts-per-country 4
+modal run modal_recover_blank.py
 ```
 
 The organizer's `student_resource/utils/validate_submission.py` should be run against the downloaded final matching file before upload. Full source data, pretrained and fine-tuned weights, outputs, and model caches are intentionally excluded from the code repository.
 
 ### B. Additional Results
 
-Aggregate protocols and measurements are in `reports/swarm/INT006-neural32-integration.md`, `reports/capped_match_evaluation.json`, and the associated INT005/M017 reports. The development holdout and leaderboard are distinct. The exact French and private-test accuracy is unknown without organizer evaluation.
+Aggregate protocols and measurements are in the INT005, M017, INT006, and INT007 reports and `reports/capped_match_evaluation.json`. The development holdout and leaderboard are distinct. The exact French and private-test accuracy is unknown without organizer evaluation.

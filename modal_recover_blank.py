@@ -61,6 +61,26 @@ def compress():
             'matching_sha256':receipt['matching_sha256']}
 
 
+@app.function(image=cpu_image,volumes={str(VOLUME_ROOT):volume},
+              cpu=2,memory=4096,timeout=1800)
+def compress_candidates():
+    from ber.predict import sha256
+    source_dir=VOLUME_ROOT/'project/output/submission_v5_neural32'
+    receipt=json.loads((source_dir/'completion.json').read_text())
+    source=source_dir/'candidate_pairs.tsv'
+    if sha256(source)!=receipt['candidate_sha256']:
+        raise ValueError('Frozen candidate checksum changed')
+    target=source_dir/'candidate_pairs.tsv.gz'
+    with source.open('rb') as src,target.open('wb') as dst:
+        with gzip.GzipFile(filename='',mode='wb',fileobj=dst,
+                           compresslevel=3,mtime=0) as gz:
+            shutil.copyfileobj(src,gz,1<<20)
+    volume.commit()
+    return {'compressed_bytes':target.stat().st_size,
+            'compressed_sha256':sha256(target),
+            'candidate_sha256':receipt['candidate_sha256']}
+
+
 @app.local_entrypoint()
 def main(action:str='run'):
     if action=='run':
@@ -69,6 +89,8 @@ def main(action:str='run'):
             json.dumps(result,indent=2),encoding='utf-8')
     elif action=='compress':
         result=compress.remote()
+    elif action=='compress-candidates':
+        result=compress_candidates.remote()
     else:
-        raise ValueError('Expected run or compress')
+        raise ValueError('Expected run, compress, or compress-candidates')
     print(json.dumps(result,indent=2),flush=True)
