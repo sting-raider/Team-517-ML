@@ -61,12 +61,16 @@ def feature_batches(c, query, executor):
 
 
 def select_anchors(c, partition, partitions, training_end=200000, confirmation=False,
-                   confirmation_start=40000):
+                   confirmation_start=40000, confirmation_reason=None, confirmation_freeze=None):
     # The 30k development population is preserved. 30k:50k never enters fitting.
     c.execute('''CREATE OR REPLACE TEMP TABLE ordered_s1 AS SELECT *,
         row_number() OVER(ORDER BY md5('sample517:'||entity_id)) AS sample_position
         FROM train WHERE source=1''')
     if confirmation:
+        from .holdout import require_confirmation_reuse
+        require_confirmation_reuse(
+            confirmation_start, 5000, confirmation_reason, confirmation_freeze
+        )
         condition = f'sample_position>{int(confirmation_start)} AND sample_position<={int(confirmation_start)+5000}'
     else:
         condition = f'(sample_position<=30000 OR (sample_position>50000 AND sample_position<={int(training_end)}))'
@@ -86,7 +90,8 @@ def select_anchors(c, partition, partitions, training_end=200000, confirmation=F
 
 def materialize(db, out, partition=0, partitions=8, training_end=200000, cap=160,
                 confirmation=False,candidate_fn=candidates,query_fn=pair_query,
-                feature_names=V2_NAMES,index_fn=None,confirmation_start=40000):
+                feature_names=V2_NAMES,index_fn=None,confirmation_start=40000,
+                confirmation_reason=None,confirmation_freeze=None):
     out=Path(out); out.mkdir(parents=True,exist_ok=True)
     if (out/'ready.json').exists():
         raise ValueError('Use a fresh feature directory; no silent cache reuse')
@@ -94,7 +99,10 @@ def materialize(db, out, partition=0, partitions=8, training_end=200000, cap=160
     build_index(c,'train'); frequency_tables(c,'train')
     if index_fn is not None:
         index_fn(c,'train')
-    meta=select_anchors(c,partition,partitions,training_end,confirmation,confirmation_start)
+    meta=select_anchors(
+        c,partition,partitions,training_end,confirmation,confirmation_start,
+        confirmation_reason,confirmation_freeze
+    )
     lookup={m['id']:i for i,m in enumerate(meta)}
     truths=[set(m['truth']) for m in meta]
     width=c.execute('SELECT max(length(entity_id)) FROM train').fetchone()[0]
@@ -121,6 +129,9 @@ def materialize(db, out, partition=0, partitions=8, training_end=200000, cap=160
     receipt={'partition':partition,'partitions':partitions,'training_end':training_end,
         'candidate_cap':cap,'feature_names':feature_names,'anchors':len(meta),'chunks':chunks,
         'confirmation':confirmation,'confirmation_start':confirmation_start,
+        'confirmation_authorization': (
+            {'action':'reuse','reason':confirmation_reason} if confirmation else None
+        ),
         'elapsed_seconds':time.time()-started}
     (out/'ready.json').write_text(json.dumps(receipt,indent=2),encoding='utf-8')
     c.close(); return receipt

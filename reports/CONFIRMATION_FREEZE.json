@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "sample_order": "train source=1 ORDER BY md5('sample517:' || entity_id)",
+  "policy": "Development and current expanded-fit search ranges are forbidden. Exact consumed windows require explicit reuse. Fresh disjoint windows require explicit consumption and a reason.",
+  "forbidden": [
+    {
+      "label": "development_30k",
+      "offset": 0,
+      "size": 30000,
+      "reason": "Used for fit, early stopping, calibration, development holdout, and model selection"
+    },
+    {
+      "label": "expanded_fit_search_range",
+      "offset": 50000,
+      "size": 150000,
+      "reason": "Current INT002/INT003 fitting admits fold=fit anchors at sample positions 50001 through 200000"
+    }
+  ],
+  "consumed": [
+    {
+      "label": "historical_shortlist_confirmation",
+      "offset": 30000,
+      "size": 5000,
+      "status": "consumed",
+      "report": "reports/confirmation.json",
+      "observed_macro_f0_5": 0.9147589908768532,
+      "reason": "Historical 30-candidate shortlist confirmation; already inspected"
+    },
+    {
+      "label": "submission_v1_confirmation",
+      "offset": 35000,
+      "size": 5000,
+      "status": "consumed",
+      "report": "reports/submission_v1_confirmation.json",
+      "observed_macro_f0_5": 0.928834953202575,
+      "reason": "Selected first-submission confirmation; already inspected"
+    },
+    {
+      "label": "int002_confirmation",
+      "offset": 40000,
+      "size": 5000,
+      "status": "consumed",
+      "report": "reports/int002_depth10_confirmation.json",
+      "observed_macro_f0_5": 0.9404781798930815,
+      "reason": "INT002 selected-model confirmation; already inspected"
+    },
+    {
+      "label": "int003_confirmation",
+      "offset": 45000,
+      "size": 5000,
+      "status": "consumed",
+      "report": "reports/int003_depth10_confirmation.json",
+      "observed_macro_f0_5": 0.9501984899746141,
+      "reason": "INT003 selected-model confirmation; already inspected"
+    }
+  ]
+}

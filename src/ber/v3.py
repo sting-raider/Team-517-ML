@@ -26,10 +26,12 @@ def pair_query(split,anchors,pairs):
         ORDER BY p.anchor,r.entity_id'''
 
 
-def materialize(db,out,partition=0,partitions=8,confirmation=False):
+def materialize(db,out,partition=0,partitions=8,confirmation=False,
+                confirmation_reason=None,confirmation_freeze=None):
     return materialize_v2(db,out,partition,partitions,confirmation=confirmation,
         candidate_fn=fused_candidates,query_fn=pair_query,
-        feature_names=V3_NAMES,index_fn=build_char_index,confirmation_start=45000)
+        feature_names=V3_NAMES,index_fn=build_char_index,confirmation_start=45000,
+        confirmation_reason=confirmation_reason,confirmation_freeze=confirmation_freeze)
 
 
 def score_rows(rows):
