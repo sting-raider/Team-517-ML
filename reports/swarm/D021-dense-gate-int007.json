@@ -1,0 +1,31 @@
+{
+  "experiment_id": "D021",
+  "issue": 299,
+  "status": "BLOCKED",
+  "recommendation": "FOLLOW-UP",
+  "fixed_dense_extra_penalty": 0.5,
+  "fixed_recovery_max_same_name_s1_anchors": 1,
+  "calibration": {
+    "v5": 0.9772376136256352,
+    "dense_gate": 0.977844004349562,
+    "int007": 0.9779415357533748,
+    "naive_additive_reference_not_a_metric": 0.9785479264773015,
+    "candidate_pair_recall": 0.9794448808588636,
+    "blocking_oracle_macro_f0_5": 0.9939180974102393
+  },
+  "holdout": {
+    "v5": 0.9707021141747368,
+    "dense_gate": 0.9714486711616093,
+    "int007": 0.9720945236442645,
+    "naive_additive_reference_not_a_metric": 0.9728410806311368,
+    "candidate_pair_recall": 0.9784843869002284,
+    "blocking_oracle_macro_f0_5": 0.9928230369823905
+  },
+  "int007_added_edges": {
+    "calibration": {"true": 51, "false": 9},
+    "holdout": {"true": 44, "false": 3}
+  },
+  "executed_tests": {"passed": 5, "failed": 0},
+  "exact_combined_metric": null,
+  "blocker": "Pair-level cap32 decisions/scores and recovery eligibility are private runtime artifacts; committed aggregate JSON cannot reconstruct post-gate recovery interaction."
+}
