@@ -94,6 +94,16 @@ def train_model(depth: int = 10):
         baseline_feature_count=len(V3_NAMES), baseline_threshold=.6250000000000002,
         blocker='lexical+char-rrf160-average-tie-rank+idf-pair',
     )
+    expected = {
+        'calibrate': (0.9491209587754517, 0.944357161560618, 0.9804608439335135),
+        'holdout': (0.9447832214793936, 0.9450685453160701, 0.9793001848908854),
+    }
+    for split, values in expected.items():
+        measured = result['baseline'][split]['all']
+        actual = (measured['macro_f0_5'], measured['candidate_pair_recall'],
+                  measured['blocking_oracle_macro_f0_5'])
+        if any(abs(a-b) > 1e-12 for a,b in zip(actual, values)):
+            raise ValueError(f'INT003 same-candidate parity failed on {split}: {actual} != {values}')
     volume.commit()
     return result
 
