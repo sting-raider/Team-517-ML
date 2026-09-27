@@ -24,7 +24,7 @@ def fixture():
         d[f"{fold}_US_dense_only"]={"predicted":5,"false_positive":1}
         d[f"{fold}_US_lexical"]={"predicted":95,"false_positive":1}
     return {"selected":baseline,"dense_gate_selected":gate,
-            "dense_gate_sweep":[worse,gate],"selection_diagnostics":d}
+            "dense_gate_sweep":[worse,copy.deepcopy(gate)],"selection_diagnostics":d}
 
 class TestD009aDenseGate(unittest.TestCase):
     def test_calibration_argmax_and_equivalent_prior(self):
