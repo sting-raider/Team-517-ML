@@ -1,0 +1,55 @@
+{
+  "experiment": "I037",
+  "scope": {
+    "sampling": "none",
+    "source1_rows": 2206821,
+    "hash_positions_reconstructed": 200000,
+    "split_counts": {
+      "fit": 108115,
+      "fit_core": 17990,
+      "fit_expanded_extra": 90125,
+      "early": 4570,
+      "calibrate": 4389,
+      "holdout": 3051,
+      "confirmation": 5000
+    },
+    "country_rows": {"India": 883188, "US": 1323633}
+  },
+  "fit_families": {
+    "fit_anchors": 108115,
+    "core_fit_anchors": 17990,
+    "expanded_extra_fit_anchors": 90125,
+    "distinct_nonempty_name_families": 96910,
+    "core_distinct_nonempty_name_families": 17483,
+    "distinct_nonempty_country_name_families": 96918,
+    "anchors_in_repeated_name_families": 17398,
+    "anchors_in_repeated_country_name_families": 17385
+  },
+  "evaluation": {
+    "early": {
+      "all": {"anchors":4570,"overlap_anchors":717,"overlap_rate":0.15689277899343546,"core_overlap_anchors":255,"core_overlap_rate":0.05579868708971553,"incremental_overlap_from_expanded_fit":0.10109409190371992,"family_novel_anchors":3853,"fanout":{"p50":2,"p90":5,"p99":11,"max":13}},
+      "India": {"anchors":1807,"overlap_anchors":365,"overlap_rate":0.20199225235196458,"core_overlap_anchors":97,"core_overlap_rate":0.05368013281682346,"incremental_overlap_from_expanded_fit":0.14831211953514112,"family_novel_anchors":1442},
+      "US": {"anchors":2763,"overlap_anchors":352,"overlap_rate":0.12739775606225118,"core_overlap_anchors":158,"core_overlap_rate":0.05718422005066956,"incremental_overlap_from_expanded_fit":0.07021353601158162,"family_novel_anchors":2411}
+    },
+    "calibrate": {
+      "all": {"anchors":4389,"overlap_anchors":678,"overlap_rate":0.1544771018455229,"core_overlap_anchors":196,"core_overlap_rate":0.044657097288676235,"incremental_overlap_from_expanded_fit":0.10982000455684666,"family_novel_anchors":3711,"fanout":{"p50":2,"p90":5,"p99":8,"max":12}},
+      "India": {"anchors":1754,"overlap_anchors":350,"overlap_rate":0.19954389965792474,"core_overlap_anchors":89,"core_overlap_rate":0.05074116305587229,"incremental_overlap_from_expanded_fit":0.14880273660205245,"family_novel_anchors":1404},
+      "US": {"anchors":2635,"overlap_anchors":328,"overlap_rate":0.12447817836812144,"core_overlap_anchors":107,"core_overlap_rate":0.040607210626185955,"incremental_overlap_from_expanded_fit":0.08387096774193549,"family_novel_anchors":2307}
+    },
+    "holdout": {
+      "all": {"anchors":3051,"overlap_anchors":501,"overlap_rate":0.16420845624385447,"core_overlap_anchors":152,"core_overlap_rate":0.04981973123566044,"incremental_overlap_from_expanded_fit":0.11438872500819404,"family_novel_anchors":2550,"fanout":{"p50":2,"p90":4,"p99":7,"max":10}},
+      "India": {"anchors":1212,"overlap_anchors":246,"overlap_rate":0.20297029702970298,"core_overlap_anchors":66,"core_overlap_rate":0.054455445544554455,"incremental_overlap_from_expanded_fit":0.1485148514851485,"family_novel_anchors":966},
+      "US": {"anchors":1839,"overlap_anchors":255,"overlap_rate":0.13866231647634583,"core_overlap_anchors":86,"core_overlap_rate":0.04676454594888527,"incremental_overlap_from_expanded_fit":0.09189777052746058,"family_novel_anchors":1584}
+    },
+    "confirmation": {
+      "all": {"anchors":5000,"overlap_anchors":852,"overlap_rate":0.1704,"core_overlap_anchors":284,"core_overlap_rate":0.0568,"incremental_overlap_from_expanded_fit":0.1136,"family_novel_anchors":4148,"fanout":{"p50":2,"p90":5,"p99":9,"max":13},"overlap_truth":{"mean_cardinality":3.6220657276995305,"singleton_rate":0.062206572769953054,"high_cardinality_ge5_rate":0.3215962441314554},"novel_truth":{"mean_cardinality":3.492767598842816,"singleton_rate":0.05038572806171649,"high_cardinality_ge5_rate":0.2666345226615236}},
+      "India": {"anchors":2022,"overlap_anchors":410,"overlap_rate":0.20276953511374876,"core_overlap_anchors":118,"core_overlap_rate":0.058358061325420374,"incremental_overlap_from_expanded_fit":0.1444114737883284,"family_novel_anchors":1612,"overlap_truth":{"mean_cardinality":3.7219512195121953,"singleton_rate":0.05853658536585366,"high_cardinality_ge5_rate":0.33658536585365856},"novel_truth":{"mean_cardinality":3.51302729528536,"singleton_rate":0.05583126550868486,"high_cardinality_ge5_rate":0.27543424317617865}},
+      "US": {"anchors":2978,"overlap_anchors":442,"overlap_rate":0.14842175957018133,"core_overlap_anchors":166,"core_overlap_rate":0.05574210879785091,"incremental_overlap_from_expanded_fit":0.09267965077233042,"family_novel_anchors":2536}
+    }
+  },
+  "validation": {
+    "focused_tests_passed": 4,
+    "replication_payload_sha256": "abff4457f916e483d842640b332c448e3d3269c6fce95396fc831798604c3a8d",
+    "first_pass_seconds": 22.756932497024536
+  }
+}
