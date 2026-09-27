@@ -1,67 +1,192 @@
 {
   "experiment": "F014",
   "issue": 237,
-  "scope": "Cross-experiment synthesis of complete Source-1 population measurements from F003a and X008; no sampling. New raw rerun attempted but execution surfaces failed before user code.",
+  "branch": "agent/r/F014-composite-numeric-keys",
   "current_main": "f08c041b274e58ae900620ac714ec8a0a06f09b0",
-  "production_semantics": {
-    "d": "first normalized address number + production address word",
-    "h": "first six characters of space-stripped normalized name + first address number",
-    "z": "first six characters of space-stripped normalized name + last address number",
-    "cutoff": "country-local target posting frequency <=1000 in production; values below are Source-1 proxy DF"
+  "recommendation": "REJECT",
+  "follow_up": "Full-target conditional rescue ablation only: test number+full-name-token when existing d/h/z and INT003 character retrieval fail, at the same final cap.",
+  "scope": {
+    "train_source1_bytes": 210069713,
+    "test_source1_bytes": 175022086,
+    "train_rows": 2206821,
+    "test_rows": 1732544,
+    "sampling": "none",
+    "labels_used": false,
+    "s2_s3_used": false,
+    "confirmation_used": false,
+    "leaderboard_tuning": false
   },
-  "test": {
-    "US": {
-      "number_only_df_le_1000": 0.854904,
-      "d_eligible_df_le_1000": 0.999991,
-      "delta_pp": 14.5087,
-      "d_highfreq_occurrence_gt_1000": 0,
-      "d_max_s1_df": 244,
-      "h_eligible": 0.999569,
-      "z_eligible": 0.999569,
-      "h_max_s1_df": 40,
-      "z_max_s1_df": 160
+  "semantics": {
+    "normalization": "NFD accent-fold, lowercase, non-alnum to spaces, collapse whitespace",
+    "number": "first normalized ASCII address digit run",
+    "number_name": "first address number + each distinct normalized name token len>=3",
+    "number_address": "first address number + each distinct production-style address word (d: proxy)",
+    "df_scope": "split + country + Source-1 only"
+  },
+  "results": {
+    "train": {
+      "US": {
+        "rows": 1323633,
+        "number": {
+          "coverage_df_le_10": 0.06045633495085118,
+          "coverage_df_le_100": 0.3305417740415961,
+          "coverage_df_le_1000": 0.7840693001761062,
+          "best_df_q50": 233,
+          "best_df_q99": 3849,
+          "mean_keys_per_row": 0.9999992445035746
+        },
+        "number_name": {
+          "coverage_df_le_10": 0.9887703011333202,
+          "coverage_df_le_100": 0.9999947115250224,
+          "coverage_df_le_1000": 0.9999984890071493,
+          "best_df_q50": 1,
+          "best_df_q99": 11,
+          "mean_keys_per_row": 3.1450764675706937
+        },
+        "number_address": {
+          "coverage_df_le_10": 0.9936379646019705,
+          "coverage_df_le_100": 0.9999841345750673,
+          "coverage_df_le_1000": 0.9999916895393209,
+          "best_df_q50": 1,
+          "best_df_q99": 9,
+          "mean_keys_per_row": 2.660911294898208
+        },
+        "name_minus_address_pp_at_1000": 0.0006799467828333405
+      },
+      "India": {
+        "rows": 883188,
+        "number": {
+          "coverage_df_le_10": 0.018377740639592022,
+          "coverage_df_le_100": 0.06818367097379041,
+          "coverage_df_le_1000": 0.26426310140083425,
+          "best_df_q50": 3060,
+          "best_df_q99": 48051,
+          "mean_keys_per_row": 0.912775082994787
+        },
+        "number_name": {
+          "coverage_df_le_10": 0.66892779340299,
+          "coverage_df_le_100": 0.8412602979207146,
+          "coverage_df_le_1000": 0.9112725716382016,
+          "best_df_q50": 2,
+          "best_df_q99": 279,
+          "mean_keys_per_row": 3.273035865523535
+        },
+        "number_address": {
+          "coverage_df_le_10": 0.8383832207865143,
+          "coverage_df_le_100": 0.9046782791432855,
+          "coverage_df_le_1000": 0.9124942820781079,
+          "best_df_q50": 1,
+          "best_df_q99": 91,
+          "mean_keys_per_row": 7.025650257929229
+        },
+        "name_minus_address_pp_at_1000": -0.1221710439906265,
+        "rescue_rows_at_1000": {
+          "number_name": 571576,
+          "number_address": 572510
+        }
+      }
     },
-    "India": {
-      "number_only_df_le_1000": 0.32879,
-      "d_eligible_df_le_1000": 0.912419,
-      "delta_pp": 58.3629,
-      "d_highfreq_occurrence_gt_1000": 0.0979127,
-      "d_max_s1_df": 8968,
-      "h_eligible": 0.912655,
-      "z_eligible": 0.912655,
-      "h_max_s1_df": 253,
-      "z_max_s1_df": 545
-    },
-    "France": {
-      "number_only_df_le_1000": 0.242719,
-      "d_eligible_df_le_1000": 0.995722,
-      "delta_pp": 75.3003,
-      "d_highfreq_occurrence_gt_1000": 0.27614,
-      "d_max_s1_df": 4423,
-      "h_eligible": 0.995803,
-      "z_eligible": 0.995803,
-      "h_max_s1_df": 264,
-      "z_max_s1_df": 262
+    "test": {
+      "US": {
+        "rows": 663106,
+        "number": {
+          "coverage_df_le_10": 0.10449158957994649,
+          "coverage_df_le_100": 0.46863548210994926,
+          "coverage_df_le_1000": 0.9080750287284386,
+          "best_df_q50": 117,
+          "best_df_q99": 1856,
+          "mean_keys_per_row": 0.9999984919454808
+        },
+        "number_name": {
+          "coverage_df_le_10": 0.9979686505626552,
+          "coverage_df_le_100": 0.9999984919454808,
+          "coverage_df_le_1000": 0.9999984919454808,
+          "best_df_q50": 1,
+          "best_df_q99": 6,
+          "mean_keys_per_row": 3.144393204103115
+        },
+        "number_address": {
+          "coverage_df_le_10": 0.9987694275123434,
+          "coverage_df_le_100": 0.9999909516728849,
+          "coverage_df_le_1000": 0.9999909516728849,
+          "best_df_q50": 1,
+          "best_df_q99": 6,
+          "mean_keys_per_row": 2.661663444456844
+        },
+        "name_minus_address_pp_at_1000": 0.0007540272595973896
+      },
+      "India": {
+        "rows": 809986,
+        "number": {
+          "coverage_df_le_10": 0.01960157336052722,
+          "coverage_df_le_100": 0.07171605435155669,
+          "coverage_df_le_1000": 0.2717059307197902,
+          "best_df_q50": 2784,
+          "best_df_q99": 44205,
+          "mean_keys_per_row": 0.9126552804616376
+        },
+        "number_name": {
+          "coverage_df_le_10": 0.6761783536999405,
+          "coverage_df_le_100": 0.8470899497028344,
+          "coverage_df_le_1000": 0.911265132977607,
+          "best_df_q50": 2,
+          "best_df_q99": 262,
+          "mean_keys_per_row": 3.2711145624739193
+        },
+        "number_address": {
+          "coverage_df_le_10": 0.8426133291192688,
+          "coverage_df_le_100": 0.9055477502080282,
+          "coverage_df_le_1000": 0.9124194739168331,
+          "best_df_q50": 1,
+          "best_df_q99": 87,
+          "mean_keys_per_row": 7.02316830167435
+        },
+        "name_minus_address_pp_at_1000": -0.11543409392260617,
+        "rescue_rows_at_1000": {
+          "number_name": 518175,
+          "number_address": 518969
+        }
+      },
+      "France": {
+        "rows": 259452,
+        "number": {
+          "coverage_df_le_10": 0.013825293310516011,
+          "coverage_df_le_100": 0.04600465596719239,
+          "coverage_df_le_1000": 0.2371614017236329,
+          "best_df_q50": 3165,
+          "best_df_q99": 8010,
+          "mean_keys_per_row": 0.99580269182739
+        },
+        "number_name": {
+          "coverage_df_le_10": 0.7833626258421597,
+          "coverage_df_le_100": 0.9620507839600388,
+          "coverage_df_le_1000": 0.9957988375499129,
+          "best_df_q50": 2,
+          "best_df_q99": 219,
+          "mean_keys_per_row": 2.8081957356273994
+        },
+        "number_address": {
+          "coverage_df_le_10": 0.9506421226276922,
+          "coverage_df_le_100": 0.990668794227834,
+          "coverage_df_le_1000": 0.99572175200037,
+          "best_df_q50": 1,
+          "best_df_q99": 42,
+          "mean_keys_per_row": 5.780152012703699
+        },
+        "name_minus_address_pp_at_1000": 0.007708554954288793,
+        "rescue_rows_at_1000": {
+          "number_name": 196830,
+          "number_address": 196810
+        }
+      }
     }
   },
-  "train": {
-    "US": {
-      "number_only_df_le_1000": 0.751337,
-      "d_eligible_df_le_1000": 0.999992,
-      "delta_pp": 24.8655
-    },
-    "India": {
-      "number_only_df_le_1000": 0.308302,
-      "d_eligible_df_le_1000": 0.912494,
-      "delta_pp": 60.4192
-    }
+  "validation": {
+    "authored_synthetic_behavior": "PASS",
+    "production_d_proxy_parity": "Fresh number_address DF<=1000 rates reproduce prior X008 values to four decimals.",
+    "runtime_seconds_sum_country_passes": 342.76,
+    "peak_rss_kib": 1284292,
+    "caveat": "Branch helper was semantically reproduced in the working Python surface because the container/private-Python backends failed at session startup."
   },
-  "caveats": [
-    "F003a number-only coverage uses the best DF among any distinct address numeric run, whereas production d: uses the first address number. This makes the number-only comparator more permissive, so the d: selectivity rescue is conservative but not an identical-key ablation.",
-    "X008 and F003a are Source-1 collision/selectivity proxies; production posting frequencies come from pooled S2/S3 target inventory.",
-    "France has no labels; no accuracy, recall, precision, or F0.5 claim is made.",
-    "The newly proposed number+full-name-token family was not empirically rescanned in this session because both local Python surfaces and the container failed with session-level ClientError before user code execution."
-  ],
-  "recommendation": "FOLLOW-UP",
-  "next_gate": "On the full target inventory, ablate existing d/h/z channels and test whether number+full-name-token or multi-number composites recover additional positives at fixed cap. Report pair/entity/all-matches recall, oracle macro F0.5, US/India/source slices, candidate counts and marginal positives per added candidate."
+  "interpretation": "At DF<=1000 number+name is effectively tied with existing number+address and slightly worse in India. At DF<=10 it trails number+address by 16.64 pp on test India and 16.73 pp on test France. Source-1 selectivity does not justify an unconditional new retrieval family."
 }
