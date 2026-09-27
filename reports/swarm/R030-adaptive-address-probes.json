@@ -1,0 +1,219 @@
+{
+  "experiment_id": "R030",
+  "issue": 272,
+  "protocol": {
+    "train_rows": 2206821,
+    "test_rows": 1732544,
+    "train_source1_sha256": "591af0e1dfeb65cab71ea6ee8cb69df00f92d6ba6fa79e05746c938775d14973",
+    "test_source1_sha256": "3d4a32c54c2ca9c53fd7c2be105bf26f708f94c4d2f88eb370972a195665c2f5",
+    "df_cutoff": 1000,
+    "fixed_k": [
+      4,
+      6,
+      8
+    ],
+    "adaptive_extra_budget": 200,
+    "runtime_seconds_sum": 306.94,
+    "runtime_note": "Sum of measured chunk execution wall times for two complete passes over each file in Python 3.13.5 / pandas 2.2.3; inter-call idle time excluded.",
+    "evidence_boundary": "Source-1 country/split-local DF proxy only; production blocker uses pooled S2+S3 target posting frequency."
+  },
+  "integrity": {
+    "f007a_train_fixed4_parity": true,
+    "train_us_vocab": 104930,
+    "train_india_vocab": 309602,
+    "train_us_eligible_keys": 1672031,
+    "train_us_dropped_fixed4": 205,
+    "train_india_eligible_keys": 2274335,
+    "train_india_dropped_fixed4": 170917,
+    "focused_tests": "4/4 PASS"
+  },
+  "train": {
+    "US": {
+      "records": 1323633,
+      "eligible_count_p99": 3,
+      "fixed4": {
+        "dropped_rate": 0.0001226053823164762,
+        "mean_probes": 1.263058566838391,
+        "posting_mass": 489533942
+      },
+      "fixed6": {
+        "dropped_rate": 0,
+        "mean_probes": 1.2632134436055915,
+        "posting_mass": 489648835,
+        "recovered_fraction": 1
+      },
+      "fixed8": {
+        "dropped_rate": 0,
+        "mean_probes": 1.2632134436055915,
+        "posting_mass": 489648835,
+        "recovered_fraction": 1
+      },
+      "adaptive200": {
+        "dropped_rate": 0.00010645735635284274,
+        "mean_probes": 1.263078965241876,
+        "posting_mass": 489537276,
+        "recovered_fraction": 0.13170731707317074
+      }
+    },
+    "India": {
+      "records": 883188,
+      "eligible_count_p90": 5,
+      "eligible_count_p95": 5,
+      "eligible_count_p99": 7,
+      "fixed4": {
+        "eligible_keys": 2274335,
+        "dropped_keys": 170917,
+        "dropped_rate": 0.07515031866457668,
+        "mean_probes": 2.3816197683845344,
+        "posting_mass": 412355612
+      },
+      "fixed6": {
+        "dropped_keys": 21918,
+        "dropped_rate": 0.009637102713540442,
+        "mean_probes": 2.550325638482407,
+        "posting_mass": 479571804,
+        "recovered_fraction": 0.8717623173821212,
+        "posting_increase_rate": 0.16300540127000868
+      },
+      "fixed8": {
+        "dropped_keys": 2067,
+        "dropped_rate": 0.0009088370886434936,
+        "mean_probes": 2.5728021666961056,
+        "posting_mass": 490294647,
+        "recovered_fraction": 0.9879064107139722,
+        "posting_increase_rate": 0.18900927435419504
+      },
+      "adaptive200": {
+        "dropped_keys": 138570,
+        "dropped_rate": 0.060927699745200244,
+        "mean_probes": 2.418245039561226,
+        "posting_mass": 415469895,
+        "recovered_fraction": 0.18925560359706758,
+        "posting_increase_rate": 0.007552420554906865
+      }
+    }
+  },
+  "test": {
+    "US": {
+      "records": 663106,
+      "eligible_count_p99": 3,
+      "fixed4": {
+        "dropped_keys": 249,
+        "dropped_rate": 0.0002408626947215279,
+        "posting_mass": 265740524
+      },
+      "fixed6": {
+        "dropped_keys": 4,
+        "dropped_rate": 0.000003869280236490408,
+        "recovered_fraction": 0.9839357429718876,
+        "posting_increase_rate": 0.0005272172941150669
+      },
+      "fixed8": {
+        "dropped_keys": 0,
+        "dropped_rate": 0,
+        "recovered_fraction": 1,
+        "posting_increase_rate": 0.0005374716578793229
+      },
+      "adaptive200": {
+        "dropped_keys": 224,
+        "dropped_rate": 0.00021667969324346286,
+        "recovered_fraction": 0.10040160642570281,
+        "posting_increase_rate": 0.000008459379721852284
+      }
+    },
+    "India": {
+      "records": 809986,
+      "eligible_count_p90": 5,
+      "eligible_count_p95": 6,
+      "eligible_count_p99": 7,
+      "fixed4": {
+        "eligible_keys": 2139025,
+        "dropped_keys": 169050,
+        "dropped_rate": 0.07903133436963103,
+        "mean_probes": 2.432109937702627,
+        "posting_mass": 383571826
+      },
+      "fixed6": {
+        "dropped_keys": 22295,
+        "dropped_rate": 0.010422973083531049,
+        "mean_probes": 2.6132920815915335,
+        "posting_mass": 449849142,
+        "recovered_fraction": 0.8681159420289855,
+        "posting_increase_rate": 0.17278984405908895
+      },
+      "fixed8": {
+        "dropped_keys": 2082,
+        "dropped_rate": 0.000973340657542572,
+        "mean_probes": 2.6382468338958946,
+        "posting_mass": 460800786,
+        "recovered_fraction": 0.987684117125111,
+        "posting_increase_rate": 0.20134158654290735
+      },
+      "adaptive200": {
+        "dropped_keys": 137331,
+        "dropped_rate": 0.06420261567770362,
+        "mean_probes": 2.471269873800288,
+        "posting_mass": 386609163,
+        "recovered_fraction": 0.18763087843833184,
+        "posting_increase_rate": 0.007918561255330572
+      }
+    },
+    "France": {
+      "records": 259452,
+      "eligible_count_p99": 4,
+      "fixed4": {
+        "eligible_keys": 349756,
+        "dropped_keys": 2620,
+        "dropped_rate": 0.007490936538615492,
+        "mean_probes": 1.3379584663059063,
+        "posting_mass": 64623273
+      },
+      "fixed6": {
+        "dropped_keys": 341,
+        "dropped_rate": 0.0009749654044533903,
+        "mean_probes": 1.3467423646763177,
+        "posting_mass": 65532431,
+        "recovered_fraction": 0.8698473282442748,
+        "posting_increase_rate": 0.014068584857965952
+      },
+      "fixed8": {
+        "dropped_keys": 40,
+        "dropped_rate": 0.0001143654433376411,
+        "mean_probes": 1.3479025021969382,
+        "posting_mass": 65661474,
+        "recovered_fraction": 0.9847328244274809,
+        "posting_increase_rate": 0.016065435125825336
+      },
+      "adaptive200": {
+        "dropped_keys": 1887,
+        "dropped_rate": 0.005395189789453219,
+        "mean_probes": 1.340783651696653,
+        "posting_mass": 64694488,
+        "recovered_fraction": 0.27977099236641223,
+        "posting_increase_rate": 0.0011020023699511476
+      }
+    },
+    "global": {
+      "fixed4_dropped_keys": 171919,
+      "fixed6": {
+        "recovered_keys": 149279,
+        "recovered_fraction": 0.8683100762568419,
+        "extra_proxy_posting_mass": 67326577,
+        "posting_increase_rate": 0.09430342853195883
+      },
+      "fixed8": {
+        "recovered_keys": 169797,
+        "recovered_fraction": 0.9876569779954514,
+        "extra_proxy_posting_mass": 78409989,
+        "posting_increase_rate": 0.1098278142649845
+      },
+      "adaptive200": {
+        "recovered_keys": 32477,
+        "recovered_fraction": 0.18890873027414073,
+        "extra_proxy_posting_mass": 3110800,
+        "posting_increase_rate": 0.0043572556121072
+      }
+    }
+  },
+  "recommendation": "FOLLOW-UP: full-target fixed-cap benchmark baseline fixed4 vs fixed6 and adaptive200 first; defer fixed8 unless fixed6 demonstrates useful marginal positive recall at acceptable candidate cost."
+}
