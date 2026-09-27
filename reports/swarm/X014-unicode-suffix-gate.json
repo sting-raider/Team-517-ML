@@ -1,0 +1,184 @@
+{
+  "experiment_id": "X014",
+  "issue": 257,
+  "branch": "agent/x/X014-unicode-suffix-gate",
+  "protocol": {
+    "test_source1_rows": 1732544,
+    "test_source1_bytes": 175022086,
+    "test_source1_sha256": "3d4a32c54c2ca9c53fd7c2be105bf26f708f94c4d2f88eb370972a195665c2f5",
+    "sampling": "none",
+    "country_rows": {
+      "US": 663106,
+      "India": 809986,
+      "France": 259452
+    },
+    "suffix_rows": {
+      "US": 376317,
+      "India": 681902,
+      "France": 178783
+    },
+    "rare_word_df_cutoff": 1000,
+    "labels_used": false,
+    "confirmation_used": false,
+    "target_side_metrics_claimed": false
+  },
+  "validation": {
+    "focused_tests": "5/5 PASS",
+    "suffix_set_mismatches": {
+      "US": 0,
+      "India": 0,
+      "France": 0
+    },
+    "fold_change_rates": {
+      "US": {
+        "name": 0,
+        "address": 0
+      },
+      "India": {
+        "name": 0,
+        "address": 0.00057408399651352
+      },
+      "France": {
+        "name": 0.15720826973775495,
+        "address": 0.27831352234710083
+      }
+    },
+    "r029_baseline_parity": {
+      "US": {
+        "coverage": 0.9433589234608056,
+        "collision": 0.0008535163182179256,
+        "collision_abs_diff": 0
+      },
+      "India": {
+        "coverage": 0.9328921164624828,
+        "collision": 0.0005596243600082372,
+        "collision_abs_diff": 0
+      },
+      "France": {
+        "coverage": 0.9740579361572409,
+        "collision": 0.018576473628298257,
+        "collision_abs_diff": 0
+      }
+    }
+  },
+  "views": {
+    "folded_name_folded_word": {
+      "France": {
+        "coverage": 0.9740579361572409,
+        "collision": 0.018576473628298257,
+        "collision_rows": 3235,
+        "p99_group": 2,
+        "changed_key_rate": 0
+      },
+      "US": {
+        "coverage": 0.9433589234608056,
+        "collision": 0.0008535163182179256,
+        "p99_group": 1
+      },
+      "India": {
+        "coverage": 0.9328921164624828,
+        "collision": 0.0005596243600082372,
+        "p99_group": 1
+      }
+    },
+    "folded_name_unicode_word": {
+      "France": {
+        "coverage": 0.9771790382754513,
+        "collision": 0.018213768509985517,
+        "collision_rows": 3182,
+        "p99_group": 2,
+        "changed_key_rate": 0.13218869333027075,
+        "delta_pp": -0.036270511831273944
+      },
+      "US": {
+        "coverage": 0.9433589234608056,
+        "collision": 0.0008535163182179256,
+        "p99_group": 1
+      },
+      "India": {
+        "coverage": 0.9328921164624828,
+        "collision": 0.0005596243600082372,
+        "p99_group": 1,
+        "changed_keys": 71,
+        "changed_key_rate": 0.00011161047629377764
+      }
+    },
+    "unicode_name_folded_word": {
+      "France": {
+        "coverage": 0.9740579361572409,
+        "collision": 0.018283614229521374,
+        "collision_rows": 3184,
+        "p99_group": 2,
+        "changed_key_rate": 0.08905222659278188,
+        "delta_pp": -0.029285939877688252
+      },
+      "US": {
+        "coverage": 0.9433589234608056,
+        "collision": 0.0008535163182179256,
+        "p99_group": 1
+      },
+      "India": {
+        "coverage": 0.9328921164624828,
+        "collision": 0.0005596243600082372,
+        "p99_group": 1
+      }
+    },
+    "unicode_name_unicode_word": {
+      "France": {
+        "coverage": 0.9771790382754513,
+        "collision": 0.017921844501811647,
+        "collision_rows": 3131,
+        "p99_group": 2,
+        "changed_key_rate": 0.20994573487610899,
+        "delta_pp": -0.06546291264866097,
+        "relative_collision_change": -0.035239687552398924
+      },
+      "US": {
+        "coverage": 0.9433589234608056,
+        "collision": 0.0008535163182179256,
+        "p99_group": 1
+      },
+      "India": {
+        "coverage": 0.9328921164624828,
+        "collision": 0.0005596243600082372,
+        "p99_group": 1,
+        "changed_keys": 71,
+        "changed_key_rate": 0.00011161047629377764
+      }
+    }
+  },
+  "paired_france_status_transitions": {
+    "folded_name_unicode_word": {
+      "0->0": 4080,
+      "0->1": 524,
+      "0->2": 34,
+      "1->1": 170905,
+      "1->2": 5,
+      "2->1": 92,
+      "2->2": 3143
+    },
+    "unicode_name_folded_word": {
+      "0->0": 4638,
+      "1->1": 170910,
+      "2->1": 51,
+      "2->2": 3184
+    },
+    "unicode_name_unicode_word": {
+      "0->0": 4080,
+      "0->1": 525,
+      "0->2": 33,
+      "1->1": 170905,
+      "1->2": 5,
+      "2->1": 142,
+      "2->2": 3093
+    }
+  },
+  "runtime": {
+    "measured_preprocess_seconds": 104.609140466,
+    "four_view_seconds": 84.214594556,
+    "france_filter_seconds": 5.924994642,
+    "france_paired_seconds": 12.118354811,
+    "measured_compute_seconds_approx": 206.867084475
+  },
+  "recommendation": "FOLLOW-UP: preserve Unicode name/address as optional parallel R029 benchmark views, but do not treat accent folding as the dominant France residual; combined Source-1 proxy collision reduction is only 3.52% relative."
+}
