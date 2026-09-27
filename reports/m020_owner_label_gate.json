@@ -1,0 +1,30 @@
+{
+  "protocol": "Exact normalized-name S1 competitor groups of size 2-20 on supplied labeled train; truth used only to measure whether closest-address owner is correct",
+  "counts": {
+    "US": {
+      "eligible_with_true_owner": 336248,
+      "best_correct": 324298,
+      "gate_70": 291446,
+      "gate_70_correct": 291445,
+      "gate_80": 242093,
+      "gate_80_correct": 242093,
+      "gate_85": 190462,
+      "gate_85_correct": 190462,
+      "gate_90": 129223,
+      "gate_90_correct": 129223
+    },
+    "India": {
+      "eligible_with_true_owner": 140069,
+      "best_correct": 132717,
+      "gate_70": 107828,
+      "gate_70_correct": 107824,
+      "gate_80": 95263,
+      "gate_80_correct": 95263,
+      "gate_85": 79971,
+      "gate_85_correct": 79971,
+      "gate_90": 56205,
+      "gate_90_correct": 56205
+    }
+  },
+  "seconds": 18.890999999945052
+}

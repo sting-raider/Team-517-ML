@@ -8,7 +8,7 @@ import numpy as np
 from .dense_training import serialize
 
 
-def score_dense_only(db, pair_path, model_path, out):
+def score_dense_only(db, pair_path, model_path, out, dense_only=True):
     import duckdb
     import torch
     from transformers import AutoModelForSequenceClassification,AutoTokenizer
@@ -17,7 +17,7 @@ def score_dense_only(db, pair_path, model_path, out):
     with Path(pair_path).open(encoding='utf-8') as stream:
         for line in stream:
             row=json.loads(line)
-            if row['dense_only']:
+            if not dense_only or row['dense_only']:
                 pairs.append((row['anchor'],row['target']))
     needed=sorted({i for pair in pairs for i in pair})
     c=duckdb.connect(str(db),read_only=True)
@@ -48,7 +48,7 @@ def score_dense_only(db, pair_path, model_path, out):
 
 def evaluate_capped_match(baseline, retrieval_root, cross_root, dense_score_root, out,
                           scheme='capped',ownership_root=None,owner_cross_root=None,
-                          record_db=None):
+                          record_db=None,override_cross_root=None):
     from .experiment import choose_threshold
     from .v2 import score_slices
 
@@ -90,6 +90,19 @@ def evaluate_capped_match(baseline, retrieval_root, cross_root, dense_score_root
                     values[pair]=(None,float(logit))
     if len(values)!=len(selected):
         raise ValueError(f'Incomplete capped scores: {len(values)} vs {len(selected)}')
+    if override_cross_root is not None:
+        override={}
+        for country in ('India','US'):
+            for prefix in ('cal','hold'):
+                with np.load(Path(override_cross_root)/f'{country}_{prefix}.npz') as z:
+                    for anchor,target,logit in zip(z['anchor'],z['target'],z['logit']):
+                        key=(str(anchor),str(target))
+                        if key in override:
+                            raise ValueError('Duplicate override pair')
+                        override[key]=float(logit)
+        if set(override)!=set(values):
+            raise ValueError(f'Cross-encoder override coverage: {len(override)} vs {len(values)}')
+        values={key:(base_prob,override[key]) for key,(base_prob,_) in values.items()}
     keys=list(selected)
     groups=np.array([byid[a] for a,_ in keys],np.int32)
     targets=np.array([t for _,t in keys])
@@ -135,6 +148,8 @@ def evaluate_capped_match(baseline, retrieval_root, cross_root, dense_score_root
             'pairs':len(keys),'dense_only_pairs':int(dense.sum()),
             'variants':variants,'selected':best,
             'selection_diagnostics':diagnostics}
+    if override_cross_root is not None:
+        report['cross_model_override']=str(override_cross_root)
     dense_gates=[]
     for extra_penalty in (-1.,0.,.5,1.,1.5,2.,3.):
         gated_logits=chosen_logits-np.where(dense,extra_penalty,0.)
@@ -259,6 +274,40 @@ def evaluate_capped_match(baseline, retrieval_root, cross_root, dense_score_root
                      JOIN needed_targets n USING(entity_id)''').fetchall()}
         if len(records)!=len(needed):
             raise ValueError('Missing target record for exact-cluster audit')
+        from rapidfuzz.fuzz import token_sort_ratio
+        selected_owners={}
+        for i,(anchor,target) in enumerate(keys):
+            if chosen[i]:
+                fold=meta[int(groups[i])]['fold']
+                selected_owners.setdefault((fold,target),[]).append(i)
+        owner_sweeps=[]
+        for minimum in (70.,80.,85.,90.):
+            removed=np.zeros(len(keys),bool)
+            resolved=0
+            for (_,target),positions in selected_owners.items():
+                if len(positions)<2 or not records[target][1]:
+                    continue
+                ranked=sorted(((token_sort_ratio(records[target][1],
+                                                  records[keys[i][0]][1]),i)
+                               for i in positions),reverse=True)
+                if ranked[0][0]<minimum or ranked[0][0]-ranked[1][0]<10.:
+                    continue
+                resolved+=1
+                for _,i in ranked[1:]:
+                    removed[i]=True
+            adjusted=1/(1+np.exp(-np.clip(chosen_logits,-30,30)))
+            adjusted[removed]=0.
+            counts={}
+            for fold_name in ('calibrate','holdout'):
+                fold_mask=np.array([m['fold']==fold_name for m in meta],bool)[groups]
+                counts[fold_name]={
+                    'removed_true_edges':int(np.count_nonzero(removed&truth&fold_mask)),
+                    'removed_false_edges':int(np.count_nonzero(removed&~truth&fold_mask))}
+            owner_sweeps.append({'minimum_address_ratio':minimum,'minimum_margin':10.,
+                'resolved_targets':resolved,'counts':counts,
+                'calibration':score_slices(meta,groups,targets,adjusted,'calibrate',best['threshold']),
+                'holdout':score_slices(meta,groups,targets,adjusted,'holdout',best['threshold'])})
+        report['conflict_address_resolver']=owner_sweeps
         selected_groups=set()
         group_key=[]
         for i,(anchor,target) in enumerate(keys):

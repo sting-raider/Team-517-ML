@@ -29,17 +29,51 @@
     },
     {
       "number": 3,
-      "status": "Prepared, not yet uploaded",
+      "status": "Evaluated (user-reported)",
       "file": "output/submission_v3_d10/matching_results.tsv",
       "sha256": "bf712f4d4fee94e56487b614ef302752bbcb2d2699e2fb65637aaf7fc32f4539",
-      "public_score": null,
+      "public_score": 0.917,
       "private_score": null,
       "candidate_cap": 160,
       "threshold": 0.6250000000000002,
       "confirmation_macro_f0_5": 0.9501984899746141,
       "baseline_on_same_confirmation": 0.942284948006719,
       "validation": "Cloud full-pair PASS; organizer matching validator PASS; local SHA256 PASS",
-      "candidate_remote": "project/output/submission_v3_d10/candidate_pairs.tsv"
+      "candidate_remote": "project/output/submission_v3_d10/candidate_pairs.tsv",
+      "evidence": "User-reported leaderboard result for v3 matching_results.tsv"
+    },
+    {
+      "number": null,
+      "model_version": "v5",
+      "status": "Evaluated (user-reported)",
+      "file": "output/submission_v5_neural32/matching_results.tsv",
+      "sha256": "5a4aff5fcc37c74769ff3db1ebf2d35f85ab2258d80e5425e90ae616f1d7b33d",
+      "public_score": 0.961,
+      "private_score": null,
+      "candidate_cap": 32,
+      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
+    },
+    {
+      "number": null,
+      "model_version": "v6",
+      "status": "Evaluated (user-reported)",
+      "file": "output/submission_v6_blank_recovery/matching_results.tsv",
+      "sha256": "ab1b41964cdfbbccb4956c47d362d6c9b08cf7de73d67c3c8b66a963f61010e5",
+      "public_score": 0.962,
+      "private_score": null,
+      "candidate_cap": 32,
+      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
+    },
+    {
+      "number": null,
+      "model_version": "v8-owner80",
+      "status": "Prepared, not yet reported as uploaded",
+      "file": "output/submission_v8_owner80/matching_results.tsv",
+      "sha256": "f3892589588bbda2c6dbcf71d3f630ae72a5c9331a608937eb93dbba6303fd82",
+      "public_score": null,
+      "private_score": null,
+      "candidate_cap": 32,
+      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
     }
   ]
 }

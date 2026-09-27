@@ -47,6 +47,7 @@ def package(matching,candidate,output):
         'Documentation_template.md':ROOT/'Documentation_template.md',
         'code/business_entity_resolution/README.md':code/'README.md',
         'code/business_entity_resolution/requirements.txt':code/'requirements.txt',
+        'code/business_entity_resolution/requirements-gpu.txt':code/'requirements-gpu.txt',
         'code/business_entity_resolution/pyproject.toml':ROOT/'pyproject.toml',
         'code/business_entity_resolution/tools/stage_modal.py':ROOT/'tools/stage_modal.py'}
     for name in CORE_MODAL+REPORTS:

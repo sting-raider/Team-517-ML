@@ -12,7 +12,8 @@ MODEL = 'cross-encoder/mmarco-mMiniLMv2-L12-H384-v1'
 REVISION = '1427fd652930e4ba29e8149678df786c240d8825'
 
 
-def train(data_root, out, max_seconds=3000, callback=None):
+def train(data_root, out, max_seconds=3000, callback=None,
+          positive_limit=2):
     import torch
     import torch.nn.functional as F
     from huggingface_hub import HfApi
@@ -44,7 +45,9 @@ def train(data_root, out, max_seconds=3000, callback=None):
                 if not positives or not row['negatives']:
                     continue
                 anchors += 1
-                for _,text in rng.sample(positives,min(2,len(positives))):
+                selected=positives if positive_limit is None else \
+                    rng.sample(positives,min(positive_limit,len(positives)))
+                for _,text in selected:
                     pairs.append((row['query'],text,1.))
                 for _,text in row['negatives']:
                     pairs.append((row['query'],text,0.))
@@ -97,6 +100,7 @@ def train(data_root, out, max_seconds=3000, callback=None):
             'positives':sum(r[2] for r in pairs),'steps':step,'planned_steps':total_steps,
             'seconds':time.monotonic()-started,'stopped_on_time_budget':step<total_steps,
             'batch_size':batch_size,'max_length':160,'seed':517,
+            'positive_limit_per_anchor':positive_limit,
             'initial_loss_100':float(np.mean(losses[:100])),
             'final_loss_100':float(np.mean(losses[-100:])),
             'peak_gpu_bytes':torch.cuda.max_memory_allocated(),

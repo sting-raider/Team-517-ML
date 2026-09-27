@@ -17,7 +17,9 @@ code/
 └── student_resource/dataset/
 ```
 
-Install `requirements.txt` and the local package. On Windows PowerShell:
+Install `requirements.txt` and the local package. The Modal scripts install the
+additional pinned GPU packages inside their Linux images; those versions are
+also listed in `requirements-gpu.txt`. On Windows PowerShell:
 
 ```powershell
 python -m venv .venv
