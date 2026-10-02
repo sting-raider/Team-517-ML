@@ -1,71 +1,94 @@
-# Team 517 business entity resolution pipeline
+# Team 517 — selected V13 submission (public score 0.969)
 
-This code regenerates both final outputs from the challenge's supplied TSV files. It uses no external entity database, geocoder, business search, or record-ID signal. The only downloads made during training are the pinned, permitted pretrained multilingual checkpoints described in `Documentation_template.md` and the checked-in INT005/M017 reports. The final candidate set contains at most 32 Source 2/3 records per Source 1 business.
+Run commands from this `business_entity_resolution` directory. All source code is under `src/`: `ber/` contains record processing, blocking, model training, scoring, and decision rules; `pipeline/` contains orchestration and CLI entrypoints. The exact selected weights are included in `models/`. No private Modal artifact or Git checkout is needed. The organizer supplies the original training/test data separately.
 
-## Inputs and environment
+## Environment and input
 
-Use Python 3.12 and a Modal account with a GPU-enabled workspace. Place the organizer's `student_resource/dataset/{train,test}/` folder next to this `business_entity_resolution` directory. The expected local layout is:
+Use Python 3.12. The Modal Linux images pin the CPU dependencies in `requirements.txt` and GPU dependencies listed in `requirements-gpu.txt`. GPU inference uses NVIDIA L4 and bfloat16; preprocessing/indexing uses CPU containers. Full regeneration processes roughly 10 million target records and 55 million candidate pairs, so it requires substantial disk and compute. Authenticate your own Modal account; this archive contains no credentials.
 
-```
-code/
-├── business_entity_resolution/
-│   ├── src/ber/
-│   ├── tools/stage_modal.py
-│   ├── modal_*.py
-│   ├── pyproject.toml
-│   └── requirements.txt
-└── student_resource/dataset/
-```
-
-Install `requirements.txt` and the local package. The Modal scripts install the
-additional pinned GPU packages inside their Linux images; those versions are
-also listed in `requirements-gpu.txt`. On Windows PowerShell:
+PowerShell setup (activate the environment before all subsequent commands):
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe -m pip install -e .
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python -m pip install -e .
 $env:PYTHONIOENCODING='utf-8'
 $env:PYTHONUTF8='1'
+$env:PYTHONPATH=(Join-Path $PWD 'src')
+modal token new
 ```
 
-Modal must be authenticated (`modal token new`, if no token is configured). Modal images in the checked-in scripts independently pin their runtime dependencies. The volume name is `team517-business-er`; choose a new workspace or clear an old run's volume if reproducing from scratch so checkpoints from another experiment cannot be reused accidentally.
+On Linux use `source .venv/bin/activate`, `export PYTHONPATH="$PWD/src"`, and `export TEAM517_MODAL_VOLUME=...` in place of PowerShell environment assignments. A CUDA toolkit/compiler is not required on the client. Core dependencies install from package repositories; no external business identity service is queried.
 
-## Rebuild from supplied data and training labels
+`--dataset` below is the organizer's `dataset/` directory with these original files:
 
-The baseline CatBoost is needed only to reproduce the historical hard-negative mining and later ensemble. Create it and the indexed DuckDB database locally:
+```
+dataset/train/train_source1.tsv
+              train_source2.tsv
+              train_source3.tsv
+              train_ground_truth.tsv
+dataset/test/test_source1.tsv
+             test_source2.tsv
+             test_source3.tsv
+```
+
+## Regenerate both outputs with the exact selected checkpoints
+
+Choose a NEW volume name for a clean run. Never reuse indexes or score shards from a different model/data version. Set this same variable for every command; it is propagated to remote images. No GPU run starts merely by installing packages or staging files. The following scoring commands do incur charges in the reviewer's account.
 
 ```powershell
-python -m ber.data --data ../student_resource/dataset --db artifacts/data.duckdb --report reports/data_audit.json
-python -m ber.blocking --db artifacts/data.duckdb --anchors 30000 --cap 80
-python -m ber.experiment --db artifacts/data.duckdb --out artifacts/submission_v1 --report reports/submission_v1.json
-python tools/stage_modal.py --database --model
+$env:TEAM517_MODAL_VOLUME='team517-v13-reproduce-20261002'
+python -m pipeline.verify_manifest --outputs ../../output
+python -m pipeline.stage_selected --dataset C:/path/to/student_resource/dataset
+modal run src/pipeline/modal_app.py --action prepare
+modal run src/pipeline/modal_v3.py --action prepare
+modal run src/pipeline/modal_dense_test.py
+modal run src/pipeline/modal_neural_submission.py --threshold 0.95 --dense-prior -2 --parts-per-country 4
+modal run src/pipeline/modal_recover_blank.py
+modal run src/pipeline/modal_final_owner.py
+New-Item -ItemType Directory -Force -Path output | Out-Null
+modal volume get $env:TEAM517_MODAL_VOLUME /project/output/submission_v13_owner_country/matching_results.tsv output/matching_results.tsv
+modal volume get $env:TEAM517_MODAL_VOLUME /project/output/submission_v13_owner_country/candidate_pairs.tsv output/candidate_pairs.tsv
 ```
 
-Then train the 53-feature and 57-feature CatBoost stages, the learned retrieval encoder, and the multilingual pair reranker on the supplied *training* labels:
+Replace the example input path. The first preparation step imports supplied records and builds BOTH train/test lexical indexes. The second creates the character indexes. Four country-specific ANN shards per country index the entire supplied test Source 2/3 inventory. Scoring first freezes 16 neural neighbors plus the highest lexical/character candidates at cap32, then applies the CatBoost/cross-encoder ensemble (`threshold=0.95`, `dense_prior=-2`). Missing-address recovery considers only that frozen candidate file. V13 resolves existing competing owners at address/margin gates India50/5, US20/2, France20/2. It never introduces a new candidate.
+
+The last remote step runs full ID/row/candidate-subset validation. To validate independently using the supplied organizer utility:
 
 ```powershell
-modal run modal_v2.py --action train --depth 10
-modal run modal_v3.py --action train --depth 10
-modal run modal_dense.py
-modal run modal_crossencoder.py
+python C:/path/to/student_resource/utils/validate_submission.py --matching output/matching_results.tsv --candidate output/candidate_pairs.tsv --test-dir C:/path/to/student_resource/dataset/test
 ```
 
-`modal_v2.py` and `modal_v3.py` are prerequisites for the final CatBoost features and neural hard-negative sampling. Model weights and intermediate databases are private Modal volume artifacts, never included in the submission zip. Encoder and reranker training code pins the pretrained model revisions and their MIT/Apache-2.0 licenses; each checkpoint is around 118 million parameters, well below the 8-billion limit.
-
-Build the full country-sharded ANN indexes on *all* supplied test Source 2/3 records, then score every test Source 1 record. The 16 nearest neural records plus top lexical/character records form a frozen set of at most 32 candidates per anchor. Pair scoring does not add candidates. The final CPU pass restores exact-name matches where the target address is empty and the anchor's normalized name is unique in its country.
-
-```powershell
-modal run modal_dense_test.py
-modal run modal_neural_submission.py --threshold 0.95 --dense-prior -2 --parts-per-country 4
-modal run modal_recover_blank.py
-```
-
-The matching file is `project/output/submission_v6_blank_recovery/matching_results.tsv` in the Modal volume. Its paired **unchanged** blocker artifact is `project/output/submission_v5_neural32/candidate_pairs.tsv`. Download both to `output/matching_results.tsv` and `output/candidate_pairs.tsv` respectively. Their expected SHA-256 digests for this run are:
+The archived leaderboard output is byte-for-byte the submitted V13 file. Its hashes are:
 
 ```
-matching_results.tsv  ab1b41964cdfbbccb4956c47d362d6c9b08cf7de73d67c3c8b66a963f61010e5
+matching_results.tsv  2d4ca5400f2e87daf886c5f4c8e1c0769720a2dd889dfd9e2de149f848199e3a
 candidate_pairs.tsv  fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec
 ```
 
-The recovery code selects only from the frozen blocker output, so every predicted target is a candidate. Run the organizer's `student_resource/utils/validate_submission.py` with `--matching` and `--candidate` after downloading. The 1,732,544-row matching output has already passed its organizer format check. The development protocol and limitations, including the unlabeled French test slice, are detailed in `Documentation_template.md`.
+There are 1,732,544 Source 1 rows, 55,384,406 candidate edges, 5,683,583 predicted links, and 101,484 empty predictions in the archived outputs. Verify the archive originals with `python -m pipeline.verify_manifest --outputs ../../output`; compare a regenerated original-test run using `--outputs output`. Different input data naturally has different hashes. A fresh DuckDB import can change physical row order; this changes the ANN training sample because it is selected in row order. GPU arithmetic, ANN rebuilding, and dependency/hardware differences can therefore change regenerated candidates and near-tie results; supplied exact checkpoints avoid nondeterministic retraining but do not imply bitwise equivalence on every hardware configuration. A full fresh-volume rescore was not rerun during final packaging.
+
+## Train from the supplied labels (optional)
+
+This alternative documents how the selected models were learned. Training from scratch is reproducible in procedure, but GPU reductions and early stopping may yield different weights. Use the saved weights above when auditing the submitted result. Use another NEW volume name and do not stage the final saved weights into it.
+
+The historical baseline provides comparison probabilities during CatBoost training; it is not a fourth final model. Build its data and sampled lexical pool locally:
+
+```powershell
+$env:TEAM517_MODAL_VOLUME='team517-v13-retrain-20261002'
+New-Item -ItemType Directory -Force -Path artifacts,reports | Out-Null
+python -m ber.data --data C:/path/to/student_resource/dataset --db artifacts/data.duckdb --report reports/data_audit.json
+python -m ber.blocking --db artifacts/data.duckdb --split train --anchors 30000 --cap 80
+python -m ber.experiment --db artifacts/data.duckdb --out artifacts/submission_v1 --report reports/submission_v1.json
+python -m ber.blocking --db artifacts/data.duckdb --split test --anchors 1 --cap 80
+python -m pipeline.stage_modal --database --model
+modal run src/pipeline/modal_v2.py --action train --depth 10
+modal run src/pipeline/modal_v3.py --action train --depth 10
+modal run src/pipeline/modal_dense.py --action train
+modal run src/pipeline/modal_crossencoder.py --action train
+```
+
+Then run `modal_dense_test.py` onward from the inference sequence. The scratch branch stages the prepared database, so it does not need raw dataset staging or `modal_app --action prepare`. `modal_v3 --action train` builds character indexes and the eight feature partitions required by neural hard-negative preparation. Calibration uses macro F0.5 on entity-disjoint training folds; labels never populate test candidates. Seed517 is recorded in code and included training reports. E5 training completed 2,128 steps on 102,125 fit anchors; M017 completed 12,578 steps over 402,483 pairs. Checkpoint time budgets did not interrupt the selected training runs.
+
+Model revisions, licenses, modification notices, and parameter counts are in `MODEL_LICENSES.md` and `licenses/`. The methodology is `../../Documentation_template.md`. Member names remain blank at the team's request.

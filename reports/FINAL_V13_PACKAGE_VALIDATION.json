@@ -1,0 +1,32 @@
+{
+  "selected_version": "v13-country-owner",
+  "public_score": 0.969,
+  "public_score_evidence": "User confirmed V13 leaderboard result on 2026-10-02",
+  "organizer_two_file_validator": "PASS: matching and candidate TSVs; 1,732,544 rows each",
+  "disk_backed_full_validator": {
+    "status": "PASS",
+    "anchors": 1732544,
+    "candidates": 55384406,
+    "matches": 5683583,
+    "empty_predictions": 101484,
+    "target_ids_checked": true
+  },
+  "matching_sha256": "2d4ca5400f2e87daf886c5f4c8e1c0769720a2dd889dfd9e2de149f848199e3a",
+  "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec",
+  "fresh_full_training_or_scoring_rerun_during_packaging": false,
+  "member_names": "Intentionally blank per team request",
+  "packaged_modal_entrypoint_help_checks": "PASS: 10 CLI modules load without starting compute",
+  "internal_import_closure": "PASS; optional _fast_features extension supplied as C++ source with Python fallback",
+  "checkpoint_structural_validation": "PASS: safetensors byte ranges and parameter counts",
+  "optional_graph_audit": {
+    "nodes": 304,
+    "edges": 673,
+    "unresolved_endpoint_edges": 229,
+    "collapsed_duplicate_edges": 9,
+    "limitation": "Structural graph is incomplete and not used as proof of runtime correctness; direct source/import checks passed."
+  },
+  "zip_crc": "PASS",
+  "archived_output_identity": "PASS",
+  "zip_structure": "PASS",
+  "reproduction_limitations": "No full fresh training/inference rerun during final packaging; database import order and ANN/hardware arithmetic can change regenerated output bytes. Exact submitted artifacts and selected model files are preserved."
+}

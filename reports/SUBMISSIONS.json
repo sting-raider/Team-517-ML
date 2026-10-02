@@ -133,13 +133,14 @@
     {
       "number": null,
       "model_version": "v13-country-owner",
-      "status": "Prepared locally; organizer and full two-file validators PASS; no public score reported",
+      "status": "Evaluated (user-reported); organizer and full two-file validators PASS",
       "file": "output/submission_v13_owner_country/matching_results.tsv",
       "sha256": "2d4ca5400f2e87daf886c5f4c8e1c0769720a2dd889dfd9e2de149f848199e3a",
-      "public_score": null,
+      "public_score": 0.969,
       "private_score": null,
       "candidate_cap": 32,
-      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
+      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec",
+      "evidence": "Team confirmed V13 public score 0.969 on 2026-10-02; selected for final archive"
     }
   ]
 }
