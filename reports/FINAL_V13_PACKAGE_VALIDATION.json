@@ -32,5 +32,8 @@
   "zip_crc": "PASS",
   "archived_output_identity": "PASS",
   "zip_structure": "PASS",
-  "reproduction_limitations": "No full fresh training/inference rerun during final packaging; database import order and ANN/hardware arithmetic can change regenerated output bytes. Exact submitted artifacts and selected model files are preserved."
+  "reproduction_limitations": "No full fresh training/inference rerun during final packaging; database import order and ANN/hardware arithmetic can change regenerated output bytes. Exact submitted artifacts and selected model files are preserved.",
+  "zip_compression": "BZIP2 (ZIP method12), lossless",
+  "upload_limit_bytes": 1024000000,
+  "checkpoint_quantization": false
 }

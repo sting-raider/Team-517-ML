@@ -2,6 +2,16 @@
 
 Run commands from this `business_entity_resolution` directory. All source code is under `src/`: `ber/` contains record processing, blocking, model training, scoring, and decision rules; `pipeline/` contains orchestration and CLI entrypoints. The exact selected weights are included in `models/`. No private Modal artifact or Git checkout is needed. The organizer supplies the original training/test data separately.
 
+## Extract the submission ZIP
+
+The ZIP uses lossless BZIP2 compression (ZIP method12) to meet the 1024 MB upload limit while retaining every exact selected checkpoint and output. Extract with 7-Zip or Python's standard library; some built-in ZIP extractors support only the older DEFLATE method. From the directory containing the ZIP:
+
+```powershell
+python -m zipfile -e Team_517_submission.zip Team_517_submission
+```
+
+Then change directory to `Team_517_submission/code/business_entity_resolution` and follow the commands below. Extracted checkpoint and TSV bytes are unchanged; this is container compression, with no quantization or model modification.
+
 ## Environment and input
 
 Use Python 3.12. The Modal Linux images pin the CPU dependencies in `requirements.txt` and GPU dependencies listed in `requirements-gpu.txt`. GPU inference uses NVIDIA L4 and bfloat16; preprocessing/indexing uses CPU containers. Full regeneration processes roughly 10 million target records and 55 million candidate pairs, so it requires substantial disk and compute. Authenticate your own Modal account; this archive contains no credentials.

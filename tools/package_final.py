@@ -10,6 +10,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MATCH_SHA = '2d4ca5400f2e87daf886c5f4c8e1c0769720a2dd889dfd9e2de149f848199e3a'
 CAND_SHA = 'fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec'
+# Use decimal MB as the stricter interpretation of the portal's 1024 MB cap.
+MAX_ARCHIVE_BYTES = 1024 * 1000 * 1000
 CORE_MODAL = ('modal_app.py', 'modal_v2.py', 'modal_v3.py', 'modal_dense.py',
               'modal_crossencoder.py', 'modal_dense_retrieval.py', 'modal_dense_test.py',
               'modal_neural_submission.py', 'modal_recover_blank.py')
@@ -125,22 +127,34 @@ def package(matching, candidate, output, model_root, stage, reuse_stage=False):
             raise ValueError(f'Forbidden package artifact: {name}')
     output.parent.mkdir(parents=True, exist_ok=True)
     temporary = output.with_suffix('.zip.tmp')
-    with zipfile.ZipFile(temporary, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=4, allowZip64=True) as archive:
+    with zipfile.ZipFile(temporary, 'w', compression=zipfile.ZIP_BZIP2, compresslevel=9, allowZip64=True) as archive:
         for name, path in sorted(mappings.items()):
+            print(f'Compressing {name}', flush=True)
             archive.write(path, name)
+    if temporary.stat().st_size > MAX_ARCHIVE_BYTES:
+        raise ValueError(f'Archive exceeds conservative 1024 MB limit: {temporary.stat().st_size:,} bytes')
+    expected = {'output/matching_results.tsv': MATCH_SHA, 'output/candidate_pairs.tsv': CAND_SHA}
+    expected.update({f'code/business_entity_resolution/{item["path"]}': item['sha256']
+                     for item in manifest['model_files']})
     with zipfile.ZipFile(temporary) as archive:
-        bad = archive.testzip()
-        if bad:
-            raise ValueError(f'ZIP integrity failure: {bad}')
-        for name, expected in (('output/matching_results.tsv', MATCH_SHA), ('output/candidate_pairs.tsv', CAND_SHA)):
-            with archive.open(name) as stream:
-                if hashlib.file_digest(stream, 'sha256').hexdigest() != expected:
-                    raise ValueError(f'Archived TSV identity mismatch: {name}')
+        for item in archive.infolist():
+            # Reading to EOF verifies ZIP CRC, and selected artifacts also get SHA-256.
+            with archive.open(item) as stream:
+                if item.filename in expected:
+                    if hashlib.file_digest(stream, 'sha256').hexdigest() != expected[item.filename]:
+                        raise ValueError(f'Archived artifact identity mismatch: {item.filename}')
+                else:
+                    while stream.read(8 << 20):
+                        pass
+            if item.filename in expected:
+                print(f'Verified identity: {item.filename}', flush=True)
     temporary.replace(output)
     receipt = {'archive': str(output.resolve()), 'archive_bytes': output.stat().st_size,
                'archive_sha256': digest(output), 'matching_sha256': MATCH_SHA, 'candidate_sha256': CAND_SHA,
                'selected_version': 'v13-country-owner', 'public_score': .969, 'entries': len(mappings),
-               'zip_crc': 'PASS', 'archived_tsv_identity': 'PASS', 'staged_code': str(code.resolve())}
+               'zip_crc': 'PASS', 'archived_tsv_identity': 'PASS', 'archived_model_identity': 'PASS',
+               'zip_compression': 'BZIP2 (ZIP method 12)', 'upload_limit_bytes': MAX_ARCHIVE_BYTES,
+               'below_size_limit': True, 'staged_code': str(code.resolve())}
     (output.parent / 'final_package_receipt.json').write_text(json.dumps(receipt, indent=2), encoding='utf-8')
     return receipt
 
