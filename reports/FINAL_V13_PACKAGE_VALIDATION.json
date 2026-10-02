@@ -14,7 +14,11 @@
   "matching_sha256": "2d4ca5400f2e87daf886c5f4c8e1c0769720a2dd889dfd9e2de149f848199e3a",
   "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec",
   "fresh_full_training_or_scoring_rerun_during_packaging": false,
-  "member_names": "Intentionally blank per team request",
+  "member_names": [
+    "Ali Sufiyan Khan",
+    "Fayaz Ahmed",
+    "Prithvi P Reddy"
+  ],
   "packaged_modal_entrypoint_help_checks": "PASS: 10 CLI modules load without starting compute",
   "internal_import_closure": "PASS; optional _fast_features extension supplied as C++ source with Python fallback",
   "checkpoint_structural_validation": "PASS: safetensors byte ranges and parameter counts",

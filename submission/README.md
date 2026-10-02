@@ -91,4 +91,4 @@ modal run src/pipeline/modal_crossencoder.py --action train
 
 Then run `modal_dense_test.py` onward from the inference sequence. The scratch branch stages the prepared database, so it does not need raw dataset staging or `modal_app --action prepare`. `modal_v3 --action train` builds character indexes and the eight feature partitions required by neural hard-negative preparation. Calibration uses macro F0.5 on entity-disjoint training folds; labels never populate test candidates. Seed517 is recorded in code and included training reports. E5 training completed 2,128 steps on 102,125 fit anchors; M017 completed 12,578 steps over 402,483 pairs. Checkpoint time budgets did not interrupt the selected training runs.
 
-Model revisions, licenses, modification notices, and parameter counts are in `MODEL_LICENSES.md` and `licenses/`. The methodology is `../../Documentation_template.md`. Member names remain blank at the team's request.
+Model revisions, licenses, modification notices, and parameter counts are in `MODEL_LICENSES.md` and `licenses/`. The methodology is `../../Documentation_template.md`.

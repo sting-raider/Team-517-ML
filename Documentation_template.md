@@ -3,6 +3,11 @@
 **Team Name:** Team 517
 
 **Team Members:**
+
+- Ali Sufiyan Khan
+- Fayaz Ahmed
+- Prithvi P Reddy
+
 **Submission Date:** 2 October 2026
 
 ## 1. Executive Summary
@@ -66,7 +71,7 @@ modal run src/pipeline/modal_recover_blank.py
 modal run src/pipeline/modal_final_owner.py
 ```
 
-The final ZIP includes the exact submitted V13 TSV, unchanged frozen candidate TSV, all source under `src/`, exact selected weights, pinned dependencies, model license notices, and a checkpoint/output integrity manifest. Raw training/test data is supplied by the organizer and is not redistributed. No credentials are included. We verified output identity, full output validity, and archive/source integrity during packaging; we did not repeat the full paid training/scoring run. Fresh database import order, ANN rebuilding, and hardware-dependent arithmetic can affect regenerated candidate/inference results; exact bytewise regeneration was not established. The archived output files are the unchanged leaderboard artifacts. Member names are intentionally blank pending the team's final entry.
+The final ZIP includes the exact submitted V13 TSV, unchanged frozen candidate TSV, all source under `src/`, exact selected weights, pinned dependencies, model license notices, and a checkpoint/output integrity manifest. Raw training/test data is supplied by the organizer and is not redistributed. No credentials are included. We verified output identity, full output validity, and archive/source integrity during packaging; we did not repeat the full paid training/scoring run. Fresh database import order, ANN rebuilding, and hardware-dependent arithmetic can affect regenerated candidate/inference results; exact bytewise regeneration was not established. The archived output files are the unchanged leaderboard artifacts. Team members are listed at the start of this document.
 
 ### B. Additional Results
 
