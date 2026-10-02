@@ -1,0 +1,20 @@
+{
+  "initialization": "intfloat/multilingual-e5-small",
+  "revision": "614241f622f53c4eeff9890bdc4f31cfecc418b3",
+  "license": "mit",
+  "parameters": 117653760,
+  "fit_anchors": 102125,
+  "steps": 2128,
+  "planned_steps": 2128,
+  "batch_size": 48,
+  "epochs_requested": 1,
+  "max_length": 128,
+  "temperature": 0.05,
+  "seed": 517,
+  "seconds": 370.883415393,
+  "stopped_on_time_budget": false,
+  "initial_loss_50": 1.6012698030471801,
+  "final_loss_50": 0.0984223086759448,
+  "peak_gpu_bytes": 6151387648,
+  "note": "Training loss only; no end-to-end retrieval or matching score established."
+}

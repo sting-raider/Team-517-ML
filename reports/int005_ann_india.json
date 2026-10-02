@@ -1,0 +1,172 @@
+{
+  "country": "India",
+  "anchors": 1754,
+  "baseline": {
+    "entities": 1754,
+    "macro_f0_5": 0.9691962151346861,
+    "singleton_count": 100,
+    "singleton_false_positive_rate": 0.0,
+    "all_empty_baseline": 0.05701254275940707,
+    "candidate_pair_recall": 0.9180596525729269,
+    "candidate_entity_recall": 0.9184581389992514,
+    "all_matches_retrieved_rate": 0.7871825876662636,
+    "blocking_oracle_macro_f0_5": 0.9691962151346861,
+    "candidate_count_quantiles": {
+      "p50": 160.0,
+      "p90": 160.0,
+      "p99": 160.0,
+      "max": 160.0
+    }
+  },
+  "variants": {
+    "16": {
+      "dense": {
+        "entities": 1754,
+        "macro_f0_5": 0.972036615559834,
+        "singleton_count": 100,
+        "singleton_false_positive_rate": 0.0,
+        "all_empty_baseline": 0.05701254275940707,
+        "candidate_pair_recall": 0.9239593575876762,
+        "candidate_entity_recall": 0.922710936450356,
+        "all_matches_retrieved_rate": 0.779322853688029,
+        "blocking_oracle_macro_f0_5": 0.972036615559834,
+        "candidate_count_quantiles": {
+          "p50": 16.0,
+          "p90": 16.0,
+          "p99": 16.0,
+          "max": 16.0
+        }
+      },
+      "union": {
+        "entities": 1754,
+        "macro_f0_5": 0.9959827239205923,
+        "singleton_count": 100,
+        "singleton_false_positive_rate": 0.0,
+        "all_empty_baseline": 0.05701254275940707,
+        "candidate_pair_recall": 0.9841035725991478,
+        "candidate_entity_recall": 0.9852865108155313,
+        "all_matches_retrieved_rate": 0.9480048367593712,
+        "blocking_oracle_macro_f0_5": 0.9959827239205923,
+        "candidate_count_quantiles": {
+          "p50": 172.0,
+          "p90": 175.0,
+          "p99": 176.0,
+          "max": 176.0
+        }
+      },
+      "mean_dense_candidates": 16.0
+    },
+    "32": {
+      "dense": {
+        "entities": 1754,
+        "macro_f0_5": 0.9744727596994259,
+        "singleton_count": 100,
+        "singleton_false_positive_rate": 0.0,
+        "all_empty_baseline": 0.05701254275940707,
+        "candidate_pair_recall": 0.9311701081612586,
+        "candidate_entity_recall": 0.9303720178115584,
+        "all_matches_retrieved_rate": 0.7986698911729141,
+        "blocking_oracle_macro_f0_5": 0.9744727596994259,
+        "candidate_count_quantiles": {
+          "p50": 32.0,
+          "p90": 32.0,
+          "p99": 32.0,
+          "max": 32.0
+        }
+      },
+      "union": {
+        "entities": 1754,
+        "macro_f0_5": 0.9967554578368971,
+        "singleton_count": 100,
+        "singleton_false_positive_rate": 0.0,
+        "all_empty_baseline": 0.05701254275940707,
+        "candidate_pair_recall": 0.98656178302196,
+        "candidate_entity_recall": 0.9876559471027427,
+        "all_matches_retrieved_rate": 0.9540507859733979,
+        "blocking_oracle_macro_f0_5": 0.9967554578368971,
+        "candidate_count_quantiles": {
+          "p50": 188.0,
+          "p90": 190.0,
+          "p99": 192.0,
+          "max": 192.0
+        }
+      },
+      "mean_dense_candidates": 32.0
+    },
+    "64": {
+      "dense": {
+        "entities": 1754,
+        "macro_f0_5": 0.976938858702324,
+        "singleton_count": 100,
+        "singleton_false_positive_rate": 0.0,
+        "all_empty_baseline": 0.05701254275940707,
+        "candidate_pair_recall": 0.9362504097017371,
+        "candidate_entity_recall": 0.9360530508051669,
+        "all_matches_retrieved_rate": 0.8119709794437727,
+        "blocking_oracle_macro_f0_5": 0.976938858702324,
+        "candidate_count_quantiles": {
+          "p50": 64.0,
+          "p90": 64.0,
+          "p99": 64.0,
+          "max": 64.0
+        }
+      },
+      "union": {
+        "entities": 1754,
+        "macro_f0_5": 0.9974347110115985,
+        "singleton_count": 100,
+        "singleton_false_positive_rate": 0.0,
+        "all_empty_baseline": 0.05701254275940707,
+        "candidate_pair_recall": 0.988692232055064,
+        "candidate_entity_recall": 0.9900153068079307,
+        "all_matches_retrieved_rate": 0.9613059250302297,
+        "blocking_oracle_macro_f0_5": 0.9974347110115985,
+        "candidate_count_quantiles": {
+          "p50": 220.0,
+          "p90": 222.0,
+          "p99": 224.0,
+          "max": 224.0
+        }
+      },
+      "mean_dense_candidates": 64.0
+    },
+    "128": {
+      "dense": {
+        "entities": 1754,
+        "macro_f0_5": 0.9780961413254996,
+        "singleton_count": 100,
+        "singleton_false_positive_rate": 0.0,
+        "all_empty_baseline": 0.05701254275940707,
+        "candidate_pair_recall": 0.9403474270730908,
+        "candidate_entity_recall": 0.9399829177942842,
+        "all_matches_retrieved_rate": 0.8240628778718259,
+        "blocking_oracle_macro_f0_5": 0.9780961413254996,
+        "candidate_count_quantiles": {
+          "p50": 128.0,
+          "p90": 128.0,
+          "p99": 128.0,
+          "max": 128.0
+        }
+      },
+      "union": {
+        "entities": 1754,
+        "macro_f0_5": 0.9978012439465465,
+        "singleton_count": 100,
+        "singleton_false_positive_rate": 0.0,
+        "all_empty_baseline": 0.05701254275940707,
+        "candidate_pair_recall": 0.9903310390036054,
+        "candidate_entity_recall": 0.9915469472754841,
+        "all_matches_retrieved_rate": 0.9673518742442564,
+        "blocking_oracle_macro_f0_5": 0.9978012439465465,
+        "candidate_count_quantiles": {
+          "p50": 283.0,
+          "p90": 286.0,
+          "p99": 288.0,
+          "max": 288.0
+        }
+      },
+      "mean_dense_candidates": 128.0
+    }
+  },
+  "protocol": "Complete S2/S3 country inventory via 4 IVF-SQ8 ANN shards; no labels used to construct search results"
+}

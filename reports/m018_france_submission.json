@@ -1,0 +1,21 @@
+{
+  "rows": 1732544,
+  "france_replaced": 259452,
+  "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec",
+  "matching_sha256": "aafbc73e655ce51222f81b57ed5ce92198ac01dad02c17d941a342dabbfb2f0b",
+  "compressed_sha256": "1136792be26849527102caa4b6e2c0b195a9b050ab4a270592f5062993dd7711",
+  "compressed_bytes": 41480532,
+  "blank_recovery": {
+    "rows": 1732544,
+    "changed_rows": 3943,
+    "added_by_country": {
+      "France": 4160,
+      "India": 0,
+      "US": 0
+    },
+    "total_added": 4160,
+    "eligible_anchors": 1095726,
+    "blank_targets": 265506,
+    "output_bytes": 96666906
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "countries": [
+    "France",
+    "India",
+    "US"
+  ],
+  "shards": 12,
+  "protocol": "Complete test S2/S3 inventory; country partitioned IVF2048-SQ8; MIT INT005 encoder"
+}

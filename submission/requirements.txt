@@ -1,0 +1,6 @@
+duckdb==1.5.5
+catboost==1.2.10
+numpy==2.3.2
+rapidfuzz==3.14.5
+pandas==2.3.3
+modal==1.5.5

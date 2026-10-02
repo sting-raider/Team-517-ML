@@ -1,0 +1,17 @@
+{
+  "rows": 1732544,
+  "changed_rows": 24146,
+  "added_by_country": {
+    "France": 5798,
+    "India": 8071,
+    "US": 11274
+  },
+  "total_added": 25143,
+  "eligible_anchors": 1095726,
+  "blank_targets": 265506,
+  "output_bytes": 96776219,
+  "matching_sha256": "ab1b41964cdfbbccb4956c47d362d6c9b08cf7de73d67c3c8b66a963f61010e5",
+  "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec",
+  "candidate_cap": 32,
+  "protocol": "Unique Source-1 normalized name within country; candidate target has identical normalized name and empty normalized address; add only from exact v5 candidate file"
+}

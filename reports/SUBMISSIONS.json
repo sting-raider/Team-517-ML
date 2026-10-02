@@ -29,17 +29,118 @@
     },
     {
       "number": 3,
-      "status": "Prepared, not yet uploaded",
+      "status": "Evaluated (user-reported)",
       "file": "output/submission_v3_d10/matching_results.tsv",
       "sha256": "bf712f4d4fee94e56487b614ef302752bbcb2d2699e2fb65637aaf7fc32f4539",
-      "public_score": null,
+      "public_score": 0.917,
       "private_score": null,
       "candidate_cap": 160,
       "threshold": 0.6250000000000002,
       "confirmation_macro_f0_5": 0.9501984899746141,
       "baseline_on_same_confirmation": 0.942284948006719,
       "validation": "Cloud full-pair PASS; organizer matching validator PASS; local SHA256 PASS",
-      "candidate_remote": "project/output/submission_v3_d10/candidate_pairs.tsv"
+      "candidate_remote": "project/output/submission_v3_d10/candidate_pairs.tsv",
+      "evidence": "User-reported leaderboard result for v3 matching_results.tsv"
+    },
+    {
+      "number": null,
+      "model_version": "v5",
+      "status": "Evaluated (user-reported)",
+      "file": "output/submission_v5_neural32/matching_results.tsv",
+      "sha256": "5a4aff5fcc37c74769ff3db1ebf2d35f85ab2258d80e5425e90ae616f1d7b33d",
+      "public_score": 0.961,
+      "private_score": null,
+      "candidate_cap": 32,
+      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
+    },
+    {
+      "number": null,
+      "model_version": "v6",
+      "status": "Evaluated (user-reported)",
+      "file": "output/submission_v6_blank_recovery/matching_results.tsv",
+      "sha256": "ab1b41964cdfbbccb4956c47d362d6c9b08cf7de73d67c3c8b66a963f61010e5",
+      "public_score": 0.962,
+      "private_score": null,
+      "candidate_cap": 32,
+      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
+    },
+    {
+      "number": null,
+      "model_version": "v7-m018-france",
+      "status": "Prepared locally; organizer full two-file validator PASS; no public score reported",
+      "file": "output/submission_v7_m018_france/matching_results.tsv",
+      "sha256": "aafbc73e655ce51222f81b57ed5ce92198ac01dad02c17d941a342dabbfb2f0b",
+      "public_score": null,
+      "private_score": null,
+      "candidate_cap": 32,
+      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
+    },
+    {
+      "number": null,
+      "model_version": "v8-owner80",
+      "status": "Evaluated (user-reported)",
+      "file": "output/submission_v8_owner80/matching_results.tsv",
+      "sha256": "f3892589588bbda2c6dbcf71d3f630ae72a5c9331a608937eb93dbba6303fd82",
+      "public_score": 0.966,
+      "private_score": null,
+      "candidate_cap": 32,
+      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
+    },
+    {
+      "number": null,
+      "model_version": "v9-m018-owner80",
+      "status": "Evaluated (user-reported); organizer full two-file validator PASS",
+      "file": "output/submission_v9_m018_owner80/matching_results.tsv",
+      "sha256": "0744bbf08066b403497c0d88df85fd718ead0b3dbb1b58fae4738f812968f4b9",
+      "public_score": 0.966,
+      "private_score": null,
+      "candidate_cap": 32,
+      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
+    },
+    {
+      "number": null,
+      "model_version": "v10-owner70",
+      "status": "Evaluated (user-reported); organizer full two-file validator PASS",
+      "file": "output/submission_v10_owner70/matching_results.tsv",
+      "sha256": "ecc553efb163a543cf5ef26ad00f452a2e544c36659790c2914538a1397f198e",
+      "public_score": 0.967,
+      "private_score": null,
+      "candidate_cap": 32,
+      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
+    },
+    {
+      "number": null,
+      "model_version": "v11-m018-owner70",
+      "status": "Prepared locally; organizer full two-file validator PASS; no public score reported",
+      "file": "output/submission_v11_m018_owner70/matching_results.tsv",
+      "sha256": "0c357184190e51ef0f4dc227f6fec601fea31c9a734160748cbf8e56b2f82dd6",
+      "public_score": null,
+      "private_score": null,
+      "candidate_cap": 32,
+      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
+    },
+    {
+      "number": null,
+      "model_version": "v12-owner50",
+      "status": "Evaluated (user-reported); organizer full two-file validator PASS",
+      "file": "output/submission_v12_owner50/matching_results.tsv",
+      "sha256": "e3c0350b5a94b815985fe321a0ec3b0d7f1b6ecdb87d67ae189c41f514459a62",
+      "public_score": 0.969,
+      "private_score": null,
+      "candidate_cap": 32,
+      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec"
+    },
+    {
+      "number": null,
+      "model_version": "v13-country-owner",
+      "status": "Evaluated (user-reported); organizer and full two-file validators PASS",
+      "file": "output/submission_v13_owner_country/matching_results.tsv",
+      "sha256": "2d4ca5400f2e87daf886c5f4c8e1c0769720a2dd889dfd9e2de149f848199e3a",
+      "public_score": 0.969,
+      "private_score": null,
+      "candidate_cap": 32,
+      "candidate_sha256": "fa286e237b9bdd31905f901d2a1449771698249d4c1dfe45dcbfa38bf647c3ec",
+      "evidence": "Team confirmed V13 public score 0.969 on 2026-10-02; selected for final archive"
     }
   ]
 }

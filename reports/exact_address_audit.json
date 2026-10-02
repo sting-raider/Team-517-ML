@@ -1,0 +1,54 @@
+{
+  "rows": [
+    {
+      "country": "India",
+      "source": 2,
+      "bucket": "name_diff",
+      "pairs": 133011,
+      "true": 130518
+    },
+    {
+      "country": "India",
+      "source": 2,
+      "bucket": "name_exact",
+      "pairs": 26431,
+      "true": 26431
+    },
+    {
+      "country": "India",
+      "source": 3,
+      "bucket": "name_diff",
+      "pairs": 62025,
+      "true": 61582
+    },
+    {
+      "country": "India",
+      "source": 3,
+      "bucket": "name_exact",
+      "pairs": 232,
+      "true": 232
+    },
+    {
+      "country": "US",
+      "source": 2,
+      "bucket": "name_diff",
+      "pairs": 197253,
+      "true": 191234
+    },
+    {
+      "country": "US",
+      "source": 2,
+      "bucket": "name_exact",
+      "pairs": 83455,
+      "true": 83455
+    },
+    {
+      "country": "US",
+      "source": 3,
+      "bucket": "name_diff",
+      "pairs": 98562,
+      "true": 97797
+    }
+  ],
+  "seconds": 1.5102527141571045
+}

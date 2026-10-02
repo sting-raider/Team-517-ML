@@ -1,0 +1,674 @@
+{
+  "protocol": "Exact dense top16 plus top v3 lexical/character candidates, cap32; complete train target inventory; cross-encoder scores all selected pairs; threshold chosen calibration only",
+  "scheme": "compact",
+  "pairs": 237272,
+  "dense_only_pairs": 93821,
+  "variants": [
+    {
+      "name": "cross_only",
+      "dense_prior": null,
+      "threshold": 0.9500000000000004,
+      "calibration": {
+        "all": {
+          "entities": 4389,
+          "macro_f0_5": 0.96805113709062,
+          "singleton_count": 252,
+          "singleton_false_positive_rate": 0.03968253968253968,
+          "all_empty_baseline": 0.05741626794258373,
+          "candidate_pair_recall": 0.9777428646242472,
+          "candidate_entity_recall": 0.9780765718582978,
+          "all_matches_retrieved_rate": 0.9262750785593425,
+          "blocking_oracle_macro_f0_5": 0.9935060197795251,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "India": {
+          "entities": 1754,
+          "macro_f0_5": 0.9644692962697523,
+          "singleton_count": 100,
+          "singleton_false_positive_rate": 0.06,
+          "all_empty_baseline": 0.05701254275940707,
+          "candidate_pair_recall": 0.9734513274336283,
+          "candidate_entity_recall": 0.9737308305022937,
+          "all_matches_retrieved_rate": 0.9111245465538089,
+          "blocking_oracle_macro_f0_5": 0.9920754827319758,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "US": {
+          "entities": 2635,
+          "macro_f0_5": 0.9704354060848521,
+          "singleton_count": 152,
+          "singleton_false_positive_rate": 0.02631578947368421,
+          "all_empty_baseline": 0.057685009487666035,
+          "candidate_pair_recall": 0.9805973403095706,
+          "candidate_entity_recall": 0.9809713991651164,
+          "all_matches_retrieved_rate": 0.9363672976238421,
+          "blocking_oracle_macro_f0_5": 0.9944582634157305,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        }
+      },
+      "holdout": {
+        "all": {
+          "entities": 3051,
+          "macro_f0_5": 0.9619868378959159,
+          "singleton_count": 199,
+          "singleton_false_positive_rate": 0.06030150753768844,
+          "all_empty_baseline": 0.06522451655195018,
+          "candidate_pair_recall": 0.9764851485148515,
+          "candidate_entity_recall": 0.9754494200672322,
+          "all_matches_retrieved_rate": 0.9221598877980365,
+          "blocking_oracle_macro_f0_5": 0.9919715431467085,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "India": {
+          "entities": 1212,
+          "macro_f0_5": 0.9545913551804018,
+          "singleton_count": 97,
+          "singleton_false_positive_rate": 0.10309278350515463,
+          "all_empty_baseline": 0.08003300330033003,
+          "candidate_pair_recall": 0.9716242661448141,
+          "candidate_entity_recall": 0.9704075023133321,
+          "all_matches_retrieved_rate": 0.905829596412556,
+          "blocking_oracle_macro_f0_5": 0.9904143067047686,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "US": {
+          "entities": 1839,
+          "macro_f0_5": 0.9668608591309368,
+          "singleton_count": 102,
+          "singleton_false_positive_rate": 0.0196078431372549,
+          "all_empty_baseline": 0.05546492659053834,
+          "candidate_pair_recall": 0.9795822942643392,
+          "candidate_entity_recall": 0.9786858842558324,
+          "all_matches_retrieved_rate": 0.9326424870466321,
+          "blocking_oracle_macro_f0_5": 0.9929978457935988,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        }
+      }
+    },
+    {
+      "name": "dense_prior_-2",
+      "dense_prior": -2.0,
+      "threshold": 0.9500000000000004,
+      "calibration": {
+        "all": {
+          "entities": 4389,
+          "macro_f0_5": 0.9757426507973854,
+          "singleton_count": 252,
+          "singleton_false_positive_rate": 0.015873015873015872,
+          "all_empty_baseline": 0.05741626794258373,
+          "candidate_pair_recall": 0.9777428646242472,
+          "candidate_entity_recall": 0.9780765718582978,
+          "all_matches_retrieved_rate": 0.9262750785593425,
+          "blocking_oracle_macro_f0_5": 0.9935060197795251,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "India": {
+          "entities": 1754,
+          "macro_f0_5": 0.974926653704581,
+          "singleton_count": 100,
+          "singleton_false_positive_rate": 0.02,
+          "all_empty_baseline": 0.05701254275940707,
+          "candidate_pair_recall": 0.9734513274336283,
+          "candidate_entity_recall": 0.9737308305022937,
+          "all_matches_retrieved_rate": 0.9111245465538089,
+          "blocking_oracle_macro_f0_5": 0.9920754827319758,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "US": {
+          "entities": 2635,
+          "macro_f0_5": 0.9762858230557456,
+          "singleton_count": 152,
+          "singleton_false_positive_rate": 0.013157894736842105,
+          "all_empty_baseline": 0.057685009487666035,
+          "candidate_pair_recall": 0.9805973403095706,
+          "candidate_entity_recall": 0.9809713991651164,
+          "all_matches_retrieved_rate": 0.9363672976238421,
+          "blocking_oracle_macro_f0_5": 0.9944582634157305,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        }
+      },
+      "holdout": {
+        "all": {
+          "entities": 3051,
+          "macro_f0_5": 0.9692422904498238,
+          "singleton_count": 199,
+          "singleton_false_positive_rate": 0.06030150753768844,
+          "all_empty_baseline": 0.06522451655195018,
+          "candidate_pair_recall": 0.9764851485148515,
+          "candidate_entity_recall": 0.9754494200672322,
+          "all_matches_retrieved_rate": 0.9221598877980365,
+          "blocking_oracle_macro_f0_5": 0.9919715431467085,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "India": {
+          "entities": 1212,
+          "macro_f0_5": 0.9674442346935745,
+          "singleton_count": 97,
+          "singleton_false_positive_rate": 0.08247422680412371,
+          "all_empty_baseline": 0.08003300330033003,
+          "candidate_pair_recall": 0.9716242661448141,
+          "candidate_entity_recall": 0.9704075023133321,
+          "all_matches_retrieved_rate": 0.905829596412556,
+          "blocking_oracle_macro_f0_5": 0.9904143067047686,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "US": {
+          "entities": 1839,
+          "macro_f0_5": 0.9704273059890158,
+          "singleton_count": 102,
+          "singleton_false_positive_rate": 0.0392156862745098,
+          "all_empty_baseline": 0.05546492659053834,
+          "candidate_pair_recall": 0.9795822942643392,
+          "candidate_entity_recall": 0.9786858842558324,
+          "all_matches_retrieved_rate": 0.9326424870466321,
+          "blocking_oracle_macro_f0_5": 0.9929978457935988,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        }
+      }
+    },
+    {
+      "name": "dense_prior_-1",
+      "dense_prior": -1.0,
+      "threshold": 0.97,
+      "calibration": {
+        "all": {
+          "entities": 4389,
+          "macro_f0_5": 0.9744876446067544,
+          "singleton_count": 252,
+          "singleton_false_positive_rate": 0.01984126984126984,
+          "all_empty_baseline": 0.05741626794258373,
+          "candidate_pair_recall": 0.9777428646242472,
+          "candidate_entity_recall": 0.9780765718582978,
+          "all_matches_retrieved_rate": 0.9262750785593425,
+          "blocking_oracle_macro_f0_5": 0.9935060197795251,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "India": {
+          "entities": 1754,
+          "macro_f0_5": 0.9730417520548561,
+          "singleton_count": 100,
+          "singleton_false_positive_rate": 0.03,
+          "all_empty_baseline": 0.05701254275940707,
+          "candidate_pair_recall": 0.9734513274336283,
+          "candidate_entity_recall": 0.9737308305022937,
+          "all_matches_retrieved_rate": 0.9111245465538089,
+          "blocking_oracle_macro_f0_5": 0.9920754827319758,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "US": {
+          "entities": 2635,
+          "macro_f0_5": 0.9754501097058167,
+          "singleton_count": 152,
+          "singleton_false_positive_rate": 0.013157894736842105,
+          "all_empty_baseline": 0.057685009487666035,
+          "candidate_pair_recall": 0.9805973403095706,
+          "candidate_entity_recall": 0.9809713991651164,
+          "all_matches_retrieved_rate": 0.9363672976238421,
+          "blocking_oracle_macro_f0_5": 0.9944582634157305,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        }
+      },
+      "holdout": {
+        "all": {
+          "entities": 3051,
+          "macro_f0_5": 0.9688674428719485,
+          "singleton_count": 199,
+          "singleton_false_positive_rate": 0.06030150753768844,
+          "all_empty_baseline": 0.06522451655195018,
+          "candidate_pair_recall": 0.9764851485148515,
+          "candidate_entity_recall": 0.9754494200672322,
+          "all_matches_retrieved_rate": 0.9221598877980365,
+          "blocking_oracle_macro_f0_5": 0.9919715431467085,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "India": {
+          "entities": 1212,
+          "macro_f0_5": 0.966147933258561,
+          "singleton_count": 97,
+          "singleton_false_positive_rate": 0.08247422680412371,
+          "all_empty_baseline": 0.08003300330033003,
+          "candidate_pair_recall": 0.9716242661448141,
+          "candidate_entity_recall": 0.9704075023133321,
+          "all_matches_retrieved_rate": 0.905829596412556,
+          "blocking_oracle_macro_f0_5": 0.9904143067047686,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "US": {
+          "entities": 1839,
+          "macro_f0_5": 0.9706597461081778,
+          "singleton_count": 102,
+          "singleton_false_positive_rate": 0.0392156862745098,
+          "all_empty_baseline": 0.05546492659053834,
+          "candidate_pair_recall": 0.9795822942643392,
+          "candidate_entity_recall": 0.9786858842558324,
+          "all_matches_retrieved_rate": 0.9326424870466321,
+          "blocking_oracle_macro_f0_5": 0.9929978457935988,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        }
+      }
+    },
+    {
+      "name": "dense_prior_0",
+      "dense_prior": 0.0,
+      "threshold": 0.97,
+      "calibration": {
+        "all": {
+          "entities": 4389,
+          "macro_f0_5": 0.9731800860408509,
+          "singleton_count": 252,
+          "singleton_false_positive_rate": 0.027777777777777776,
+          "all_empty_baseline": 0.05741626794258373,
+          "candidate_pair_recall": 0.9777428646242472,
+          "candidate_entity_recall": 0.9780765718582978,
+          "all_matches_retrieved_rate": 0.9262750785593425,
+          "blocking_oracle_macro_f0_5": 0.9935060197795251,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "India": {
+          "entities": 1754,
+          "macro_f0_5": 0.96973095488302,
+          "singleton_count": 100,
+          "singleton_false_positive_rate": 0.05,
+          "all_empty_baseline": 0.05701254275940707,
+          "candidate_pair_recall": 0.9734513274336283,
+          "candidate_entity_recall": 0.9737308305022937,
+          "all_matches_retrieved_rate": 0.9111245465538089,
+          "blocking_oracle_macro_f0_5": 0.9920754827319758,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "US": {
+          "entities": 2635,
+          "macro_f0_5": 0.9754760162309214,
+          "singleton_count": 152,
+          "singleton_false_positive_rate": 0.013157894736842105,
+          "all_empty_baseline": 0.057685009487666035,
+          "candidate_pair_recall": 0.9805973403095706,
+          "candidate_entity_recall": 0.9809713991651164,
+          "all_matches_retrieved_rate": 0.9363672976238421,
+          "blocking_oracle_macro_f0_5": 0.9944582634157305,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        }
+      },
+      "holdout": {
+        "all": {
+          "entities": 3051,
+          "macro_f0_5": 0.9677086649521615,
+          "singleton_count": 199,
+          "singleton_false_positive_rate": 0.06532663316582915,
+          "all_empty_baseline": 0.06522451655195018,
+          "candidate_pair_recall": 0.9764851485148515,
+          "candidate_entity_recall": 0.9754494200672322,
+          "all_matches_retrieved_rate": 0.9221598877980365,
+          "blocking_oracle_macro_f0_5": 0.9919715431467085,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "India": {
+          "entities": 1212,
+          "macro_f0_5": 0.9638531857124752,
+          "singleton_count": 97,
+          "singleton_false_positive_rate": 0.09278350515463918,
+          "all_empty_baseline": 0.08003300330033003,
+          "candidate_pair_recall": 0.9716242661448141,
+          "candidate_entity_recall": 0.9704075023133321,
+          "all_matches_retrieved_rate": 0.905829596412556,
+          "blocking_oracle_macro_f0_5": 0.9904143067047686,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "US": {
+          "entities": 1839,
+          "macro_f0_5": 0.9702496333254619,
+          "singleton_count": 102,
+          "singleton_false_positive_rate": 0.0392156862745098,
+          "all_empty_baseline": 0.05546492659053834,
+          "candidate_pair_recall": 0.9795822942643392,
+          "candidate_entity_recall": 0.9786858842558324,
+          "all_matches_retrieved_rate": 0.9326424870466321,
+          "blocking_oracle_macro_f0_5": 0.9929978457935988,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        }
+      }
+    },
+    {
+      "name": "dense_prior_1",
+      "dense_prior": 1.0,
+      "threshold": 0.97,
+      "calibration": {
+        "all": {
+          "entities": 4389,
+          "macro_f0_5": 0.9718853045740579,
+          "singleton_count": 252,
+          "singleton_false_positive_rate": 0.03571428571428571,
+          "all_empty_baseline": 0.05741626794258373,
+          "candidate_pair_recall": 0.9777428646242472,
+          "candidate_entity_recall": 0.9780765718582978,
+          "all_matches_retrieved_rate": 0.9262750785593425,
+          "blocking_oracle_macro_f0_5": 0.9935060197795251,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "India": {
+          "entities": 1754,
+          "macro_f0_5": 0.9672001370199508,
+          "singleton_count": 100,
+          "singleton_false_positive_rate": 0.06,
+          "all_empty_baseline": 0.05701254275940707,
+          "candidate_pair_recall": 0.9734513274336283,
+          "candidate_entity_recall": 0.9737308305022937,
+          "all_matches_retrieved_rate": 0.9111245465538089,
+          "blocking_oracle_macro_f0_5": 0.9920754827319758,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "US": {
+          "entities": 2635,
+          "macro_f0_5": 0.9750040081375888,
+          "singleton_count": 152,
+          "singleton_false_positive_rate": 0.019736842105263157,
+          "all_empty_baseline": 0.057685009487666035,
+          "candidate_pair_recall": 0.9805973403095706,
+          "candidate_entity_recall": 0.9809713991651164,
+          "all_matches_retrieved_rate": 0.9363672976238421,
+          "blocking_oracle_macro_f0_5": 0.9944582634157305,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        }
+      },
+      "holdout": {
+        "all": {
+          "entities": 3051,
+          "macro_f0_5": 0.9661948019920897,
+          "singleton_count": 199,
+          "singleton_false_positive_rate": 0.06532663316582915,
+          "all_empty_baseline": 0.06522451655195018,
+          "candidate_pair_recall": 0.9764851485148515,
+          "candidate_entity_recall": 0.9754494200672322,
+          "all_matches_retrieved_rate": 0.9221598877980365,
+          "blocking_oracle_macro_f0_5": 0.9919715431467085,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "India": {
+          "entities": 1212,
+          "macro_f0_5": 0.9616429786997178,
+          "singleton_count": 97,
+          "singleton_false_positive_rate": 0.09278350515463918,
+          "all_empty_baseline": 0.08003300330033003,
+          "candidate_pair_recall": 0.9716242661448141,
+          "candidate_entity_recall": 0.9704075023133321,
+          "all_matches_retrieved_rate": 0.905829596412556,
+          "blocking_oracle_macro_f0_5": 0.9904143067047686,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        },
+        "US": {
+          "entities": 1839,
+          "macro_f0_5": 0.969194698582821,
+          "singleton_count": 102,
+          "singleton_false_positive_rate": 0.0392156862745098,
+          "all_empty_baseline": 0.05546492659053834,
+          "candidate_pair_recall": 0.9795822942643392,
+          "candidate_entity_recall": 0.9786858842558324,
+          "all_matches_retrieved_rate": 0.9326424870466321,
+          "blocking_oracle_macro_f0_5": 0.9929978457935988,
+          "candidate_count_quantiles": {
+            "p50": 32.0,
+            "p90": 32.0,
+            "p99": 32.0,
+            "max": 32.0
+          }
+        }
+      }
+    }
+  ],
+  "selected": {
+    "name": "dense_prior_-2",
+    "dense_prior": -2.0,
+    "threshold": 0.9500000000000004,
+    "calibration": {
+      "all": {
+        "entities": 4389,
+        "macro_f0_5": 0.9757426507973854,
+        "singleton_count": 252,
+        "singleton_false_positive_rate": 0.015873015873015872,
+        "all_empty_baseline": 0.05741626794258373,
+        "candidate_pair_recall": 0.9777428646242472,
+        "candidate_entity_recall": 0.9780765718582978,
+        "all_matches_retrieved_rate": 0.9262750785593425,
+        "blocking_oracle_macro_f0_5": 0.9935060197795251,
+        "candidate_count_quantiles": {
+          "p50": 32.0,
+          "p90": 32.0,
+          "p99": 32.0,
+          "max": 32.0
+        }
+      },
+      "India": {
+        "entities": 1754,
+        "macro_f0_5": 0.974926653704581,
+        "singleton_count": 100,
+        "singleton_false_positive_rate": 0.02,
+        "all_empty_baseline": 0.05701254275940707,
+        "candidate_pair_recall": 0.9734513274336283,
+        "candidate_entity_recall": 0.9737308305022937,
+        "all_matches_retrieved_rate": 0.9111245465538089,
+        "blocking_oracle_macro_f0_5": 0.9920754827319758,
+        "candidate_count_quantiles": {
+          "p50": 32.0,
+          "p90": 32.0,
+          "p99": 32.0,
+          "max": 32.0
+        }
+      },
+      "US": {
+        "entities": 2635,
+        "macro_f0_5": 0.9762858230557456,
+        "singleton_count": 152,
+        "singleton_false_positive_rate": 0.013157894736842105,
+        "all_empty_baseline": 0.057685009487666035,
+        "candidate_pair_recall": 0.9805973403095706,
+        "candidate_entity_recall": 0.9809713991651164,
+        "all_matches_retrieved_rate": 0.9363672976238421,
+        "blocking_oracle_macro_f0_5": 0.9944582634157305,
+        "candidate_count_quantiles": {
+          "p50": 32.0,
+          "p90": 32.0,
+          "p99": 32.0,
+          "max": 32.0
+        }
+      }
+    },
+    "holdout": {
+      "all": {
+        "entities": 3051,
+        "macro_f0_5": 0.9692422904498238,
+        "singleton_count": 199,
+        "singleton_false_positive_rate": 0.06030150753768844,
+        "all_empty_baseline": 0.06522451655195018,
+        "candidate_pair_recall": 0.9764851485148515,
+        "candidate_entity_recall": 0.9754494200672322,
+        "all_matches_retrieved_rate": 0.9221598877980365,
+        "blocking_oracle_macro_f0_5": 0.9919715431467085,
+        "candidate_count_quantiles": {
+          "p50": 32.0,
+          "p90": 32.0,
+          "p99": 32.0,
+          "max": 32.0
+        }
+      },
+      "India": {
+        "entities": 1212,
+        "macro_f0_5": 0.9674442346935745,
+        "singleton_count": 97,
+        "singleton_false_positive_rate": 0.08247422680412371,
+        "all_empty_baseline": 0.08003300330033003,
+        "candidate_pair_recall": 0.9716242661448141,
+        "candidate_entity_recall": 0.9704075023133321,
+        "all_matches_retrieved_rate": 0.905829596412556,
+        "blocking_oracle_macro_f0_5": 0.9904143067047686,
+        "candidate_count_quantiles": {
+          "p50": 32.0,
+          "p90": 32.0,
+          "p99": 32.0,
+          "max": 32.0
+        }
+      },
+      "US": {
+        "entities": 1839,
+        "macro_f0_5": 0.9704273059890158,
+        "singleton_count": 102,
+        "singleton_false_positive_rate": 0.0392156862745098,
+        "all_empty_baseline": 0.05546492659053834,
+        "candidate_pair_recall": 0.9795822942643392,
+        "candidate_entity_recall": 0.9786858842558324,
+        "all_matches_retrieved_rate": 0.9326424870466321,
+        "blocking_oracle_macro_f0_5": 0.9929978457935988,
+        "candidate_count_quantiles": {
+          "p50": 32.0,
+          "p90": 32.0,
+          "p99": 32.0,
+          "max": 32.0
+        }
+      }
+    }
+  }
+}

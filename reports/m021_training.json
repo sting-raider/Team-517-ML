@@ -1,0 +1,23 @@
+{
+  "initialization": "BAAI/bge-reranker-v2-m3",
+  "revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e",
+  "license": "apache-2.0",
+  "parameters": 567755777,
+  "fit_anchors": 102125,
+  "training_pairs": 578464,
+  "positives": 374305.0,
+  "steps": 36154,
+  "planned_steps": 36154,
+  "seconds": 4173.625820661,
+  "stopped_on_time_budget": false,
+  "batch_size": 16,
+  "max_length": 160,
+  "seed": 517,
+  "learning_rate": 1e-05,
+  "checkpoint_steps": 5000,
+  "positive_limit_per_anchor": null,
+  "initial_loss_100": 0.3803747358545661,
+  "final_loss_100": 0.052504908080445604,
+  "peak_gpu_bytes": 11435738112,
+  "note": "Training loss only; no held-out entity F0.5 established."
+}

@@ -1,0 +1,26 @@
+{
+  "scope": "All 259452 France test Source 1 businesses; four completed INT006 output partitions; predictions have no labels",
+  "method": "Count assignments per predicted Source 2/3 target; a conflicted target is assigned to multiple Source 1 businesses",
+  "v3": {
+    "predicted_edges": 1130876,
+    "mean_edges_per_anchor": 4.3587,
+    "empty_predictions": 8915,
+    "conflicted_targets": 78398,
+    "excess_edges_on_conflicted_targets": 210488
+  },
+  "v4_d017": {
+    "predicted_edges": 938641,
+    "mean_edges_per_anchor": 3.6178,
+    "empty_predictions": 10937,
+    "conflicted_targets": 12385,
+    "excess_edges_on_conflicted_targets": 18253
+  },
+  "v5_neural32": {
+    "predicted_edges": 931003,
+    "mean_edges_per_anchor": 3.5883,
+    "empty_predictions": 11980,
+    "conflicted_targets": 50550,
+    "excess_edges_on_conflicted_targets": 81729
+  },
+  "interpretation": "France target-owner ambiguity remains common in v5; the unlabelled counts cannot establish which variant is more accurate. The v6 owner filter is an optional, separately measured output variant."
+}

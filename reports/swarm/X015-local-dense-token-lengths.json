@@ -1,0 +1,26 @@
+{
+  "model": "intfloat/multilingual-e5-small",
+  "revision": "614241f622f53c4eeff9890bdc4f31cfecc418b3",
+  "max_length": 128,
+  "sample_rule": "hash(Source1 ID)%100<2; first 5000 per country",
+  "countries": {
+    "US": {
+      "records": 5000,
+      "p99": 38.0,
+      "max": 57,
+      "over_128": 0
+    },
+    "India": {
+      "records": 5000,
+      "p99": 61.0,
+      "max": 90,
+      "over_128": 0
+    },
+    "France": {
+      "records": 5000,
+      "p99": 45.0,
+      "max": 52,
+      "over_128": 0
+    }
+  }
+}

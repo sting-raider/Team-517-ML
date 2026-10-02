@@ -28,7 +28,9 @@ def main():
         for name in ("mixed.cbm", "model_config.json", "anchors.json"):
             files.append((ROOT / "artifacts/submission_v1" / name,
                           f"/project/artifacts/submission_v1/{name}"))
-        files.append((ROOT / "reports/candidate_budget.json", "/project/reports/candidate_budget.json"))
+        budget = ROOT / "reports/candidate_budget.json"
+        if budget.is_file():
+            files.append((budget, "/project/reports/candidate_budget.json"))
     if args.archive:
         files.append((ROOT.parent / "6ab10eb3b23ba_student_resource.zip", "/dataset/source.zip"))
     if args.dataset:
